@@ -1,0 +1,61 @@
+[
+  {
+    "user_id": "usr_demo_001",
+    "name": "Test User",
+    "phone": "+923001234567",
+    "email": "test@tadbeerai.com",
+    "notify_sms": true,
+    "notify_email": true,
+    "domains": [
+      "all"
+    ],
+    "registered_at": "2026-05-19T00:00:00Z",
+    "notify_push": true,
+    "fcm_token": "fcm_test_token_123",
+    "updated_at": "2026-05-20T06:47:52.368832"
+  },
+  {
+    "user_id": "usr_e67e847afc",
+    "name": "Guest",
+    "phone": "",
+    "email": "",
+    "notify_sms": true,
+    "notify_email": true,
+    "notify_push": true,
+    "fcm_token": "",
+    "domains": [
+      "all"
+    ],
+    "registered_at": "2026-05-20T11:03:05.032608"
+  },
+  {
+    "user_id": "usr_461529cc9a",
+    "name": "Guest",
+    "phone": "",
+    "email": "",
+    "notify_sms": true,
+    "notify_email": true,
+    "notify_push": true,
+    "fcm_token": "test_fcm_token_xyz",
+    "domains": [
+      "all"
+    ],
+    "registered_at": "2026-05-20T11:03:05.049716"
+  },
+  {
+    "user_id": "test_user_123",
+    "category": "shop",
+    "name": "Ali Hassan",
+    "email": "ali.hassan@test.com",
+    "phone": "+923001234567",
+    "fcm_token": "mock_fcm_token",
+    "profile_data": {
+      "shop_type": "Grocery",
+      "city": "Karachi",
+      "monthly_revenue": "150000",
+      "inventory_size": "200"
+    },
+    "created_at": "2026-05-30T21:26:31.350888",
+    "mode": "account"
+  }
+]

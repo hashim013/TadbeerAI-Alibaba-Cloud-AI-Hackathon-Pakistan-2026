@@ -1,0 +1,522 @@
+[
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 15. Update delivery pricing table. \u2014 TadbeerAI (2026-05-20 06:41 UTC)",
+    "action_id": "exec_0d9f5cdbbecd",
+    "status": "skipped",
+    "timestamp": "2026-05-20T06:41:36.929979"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\u26a1 TadbeerAI Alert: Delivery Fee Adjustment: \nDear Test User,\n\nThe following energy-related action has been executed by TadbeerAI:\n\n**Action**: U",
+    "action_id": "exec_0d9f5cdbbecd",
+    "status": "skipped",
+    "timestamp": "2026-05-20T06:41:36.931048"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 15. Update delivery pricing table. \u2014 TadbeerAI (2026-05-20 06:41 UTC)",
+    "action_id": "exec_0d9f5cdbbecd",
+    "status": "skipped",
+    "timestamp": "2026-05-20T06:41:36.942598"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 15. Update delivery pricing table. \u2014 TadbeerAI (2026-05-20 06:42 UTC)",
+    "action_id": "exec_e73da8130a6e",
+    "status": "skipped",
+    "timestamp": "2026-05-20T06:42:04.489496"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\u26a1 TadbeerAI Alert: Delivery Fee Adjustment: \nDear Test User,\n\nThe following energy-related action has been executed by TadbeerAI:\n\n**Action**: U",
+    "action_id": "exec_e73da8130a6e",
+    "status": "skipped",
+    "timestamp": "2026-05-20T06:42:04.490024"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 15. Update delivery pricing table. \u2014 TadbeerAI (2026-05-20 06:42 UTC)",
+    "action_id": "exec_e73da8130a6e",
+    "status": "skipped",
+    "timestamp": "2026-05-20T06:42:04.501147"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 15. Update delivery pricing table. \u2014 TadbeerAI (2026-05-20 06:47 UTC)",
+    "action_id": "exec_bf27e4bb3e50",
+    "status": "skipped",
+    "timestamp": "2026-05-20T06:47:52.467426"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\u26a1 TadbeerAI Alert: Delivery Fee Adjustment: \nDear Test User,\n\nThe following energy-related action has been executed by TadbeerAI:\n\n**Action**: U",
+    "action_id": "exec_bf27e4bb3e50",
+    "status": "skipped",
+    "timestamp": "2026-05-20T06:47:52.468676"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 15. Update delivery pricing table. \u2014 TadbeerAI (2026-05-20 06:47 UTC)",
+    "action_id": "exec_bf27e4bb3e50",
+    "status": "skipped",
+    "timestamp": "2026-05-20T06:47:52.491134"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 15. Update delivery pricing table. \u2014 TadbeerAI (2026-05-20 08:32 UTC)",
+    "action_id": "exec_50fb740370de",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:23.143317"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\u26a1 TadbeerAI Alert: Delivery Fee Adjustment: \nDear Test User,\n\nThe following energy-related action has been executed by TadbeerAI:\n\n**Action**: U",
+    "action_id": "exec_50fb740370de",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:23.148442"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 15. Update delivery pricing table. \u2014 TadbeerAI (2026-05-20 08:32 UTC)",
+    "action_id": "exec_50fb740370de",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:23.192315"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\ud83d\udcb1 FINANCE ALERT: Interest rate adjusted. Variance: Rs. 10%. \u2014 TadbeerAI (2026-05-20 08:32 UTC)",
+    "action_id": "exec_cd317992fbcc",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:39.386253"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\ud83d\udcb5 TadbeerAI Alert: Interest Rate Adjustment: \nDear Test User,\n\nFinancial adjustments have been executed:\n\n**Action**: Adjust loan buffer\n**Varian",
+    "action_id": "exec_cd317992fbcc",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:39.432132"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\ud83d\udcb1 FINANCE ALERT: Interest rate adjusted. Variance: Rs. 10%. \u2014 TadbeerAI (2026-05-20 08:32 UTC)",
+    "action_id": "exec_cd317992fbcc",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:39.480976"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\u2696\ufe0f POLICY ALERT: Compliance updates applied. Cost impact: Rs. Rs. 10. \u2014 TadbeerAI (2026-05-20 08:32 UTC)",
+    "action_id": "exec_a641b3519087",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:42.809567"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\u2696\ufe0f TadbeerAI Alert: Regulatory Compliance Update: \nDear Test User,\n\nA compliance/policy action has been executed:\n\n**Action**: Perform compliance audi",
+    "action_id": "exec_a641b3519087",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:42.879143"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\u2696\ufe0f POLICY ALERT: Compliance updates applied. Cost impact: Rs. Rs. 10. \u2014 TadbeerAI (2026-05-20 08:32 UTC)",
+    "action_id": "exec_a641b3519087",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:42.930180"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\ud83d\udea2 TRADE ALERT: Tariffs/duties adjusted. Impact: Rs. Rs. 10. \u2014 TadbeerAI (2026-05-20 08:32 UTC)",
+    "action_id": "exec_50d8e169979c",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:46.079717"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\ud83d\udea2 TadbeerAI Alert: Trade & Tariff Adjustments: \nDear Test User,\n\nTrade action executed:\n\n**Action**: Adjust export buffer\n**Tariff/Export Impact**:",
+    "action_id": "exec_50d8e169979c",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:46.128921"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\ud83d\udea2 TRADE ALERT: Tariffs/duties adjusted. Impact: Rs. Rs. 10. \u2014 TadbeerAI (2026-05-20 08:32 UTC)",
+    "action_id": "exec_50d8e169979c",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:46.176273"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\ud83d\udce6 LOGISTICS ALERT: Safety stock increased by Rs. 10 days. \u2014 TadbeerAI (2026-05-20 08:32 UTC)",
+    "action_id": "exec_2e45f59f35ea",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:49.109604"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\ud83d\udce6 TadbeerAI Alert: Safety Stock Updated: \nDear Test User,\n\nSafety stock levels have been adjusted:\n\n**Action**: Extend safety stock target\n**",
+    "action_id": "exec_2e45f59f35ea",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:49.158949"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\ud83d\udce6 LOGISTICS ALERT: Safety stock increased by Rs. 10 days. \u2014 TadbeerAI (2026-05-20 08:32 UTC)",
+    "action_id": "exec_2e45f59f35ea",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:32:49.203877"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\ud83d\udcb1 FINANCE ALERT: Interest rate adjusted. Variance: Rs. 10%. \u2014 TadbeerAI (2026-05-20 08:33 UTC)",
+    "action_id": "exec_f03440a90240",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:33:06.110238"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\ud83d\udcb5 TadbeerAI Alert: Interest Rate Adjustment: \nDear Test User,\n\nFinancial adjustments have been executed:\n\n**Action**: Adjust loan buffer\n**Varian",
+    "action_id": "exec_f03440a90240",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:33:06.157458"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\ud83d\udcb1 FINANCE ALERT: Interest rate adjusted. Variance: Rs. 10%. \u2014 TadbeerAI (2026-05-20 08:33 UTC)",
+    "action_id": "exec_f03440a90240",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:33:06.203491"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\u2696\ufe0f POLICY ALERT: Compliance updates applied. Cost impact: Rs. Rs. 10. \u2014 TadbeerAI (2026-05-20 08:33 UTC)",
+    "action_id": "exec_47a4c664b40c",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:33:09.785095"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\u2696\ufe0f TadbeerAI Alert: Regulatory Compliance Update: \nDear Test User,\n\nA compliance/policy action has been executed:\n\n**Action**: Perform compliance audi",
+    "action_id": "exec_47a4c664b40c",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:33:09.911751"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\u2696\ufe0f POLICY ALERT: Compliance updates applied. Cost impact: Rs. Rs. 10. \u2014 TadbeerAI (2026-05-20 08:33 UTC)",
+    "action_id": "exec_47a4c664b40c",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:33:09.988151"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\ud83d\udea2 TRADE ALERT: Tariffs/duties adjusted. Impact: Rs. Rs. 10. \u2014 TadbeerAI (2026-05-20 08:33 UTC)",
+    "action_id": "exec_cf999f9203e7",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:33:13.480459"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\ud83d\udea2 TadbeerAI Alert: Trade & Tariff Adjustments: \nDear Test User,\n\nTrade action executed:\n\n**Action**: Adjust export buffer\n**Tariff/Export Impact**:",
+    "action_id": "exec_cf999f9203e7",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:33:13.534681"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\ud83d\udea2 TRADE ALERT: Tariffs/duties adjusted. Impact: Rs. Rs. 10. \u2014 TadbeerAI (2026-05-20 08:33 UTC)",
+    "action_id": "exec_cf999f9203e7",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:33:13.588426"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\u26d3\ufe0f SUPPLY CHAIN ALERT: Optimization triggered. Delay delta: Rs. 10 days. \u2014 TadbeerAI (2026-05-20 08:33 UTC)",
+    "action_id": "exec_ec3a94a1f332",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:33:18.423124"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\u26d3\ufe0f TadbeerAI Alert: Supply Chain Optimization: \nDear Test User,\n\nSupply Chain action executed:\n\n**Action**: Activate alternate supply line\n**Delay ",
+    "action_id": "exec_ec3a94a1f332",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:33:18.482898"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\u26d3\ufe0f SUPPLY CHAIN ALERT: Optimization triggered. Delay delta: Rs. 10 days. \u2014 TadbeerAI (2026-05-20 08:33 UTC)",
+    "action_id": "exec_ec3a94a1f332",
+    "status": "skipped",
+    "timestamp": "2026-05-20T08:33:18.560909"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 15. Update delivery pricing table. \u2014 TadbeerAI (2026-05-20 11:01 UTC)",
+    "action_id": "exec_39e045e91de9",
+    "status": "skipped",
+    "timestamp": "2026-05-20T11:01:59.025187"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\u26a1 TadbeerAI Alert: Delivery Fee Adjustment: \nDear Test User,\n\nThe following energy-related action has been executed by TadbeerAI:\n\n**Action**: U",
+    "action_id": "exec_39e045e91de9",
+    "status": "skipped",
+    "timestamp": "2026-05-20T11:01:59.026397"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 15. Update delivery pricing table. \u2014 TadbeerAI (2026-05-20 11:01 UTC)",
+    "action_id": "exec_39e045e91de9",
+    "status": "skipped",
+    "timestamp": "2026-05-20T11:01:59.040718"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 15. Update delivery pricing table. \u2014 TadbeerAI (2026-05-20 11:03 UTC)",
+    "action_id": "exec_bf10c6c8b612",
+    "status": "skipped",
+    "timestamp": "2026-05-20T11:03:04.944292"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\u26a1 TadbeerAI Alert: Delivery Fee Adjustment: \nDear Test User,\n\nThe following energy-related action has been executed by TadbeerAI:\n\n**Action**: U",
+    "action_id": "exec_bf10c6c8b612",
+    "status": "skipped",
+    "timestamp": "2026-05-20T11:03:04.954112"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 15. Update delivery pricing table. \u2014 TadbeerAI (2026-05-20 11:03 UTC)",
+    "action_id": "exec_bf10c6c8b612",
+    "status": "skipped",
+    "timestamp": "2026-05-20T11:03:04.980774"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 20. Update delivery fee. \u2014 TadbeerAI (2026-05-30 21:26 UTC)",
+    "action_id": "exec_b0ed4525c7f1",
+    "status": "skipped",
+    "timestamp": "2026-05-30T21:26:36.457407"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\u26a1 TadbeerAI Alert: Delivery Fee Adjustment: \nDear Test User,\n\nThe following energy-related action has been executed by TadbeerAI:\n\n**Action**: U",
+    "action_id": "exec_b0ed4525c7f1",
+    "status": "skipped",
+    "timestamp": "2026-05-30T21:26:36.470990"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 20. Update delivery fee. \u2014 TadbeerAI (2026-05-30 21:26 UTC)",
+    "action_id": "exec_b0ed4525c7f1",
+    "status": "skipped",
+    "timestamp": "2026-05-30T21:26:36.482814"
+  },
+  {
+    "recipient": "test_fcm_token_xyz",
+    "type": "push",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 20. Update delivery fee. \u2014 TadbeerAI (2026-05-30 21:26 UTC)",
+    "action_id": "exec_b0ed4525c7f1",
+    "status": "skipped",
+    "timestamp": "2026-05-30T21:26:36.493157"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 20. Update delivery fee. \u2014 TadbeerAI (2026-05-30 21:26 UTC)",
+    "action_id": "exec_b0ed4525c7f1",
+    "status": "skipped",
+    "timestamp": "2026-05-30T21:26:36.494469"
+  },
+  {
+    "recipient": "ali.hassan@test.com",
+    "type": "email",
+    "content": "\u26a1 TadbeerAI Alert: Delivery Fee Adjustment: \nDear Ali Hassan,\n\nThe following energy-related action has been executed by TadbeerAI:\n\n**Action**: ",
+    "action_id": "exec_b0ed4525c7f1",
+    "status": "skipped",
+    "timestamp": "2026-05-30T21:26:36.512646"
+  },
+  {
+    "recipient": "mock_fcm_token",
+    "type": "push",
+    "content": "\ud83d\ude97 ENERGY ALERT: Delivery fee updated to Rs. Rs. 20. Update delivery fee. \u2014 TadbeerAI (2026-05-30 21:26 UTC)",
+    "action_id": "exec_b0ed4525c7f1",
+    "status": "skipped",
+    "timestamp": "2026-05-30T21:26:36.521070"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\u26a1 TADBEERAI ALERT: Increase Prices. Impact: Rs. Rs. 20. (2026-06-01 07:23 UTC)",
+    "action_id": "exec_ea8db0684738",
+    "status": "disabled",
+    "timestamp": "2026-06-01T07:23:35.537125"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\u26a1 TadbeerAI Alert: Energy Action Executed: \nDear Test User,\n\nThe following business action has been executed:\n\n**Action**: Increase Prices\n**Do",
+    "action_id": "exec_ea8db0684738",
+    "status": "sent",
+    "timestamp": "2026-06-01T07:23:35.644697"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\u26a1 TADBEERAI ALERT: Increase Prices. Impact: Rs. Rs. 20. (2026-06-01 07:23 UTC)",
+    "action_id": "exec_ea8db0684738",
+    "status": "sent",
+    "timestamp": "2026-06-01T07:23:35.677537"
+  },
+  {
+    "recipient": "test_fcm_token_xyz",
+    "type": "push",
+    "content": "\u26a1 TADBEERAI ALERT: Increase Prices. Impact: Rs. Rs. 20. (2026-06-01 07:23 UTC)",
+    "action_id": "exec_ea8db0684738",
+    "status": "sent",
+    "timestamp": "2026-06-01T07:23:35.709614"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\u26a1 TADBEERAI ALERT: Increase Prices. Impact: Rs. Rs. 20. (2026-06-01 07:23 UTC)",
+    "action_id": "exec_ea8db0684738",
+    "status": "disabled",
+    "timestamp": "2026-06-01T07:23:35.739679"
+  },
+  {
+    "recipient": "ali.hassan@test.com",
+    "type": "email",
+    "content": "\u26a1 TadbeerAI Alert: Energy Action Executed: \nDear Ali Hassan,\n\nThe following business action has been executed:\n\n**Action**: Increase Prices\n**D",
+    "action_id": "exec_ea8db0684738",
+    "status": "sent",
+    "timestamp": "2026-06-01T07:23:35.759854"
+  },
+  {
+    "recipient": "mock_fcm_token",
+    "type": "push",
+    "content": "\u26a1 TADBEERAI ALERT: Increase Prices. Impact: Rs. Rs. 20. (2026-06-01 07:23 UTC)",
+    "action_id": "exec_ea8db0684738",
+    "status": "sent",
+    "timestamp": "2026-06-01T07:23:35.794939"
+  },
+  {
+    "recipient": "<MagicMock name='mock.firestore.client().collection().document().get().to_dict().get()' id='2509331313488'>",
+    "type": "push",
+    "content": "Insight: This hike in petrol price will likely increase the transportation costs for retail shop owners in Karachi, potentially affecting their stock inventory management and overall profitability. As",
+    "action_id": "",
+    "status": "sent",
+    "timestamp": "2026-06-01T07:23:36.498601"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\u26a1 TADBEERAI ALERT: Increase Prices. Impact: Rs. Rs. 20. (2026-06-01 07:33 UTC)",
+    "action_id": "exec_e335fe1a02ee",
+    "status": "disabled",
+    "timestamp": "2026-06-01T07:33:27.296456"
+  },
+  {
+    "recipient": "test@tadbeerai.com",
+    "type": "email",
+    "content": "\u26a1 TadbeerAI Alert: Energy Action Executed: \nDear Test User,\n\nThe following business action has been executed:\n\n**Action**: Increase Prices\n**Do",
+    "action_id": "exec_e335fe1a02ee",
+    "status": "sent",
+    "timestamp": "2026-06-01T07:33:27.324460"
+  },
+  {
+    "recipient": "fcm_test_token_123",
+    "type": "push",
+    "content": "\u26a1 TADBEERAI ALERT: Increase Prices. Impact: Rs. Rs. 20. (2026-06-01 07:33 UTC)",
+    "action_id": "exec_e335fe1a02ee",
+    "status": "sent",
+    "timestamp": "2026-06-01T07:33:27.358825"
+  },
+  {
+    "recipient": "test_fcm_token_xyz",
+    "type": "push",
+    "content": "\u26a1 TADBEERAI ALERT: Increase Prices. Impact: Rs. Rs. 20. (2026-06-01 07:33 UTC)",
+    "action_id": "exec_e335fe1a02ee",
+    "status": "sent",
+    "timestamp": "2026-06-01T07:33:27.398498"
+  },
+  {
+    "recipient": "+923001234567",
+    "type": "sms",
+    "content": "\u26a1 TADBEERAI ALERT: Increase Prices. Impact: Rs. Rs. 20. (2026-06-01 07:33 UTC)",
+    "action_id": "exec_e335fe1a02ee",
+    "status": "disabled",
+    "timestamp": "2026-06-01T07:33:27.432155"
+  },
+  {
+    "recipient": "ali.hassan@test.com",
+    "type": "email",
+    "content": "\u26a1 TadbeerAI Alert: Energy Action Executed: \nDear Ali Hassan,\n\nThe following business action has been executed:\n\n**Action**: Increase Prices\n**D",
+    "action_id": "exec_e335fe1a02ee",
+    "status": "sent",
+    "timestamp": "2026-06-01T07:33:27.468198"
+  },
+  {
+    "recipient": "mock_fcm_token",
+    "type": "push",
+    "content": "\u26a1 TADBEERAI ALERT: Increase Prices. Impact: Rs. Rs. 20. (2026-06-01 07:33 UTC)",
+    "action_id": "exec_e335fe1a02ee",
+    "status": "sent",
+    "timestamp": "2026-06-01T07:33:27.498803"
+  },
+  {
+    "recipient": "<MagicMock name='mock.firestore.client().collection().document().get().to_dict().get()' id='1681236268944'>",
+    "type": "push",
+    "content": "Insight: This sudden hike in petrol price will likely increase the transportation costs for retail shop owners in Karachi, potentially leading to higher prices for goods and affecting local customer t",
+    "action_id": "",
+    "status": "sent",
+    "timestamp": "2026-06-01T07:33:29.576136"
+  }
+]

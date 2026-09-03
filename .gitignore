@@ -1,0 +1,75 @@
+# ─────────────────────────────────────────────────────────────
+# Root .gitignore for TadbeerAI 2.0 (Flutter + Python Backend)
+# ─────────────────────────────────────────────────────────────
+
+# --- Environments & Secrets (NEVER COMMIT) ---
+.env
+.env.*
+*.env
+**/.env
+**/.env.*
+app.yaml
+*app.yaml
+**/app.yaml
+client_secret*.json
+**/client_secret*.json
+credentials*.json
+**/credentials*.json
+*service_account*.json
+**/*service_account*.json
+
+# --- Android / iOS Keys & Keystores ---
+**/key.properties
+*.jks
+*.keystore
+*.p12
+*.pem
+*.cer
+*.crt
+
+# --- Mobile Firebase Config (Contains API keys) ---
+**/google-services.json
+**/GoogleService-Info.plist
+**/firebase_options.dart
+
+# --- Python Backend ---
+.venv/
+**/.venv/
+env/
+**/env/
+venv/
+**/venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.sqlite3
+
+# --- Flutter / Dart ---
+.dart_tool/
+**/.dart_tool/
+.pub/
+**/.pub/
+.pub-cache/
+**/.pub-cache/
+build/
+**/build/
+.packages
+**/.packages
+.flutter-plugins
+**/.flutter-plugins
+.flutter-plugins-dependencies
+**/.flutter-plugins-dependencies
+**/doc/api/
+
+# --- IDE & OS Files ---
+.DS_Store
+Thumbs.db
+.idea/
+**/.idea/
+.vscode/
+**/.vscode/
+*.swp
+*.bak
+*.log

@@ -1,0 +1,22 @@
+{
+  "scenarios": [
+    {
+      "id": 1,
+      "domain": "logistics",
+      "input": "Petrol price hike by Rs.15 per liter",
+      "expected_action": "update_pricing"
+    },
+    {
+      "id": 2,
+      "domain": "finance",
+      "input": "Dollar reaches Rs.285, rupee hits record low",
+      "expected_action": "flag_supplier"
+    },
+    {
+      "id": 3,
+      "domain": "policy",
+      "input": "SBP raises interest rate to 22%",
+      "expected_action": "draft_policy"
+    }
+  ]
+}

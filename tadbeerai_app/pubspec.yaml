@@ -1,0 +1,45 @@
+name: tadbeerai
+description: Tadbeer AI 2.0 — Your AI-Powered Financial Intelligence Companion.
+
+publish_to: 'none'
+version: 2.0.0+1
+
+environment:
+  sdk: '>=3.6.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.6.1
+
+  # Navigation
+  go_router: ^15.0.0
+
+  # Localization
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.0
+
+  # Local persistence (mock-first phase: session, onboarding, settings)
+  shared_preferences: ^2.2.3
+
+  # Network layer (repositories switch to remote in later phases)
+  dio: ^5.4.3+1
+
+  # Design
+  google_fonts: ^6.2.1
+  flutter_animate: ^4.5.2
+  fl_chart: ^1.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/images/
