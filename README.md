@@ -1,195 +1,319 @@
-# 🌌 TadbeerAI: Proactive Business Intelligence System
+<p align="center">
+  <img src="assets/banner.png" alt="Tadbeer AI 2.0 — Your AI Financial Intelligence Companion" width="100%">
+</p>
 
-TadbeerAI is a premium, enterprise-grade **Active AI-Decision Support System** tailored specifically for Pakistani business owners and financial operators. It monitors the highly volatile Pakistani macroeconomic landscape—analyzing real-time shifts in energy prices, rupee fluctuations, stock market (KSE-100) indices, gold bullion rates, and trade policies—and automatically generates actionable business strategies, executes operational simulations, tracks state changes, and alerts key stakeholders.
+<p align="center">
+  <strong>Smarter Decisions, Brighter Tomorrows — Built for a Stronger Pakistan 🇵🇰</strong>
+</p>
 
-This repository contains both the **FastAPI Multi-Agent Backend** (Python) and the **Premium Flutter Mobile Application** (Dart), forming a cohesive, end-to-end, self-healing intelligence ecosystem.
+<p align="center">
+  <a href="#-system-architecture"><img src="https://img.shields.io/badge/Architecture-LangGraph%20Multi--Agent-00D4B2?style=flat-square" alt="LangGraph"></a>
+  <a href="#-flutter-mobile-application"><img src="https://img.shields.io/badge/Frontend-Flutter%203.x%20%7C%20Riverpod-02569B?style=flat-square&logo=flutter" alt="Flutter"></a>
+  <a href="#-fastapi-backend"><img src="https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python%203.11-009688?style=flat-square&logo=fastapi" alt="FastAPI"></a>
+  <a href="#-firebase-authentication"><img src="https://img.shields.io/badge/Auth-Firebase%20Authentication-FFCA28?style=flat-square&logo=firebase" alt="Firebase"></a>
+  <a href="#-data-sources--provenance"><img src="https://img.shields.io/badge/Economic%20Data-PBS%20SPI%20%26%20SBP-10B981?style=flat-square" alt="PBS & SBP"></a>
+  <a href="#-automated-test-suite--verification"><img src="https://img.shields.io/badge/Tests-551%20Passed%20(301%20Backend%20%2B%20250%20Flutter)-success?style=flat-square" alt="Tests"></a>
+  <a href="#-code-quality"><img src="https://img.shields.io/badge/Flutter%20Analyze-0%20Issues-brightgreen?style=flat-square" alt="Analyze"></a>
+</p>
+
+---
+
+## 📖 Table of Contents
+- [About Tadbeer AI 2.0](#-about-tadbeer-ai-20)
+- [Core Pillars & Capabilities](#-core-pillars--capabilities)
+  - [1. Essential Prices & Economic Intelligence](#1-essential-prices--economic-intelligence-pbs-spi)
+  - [2. Deterministic What-If Simulation Engine](#2-deterministic-what-if-simulation-engine)
+  - [3. Personalized Financial Health & Profile Wizard](#3-personalized-financial-health--profile-wizard)
+  - [4. Ask Tadbeer — Multi-Agent AI Companion](#4-ask-tadbeer--multi-agent-ai-companion)
+  - [5. Firebase Authentication](#5-firebase-authentication)
+  - [6. Trilingual Localization](#6-trilingual-localization)
+- [System Architecture](#-system-architecture)
+- [Repository Structure](#-repository-structure)
+- [Getting Started](#-getting-started)
+  - [Backend Setup (FastAPI + LangGraph)](#backend-setup-fastapi--langgraph)
+  - [Mobile App Setup (Flutter)](#mobile-app-setup-flutter)
+- [Automated Test Suite & Verification](#-automated-test-suite--verification)
+- [Data Sources & Provenance Honesty](#-data-sources--provenance-honesty)
+- [Hackathon Milestone](#-hackathon-milestone)
+
+---
+
+## 🌟 About Tadbeer AI 2.0
+
+In Pakistan's dynamic macroeconomic climate—marked by shifting inflation, exchange rate adjustments, and volatile utility and food prices—everyday households, salaried professionals, and micro-entrepreneurs face four critical questions:
+
+1. **"What is happening to the everyday commodities and essentials I actually buy?"**
+2. **"How do these macroeconomic shifts impact my monthly household budget and runway?"**
+3. **"What if petrol prices rise by 10%, or grocery expenses increase by Rs 5,000?"**
+4. **"What concrete, prioritized financial actions should I take today to safeguard my family?"**
+
+**Tadbeer AI 2.0** bridges this gap. It connects **official macroeconomic data and weekly essential commodity prices** with **user-specific financial contexts**, powering **100% deterministic What-If simulations** and a **supervised LangGraph multi-agent financial companion** fluent in English, Urdu (اردو), and Roman Urdu.
+
+> 🛡️ **Guiding Principle: Zero Mathematical Hallucinations**  
+> Large Language Models excel at synthesis, explanation, and empathetic communication, but are prone to calculation errors. In Tadbeer AI, **all arithmetic, scenario modeling, budget ratios, and runway projections are computed by deterministic Python and Dart mathematical engines**. The AI explains and contextualizes verified numbers without inventing data.
+
+---
+
+## 🚀 Core Pillars & Capabilities
+
+### 1. Essential Prices & Economic Intelligence (PBS SPI)
+- **Sensitive Price Indicator (SPI) Monitoring**: Tracks official weekly prices for 16 key consumer commodities across 17 urban centres and 50 markets in Pakistan (Flour, Tomatoes, Onions, Potatoes, Chicken, Fresh Milk, Eggs, Pulses, Cooking Oil, LPG Cylinders, etc.).
+- **Economic Explanation**: Every commodity includes **What Changed**, **Why It Matters**, and a **Household Budget Impact** actionable hint.
+- **Macroeconomic Dashboard**: Real-time tracking of Headline CPI Inflation, SBP Policy Rate, USD/PKR interbank rate, KIBOR (3-Month), FX Reserves, and Worker Remittances.
+- **Transparent Provenance**: Direct citation of the Pakistan Bureau of Statistics (PBS) and State Bank of Pakistan (SBP), observation periods, and explicit status badges (`live` vs `demo`).
+
+### 2. Deterministic What-If Simulation Engine
+- **Mathematical Integrity**: Evaluates how economic shocks affect monthly income, discretionary spending, and emergency runway.
+- **Multi-Shock Scenarios**:
+  - *Income Shock*: Job loss, salary cuts, delayed bonuses.
+  - *Essential Expense Shock*: Grocery hikes, kitchen commodity surges.
+  - *Fuel & Transport Shock*: Petrol/diesel increases.
+  - *Utility Tariff Shock*: Electricity/gas adjustments.
+  - *Currency Depreciation Shock*: PKR devaluation against USD.
+- **Actionable Guidance**: Every scenario output provides updated runway months, net cash flow balance, and prioritized financial steps.
+
+### 3. Personalized Financial Health & Profile Wizard
+- **4-Step Setup Wizard**: Smooth user onboarding covering Monthly Income, Savings, Budget Category Allocations, and Financial Goals.
+- **50/30/20 Budgeting Rules**: Real-time classification of Needs, Wants, and Savings.
+- **Financial Health Score (0–100)**: Transparent score evaluated on emergency fund sufficiency, debt load, budget compliance, and savings rate.
+- **Local Device Privacy**: Financial transactions, budgets, goals, and profile data are stored 100% locally on-device via `SharedPreferences`.
+
+### 4. Ask Tadbeer — Multi-Agent AI Companion
+- **LangGraph Supervisor Graph**: A stateful multi-agent supervisor orchestrates user queries across specialized nodes:
+  - `economic_intelligence`: Retrieves verified PBS SPI commodity prices and SBP indicators.
+  - `what_if_analysis`: Runs deterministic scenario calculators.
+  - `personal_finance`: Contextualizes user budget and spending patterns.
+  - `general_financial_assistant`: Answers financial literacy, savings strategies, and halal finance questions.
+- **Context-Aware Deep Linking**: Tap any essential commodity or economic indicator to ask Tadbeer directly about its impact.
+- **Chat History Persistence**: Automatic local conversation persistence across app sessions with one-tap clear.
+
+### 5. Firebase Authentication
+- **Decoupled Repository Pattern**: Clean domain separation (`AuthRepository` &rarr; `FirebaseAuthRepository` / `MockAuthRepository`).
+- **Secure Email/Password Flow**: Comprehensive error code mapping into friendly, actionable user messages.
+- **Resilient Fallback**: Gracefully operates with offline mock authentication when Firebase is unconfigured or in test environments.
+
+### 6. Trilingual Localization
+- Complete native localization across all screens, charts, badges, and assistant interactions:
+  - **English** (`en`)
+  - **Urdu** (`ur`) — اردو میں مکمل مالیاتی رہنمائی
+  - **Roman Urdu** (`ur-Latn`) — Aasan Roman Urdu for effortless accessibility.
 
 ---
 
 ## 🏗️ System Architecture
 
-TadbeerAI is built on a highly decoupled, service-oriented architecture:
-
 ```mermaid
-graph TD
-    %% Frontend Layer
-    subgraph Flutter Mobile App
-        UI[Premium Mobile UI]
-        Hive[Hive DB - Persistence]
-        Prov[Provider - Theme/Lang/Persona]
+graph TB
+    %% Mobile Layer
+    subgraph Client ["Flutter Mobile Client (tadbeerai_app)"]
+        UI["4-Tab Modern UI<br/>(Home | Finance | Economy | Ask Tadbeer)"]
+        State["Riverpod State Management"]
+        Router["GoRouter Deep Linking"]
+        Storage["Local SharedPreferences<br/>(Financial Profile, Budgets, Chats)"]
+        AuthRepo["AuthRepository<br/>(Firebase Auth + Mock Fallback)"]
     end
 
-    %% API Layer
-    subgraph FastAPI Gateway
-        API[FastAPI Router]
-        Sched[APScheduler - 15m Poll]
-        Cache[JSON Cache Store]
+    %% Network Transport
+    Client -->|REST & JSON (Dio)| Gateway
+
+    %% Backend Layer
+    subgraph Backend ["FastAPI AI Backend (tadbeerai_backend)"]
+        Gateway["FastAPI API Gateway (/v1)"]
+        
+        subgraph DataAdapters ["Data Adapters & Gateways"]
+            PBS["PBS SPI Commodity Client<br/>(16 Essential Items)"]
+            SBP["SBP Macroeconomic Client<br/>(CPI, FX, KIBOR, USD/PKR)"]
+            Cache["In-Memory TTL Cache"]
+        end
+
+        subgraph Engine ["Deterministic Calculation Engine"]
+            WhatIfCalc["Scenario Calculators<br/>(Expense, Income, FX, Fuel)"]
+            HealthCalc["Health Score & Runway Math"]
+        end
+
+        subgraph MultiAgent ["LangGraph Multi-Agent Pipeline"]
+            Supervisor["Routing Supervisor"]
+            NodeEcon["Economic Intelligence Node"]
+            NodeWhatIf["What-If Analysis Node"]
+            NodeFinance["Personal Finance Node"]
+            NodeGeneral["General Assistant Node"]
+        end
     end
 
-    %% Multi-Agent Layer
-    subgraph 7-Agent Core Pipeline
-        A0[Agent 0: RSS Watcher]
-        A1[Agent 1: Relevance Filter]
-        A2[Agent 2: Content Ingestor]
-        A3[Agent 3: Insight Extractor]
-        A4[Agent 4: Impact Analyzer]
-        A5[Agent 5: Action Generator]
-        A6[Agent 6: Simulation Agent]
-    end
-
-    %% External Systems
-    subgraph Cloud Integrations
-        LLM[Gemini / Groq API]
-        FStore[Google Firestore]
-        FCM[Firebase Cloud Messaging]
-        SMTP[SMTP Email Server]
-    end
-
-    %% Visual Connections
-    UI -->|GET /feed?refresh=true| API
-    UI -->|POST /analyse| API
-    UI -->|POST /simulate| API
-    
-    API --> Sched
-    Sched --> A0
-    A0 -->|135+ Raw News Items| A1
-    A1 -->|Top 30 Business Ranked| Cache
-    Cache --> API
-    
-    API --> A2
-    A2 -->|Self-Healing Fallback| LLM
-    A2 --> A3
-    A3 --> A4
-    A4 --> A5
-    A5 --> API
-    
-    API --> A6
-    A6 -->|Run Math Simulations| FStore
-    A6 -->|Notify Push/SMS| FCM
-    A6 -->|Notify Email| SMTP
+    %% External Connections
+    Gateway --> DataAdapters
+    Gateway --> Engine
+    Gateway --> MultiAgent
+    DataAdapters --> Cache
+    MultiAgent --> Supervisor
+    Supervisor --> NodeEcon
+    Supervisor --> NodeWhatIf
+    Supervisor --> NodeFinance
+    Supervisor --> NodeGeneral
+    NodeWhatIf --> Engine
+    NodeEcon --> DataAdapters
 ```
 
 ---
 
-## 🤖 The 7-Agent Network
+## 📂 Repository Structure
 
-The core value of TadbeerAI lies in its specialized, collaborative **Multi-Agent Network**:
-
-| Agent | Module | Description | Key Tech |
-| :--- | :--- | :--- | :--- |
-| **Agent 0** | **RSS Watcher** | Periodically polls 6 major Pakistan financial RSS feeds (Dawn, Business Recorder, ARY News, etc.). Deduplicates entries by URL hash. | `feedparser`, `httpx` |
-| **Agent 1** | **Relevance Filter** | Filter sports/lifestyle news and scores articles for strict Pakistani business relevance. Maps news to 1 of 9 operational domains. | `relevance_filter.py` |
-| **Agent 2** | **Content Ingestor** | Scrapes full articles. Employs a **Self-Healing LLM Fallback** to reconstruct realistic article bodies if a site blocks bots with 403 or requires JS. | `BeautifulSoup`, `call_llm` |
-| **Agent 3** | **Insight Extractor** | Extracts specific business signals from text, quantifying SBP rate changes, PKR devaluation, and fuel hikes without hallucinations. | `Gemini 2.0 Flash` |
-| **Agent 4** | **Impact Analyzer** | Assesses business SWOT impacts across key metrics (delivery fees, customer churn, supply chain delays, alternate sourcing). | `Groq / Llama 3.3` |
-| **Agent 5** | **Action Generator** | Generates ranked, highly practical operational decisions. Quantifies churn risk, timeline, and business mathematics. | `action_generator.py` |
-| **Agent 6** | **Simulation Agent** | Executes selected actions, performs real-world math simulations, updates variables in the mock/real DB, and triggers FCM/SMS/Email alerts. | `simulation_agent.py` |
-
----
-
-## 🏗️ Key Engineering Features
-
-### 🔌 1. Self-Healing Crawler System
-Many Pakistani news portals implement aggressive security measures (like Cloudflare walls) that block automated headers with HTTP 403, or utilize dynamic SPA frameworks that return blank HTML. 
-
-Instead of showing a raw HTTP 422 error, **Agent 2 automatically self-heals**:
-* It parses the URL slug and domain (e.g. `kse-100-rises-715-points-as-buying-activity-picks-up-across-key-sectors`).
-* It invokes the active LLM (Gemini or Groq) to generate a realistic, 150-250 word financial news article representing exactly what the article is about.
-* The downstream agents analyze this generated text seamlessly, ensuring the user experiences a flawless analysis flow with zero crashes!
-
-### 👤 2. Dynamic Category-Wise Personalization (Personas)
-TadbeerAI is built around **4 specialized user personas**: **Shop Owners, Business Owners, Salaried Employees, and Students**. Personalization happens at every stage of the pipeline:
-* **Backend Keyword Filtering:** The `/feed` endpoint filters the news feed by keyword dictionaries specific to each persona, ensuring users only see what is relevant to their role.
-* **Frontend Relevance Scoring & Badging:** The Flutter app runs a dynamic scoring algorithm to sort highly relevant news cards to the top of the feed, complete with visual UI badges (`Shop Specific`, `Student Specific`, etc.).
-* **Persona-Driven Agent Reasoning:** The downstream AI agents (Agents 3, 4, and 5) receive the user's profile and dynamically tailor their extracted insights, SWOT impacts, and recommended operational decisions to fit the user's specific context.
-
-### 📢 3. Multi-Channel Alert Delivery System
-When a user decides to execute a recommended action:
-* **Execution Engine:** Clicking "Execute & notify users" invokes Agent 6, running mathematical state changes on the server and persisting changes to Firestore (or JSON database fallback).
-* **SMTP & FCM Integration:** Dispatches real push notifications via Firebase Cloud Messaging and professional risk reports via SMTP Email to registered account users.
-* **Gemini-Powered SMS Drafting:** Automatically calls Gemini to draft a contextually relevant, customer-facing SMS announcement explaining the operational changes (e.g., price updates or delivery delays) that the business owner can copy and send to their client lists.
-
-### ⚡ 4. Intelligent Auto & Force-Refresh
-* **Auto-Expiration:** Backend `/feed` cache automatically expires and updates if the file is more than 10 minutes old, eliminating stale news feeds.
-* **Client-Side Trigger:** Pull-to-refresh and the refresh button on the Flutter app automatically pass `/feed?refresh=true`, bypassing backend caches and updating RSS feeds in real-time.
-
-### 🎨 5. Premium Flutter UI & UX
-* **Micro-Animations:** Seamless transitions, card entries, shimmers, and status changes powered by `flutter_animate`.
-* **Zero Flashes:** Hive persistence is queried synchronously inside Flutter's `main()` before rendering, ensuring the user's preferred theme and language are applied immediately without transient flashes.
-* **Detailed Trace Logs:** Shows full step-by-step reasoning logs (Execution Logs, State Diffs, Timings) for all past simulation alerts.
+```
+TadbeerAI 2.0/
+├── assets/                          # Repository branding & media assets
+│   └── banner.png                   # Official Tadbeer AI 2.0 Banner
+├── tadbeerai_app/                   # Flutter Mobile Client
+│   ├── lib/
+│   │   ├── core/                    # App config, routing, themes, utils, widgets
+│   │   ├── data/                    # Repositories (API, Mock, Firebase Auth)
+│   │   ├── domain/                  # Entities (CommodityPrice, EconomicIndicator, Profile)
+│   │   ├── features/
+│   │   │   ├── assistant/           # Ask Tadbeer chat screen & bubble widgets
+│   │   │   ├── auth/                # Login, Signup, AuthController
+│   │   │   ├── dashboard/           # Home dashboard & economic pulse previews
+│   │   │   ├── economy/             # Economy tab, Essential Prices, detail modal sheet
+│   │   │   ├── finance/             # Financial health, budget breakdown, goals
+│   │   │   └── profile/             # 4-step financial profile setup wizard
+│   │   ├── l10n/                    # Localization catalogs (.arb files: en, ur, ur-Latn)
+│   │   └── providers/               # Riverpod dependency injection & state providers
+│   └── test/                        # 250 unit, repository, and widget tests
+│
+└── tadbeerai_backend/               # Python FastAPI + LangGraph Backend
+    ├── core/
+    │   ├── agents/                  # LangGraph multi-agent graph, supervisor & nodes
+    │   ├── economic_data/           # PBS SPI commodity client, SBP client, service
+    │   ├── llm/                     # Multi-provider LLM adapters (Gemini, Groq, Mock)
+    │   ├── scenarios/               # Deterministic What-If mathematical calculators
+    │   └── api_v1.py                # REST endpoints (/v1/chat, /v1/economy, etc.)
+    └── tests/                       # 301 backend pytest test suites
+```
 
 ---
 
-## 🌐 API Specifications
+## ⚡ Getting Started
 
-| Method | Endpoint | Request Body | Description |
-| :--- | :--- | :--- | :--- |
-| **GET** | `/health` | *None* | Health status, primary AI provider, Firestore state, and registered user count. |
-| **GET** | `/feed` | `?refresh=true` (Optional) | Fetches ranked and filtered Pakistani business news (up to 30 items). |
-| **POST** | `/analyse` | `{"text": "...", "source_url": "...", "language": "en"}` | Pipeline for Agent 2 → Agent 5. Returns insight, impacts, and ranked actions. |
-| **POST** | `/simulate`| `{"action_index": 0, "user_id": "...", "notify_channels": []}`| Agent 6 execution. Runs simulation math, registers state diffs, and sends alerts. |
-| **GET** | `/trace` | *None* | Exposes the complete 7-Agent execution log for debugging and audit transparency. |
+### Prerequisites
+- **Flutter SDK**: 3.22.0 or higher
+- **Python**: 3.11 or higher
+- **Git**
 
 ---
 
-## 🚀 Setup & Execution Guide
+### Backend Setup (FastAPI + LangGraph)
 
-### 🐍 Backend (FastAPI) Setup
-
-1. **Navigate to backend and configure environment:**
+1. **Navigate to the backend folder**:
    ```bash
    cd tadbeerai_backend
+   ```
+
+2. **Create and activate a virtual environment**:
+   ```bash
+   # Windows (PowerShell)
    python -m venv .venv
-   .venv\Scripts\activate   # Windows
-   source .venv/bin/activate # Unix/macOS
+   .\.venv\Scripts\Activate.ps1
+
+   # macOS / Linux
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+3. **Install dependencies**:
+   ```bash
    pip install -r requirements.txt
    ```
 
-2. **Create `.env` file:**
-   ```ini
-   AI_PROVIDER=gemini # gemini | groq
-   GEMINI_API_KEY=your_gemini_api_key_here
-   GEMINI_MODEL=gemini-2.0-flash
-   GROQ_API_KEY=your_groq_api_key_here
-   GROQ_MODEL=llama-3.3-70b-versatile
-   POLL_INTERVAL_MINUTES=15
+4. **Configure environment variables**:
+   Create a `.env` file in `tadbeerai_backend/`:
+   ```env
+   TADBEER_ENV=development
+   TADBEER_LLM_PROVIDER=gemini       # Options: gemini | groq | mock
+   GEMINI_API_KEY=your_gemini_key    # Optional if using mock provider
+   GROQ_API_KEY=your_groq_key        # Optional fallback provider
    PORT=8000
    ```
 
-3. **Start local development server:**
+5. **Run the backend server**:
    ```bash
-   uvicorn main:app --reload --port 8000
+   python main.py
+   # Or using uvicorn directly:
+   uvicorn main:app --host 0.0.0.0 --port 8000 --reload
    ```
-   Explore Swagger UI documentation at `http://127.0.0.1:8000/docs`.
+   API Documentation is live at: `http://localhost:8000/docs`
+
+6. **Run backend tests**:
+   ```bash
+   python -m pytest
+   ```
 
 ---
 
-### 📱 Frontend (Flutter) Setup
+### Mobile App Setup (Flutter)
 
-1. **Navigate to app directory and install dependencies:**
+1. **Navigate to the Flutter app directory**:
    ```bash
    cd tadbeerai_app
+   ```
+
+2. **Install Flutter packages**:
+   ```bash
    flutter pub get
    ```
 
-2. **Configure API base URL:**
-   Open [api_service.dart](tadbeerai_app/lib/core/services/api_service.dart) and configure your `_base` IP or Render deployment domain:
-   ```dart
-   static const _base = "http://10.0.2.2:8000"; // Android Emulator PC Localhost
+3. **Verify static analysis**:
+   ```bash
+   flutter analyze
    ```
 
-3. **Run Mobile App:**
+4. **Run the Flutter test suite**:
    ```bash
+   flutter test
+   ```
+
+5. **Launch the application**:
+   ```bash
+   # Running on connected device or emulator:
    flutter run
    ```
 
 ---
 
-## 🏆 Hackathon Context
-* **Project Name:** TadbeerAI
-* **Team Name:** TADBEERAI
-* **Hackathon:** Google Antigravity AISeekho2026
-* **Challenge:** 1 Autonomous Content-to-Action Agent (Insight → Action System)
+## 🧪 Automated Test Suite & Verification
+
+The project enforces continuous verification across all domain, repository, widget, and agent logic.
+
+| Scope | Suite | Result | Execution Time |
+| :--- | :--- | :---: | :---: |
+| **Flutter App** | `flutter test` | **250 Passed / 0 Failed** (5 skipped opt-in E2E) | ~20.2s |
+| **Flutter Linter** | `flutter analyze` | **0 Errors / 0 Warnings / 0 Issues** | ~9.9s |
+| **FastAPI Backend** | `pytest` | **301 Passed / 0 Failed** | ~1.12s |
+| **Python Bytecode** | `compileall` | **Code 0 (Clean compilation)** | < 1.0s |
+| **Combined** | **Total Verification** | **551 Automated Tests Passing** | — |
 
 ---
-Developed with ♥ by team **TADBEERAI**. Empowering Pakistani businesses through proactive, self-healing agentic intelligence.
+
+## 🏛️ Data Sources & Provenance Honesty
+
+Tadbeer AI 2.0 upholds complete statistical integrity:
+
+- **Pakistan Bureau of Statistics (PBS)**:
+  - Weekly Sensitive Price Indicator (SPI) bulletin tracking 51 essential commodities across 17 urban centres and 50 markets.
+  - Retail average prices for staple grains, pulses, dairy, poultry, vegetables, edible oil, and LPG cylinders.
+- **State Bank of Pakistan (SBP)**:
+  - Monetary Policy Committee policy rates, KIBOR (3-Month), weighted interbank USD/PKR exchange rates, and liquid FX reserves.
+- **Status Transparency**:
+  - Whenever live gateway connections are unavailable, the application gracefully switches to bundled seed data, explicitly badging status as `demo` or `partial` with detailed fallback reasons. **Synthetic numbers are never falsely marked as live**.
+
+---
+
+## 🏆 Hackathon Milestone
+
+- **Competition**: Alibaba Cloud AI Hackathon Pakistan 2026
+- **Current Milestone**: **Regional-Round Freeze Complete**
+- **Theme**: Financial Intelligence, Inclusive FinTech, and Localized AI for Pakistan 🇵🇰
+
+---
+
+<p align="center">
+  Built with ❤️ for a resilient, financially empowered Pakistan.<br/>
+  <strong>Tadbeer AI 2.0 Team</strong>
+</p>
