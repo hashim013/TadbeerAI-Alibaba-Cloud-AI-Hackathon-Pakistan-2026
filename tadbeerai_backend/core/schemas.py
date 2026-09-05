@@ -1,6 +1,44 @@
-from typing import Optional
+from typing import Any, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
+
+
+class AssistantChatRequest(BaseModel):
+    """Request body for POST /v1/assistant/chat."""
+
+    message: str = Field(..., min_length=1, max_length=4000)
+    language: str = "en"
+    #: optional personal context for the multi-agent pipeline (Phase 2+);
+    #: omitted by existing clients — the graph degrades gracefully without it
+    financial_context: Optional[dict[str, Any]] = None
+
+    @field_validator("message")
+    @classmethod
+    def message_not_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("message must not be blank")
+        return value
+
+
+class AssistantChatResponse(BaseModel):
+    """Structured reply from POST /v1/assistant/chat.
+
+    ``agentsUsed``/``metrics``/``recommendations``/``sources`` are populated
+    by the multi-agent pipeline and the deterministic tools. ``dataStatus``
+    is code-controlled: "live" / "partial" / "demo" / "unavailable" for
+    economic indicators, or "scenario" when the answer's numbers are a
+    user-defined what-if assumption computed deterministically.
+    """
+
+    answer: str
+    intent: str
+    language: str = "en"
+    provider: str
+    agentsUsed: list[str] = Field(default_factory=list)
+    metrics: dict[str, Any] = Field(default_factory=dict)
+    recommendations: list[str] = Field(default_factory=list)
+    sources: list[str] = Field(default_factory=list)
+    dataStatus: str = "demo"
 
 
 class AnalyseRequest(BaseModel):

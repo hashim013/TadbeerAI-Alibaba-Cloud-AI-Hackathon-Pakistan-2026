@@ -1855,6 +1855,378 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get retryAction;
 
+  /// No description provided for @errorAssistantNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to reach Tadbeer right now. Please check your connection and try again.'**
+  String get errorAssistantNetwork;
+
+  /// No description provided for @errorAssistantTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Tadbeer is taking longer than expected. Please try again.'**
+  String get errorAssistantTimeout;
+
+  /// No description provided for @errorAssistantServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Tadbeer\'s service hit a problem. Please try again in a moment.'**
+  String get errorAssistantServer;
+
+  /// No description provided for @errorAssistantMalformed.
+  ///
+  /// In en, this message translates to:
+  /// **'Tadbeer couldn\'t complete its answer. Please try again.'**
+  String get errorAssistantMalformed;
+
+  /// No description provided for @liveAiBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Tadbeer AI'**
+  String get liveAiBadge;
+
+  /// No description provided for @dataStatusLive.
+  ///
+  /// In en, this message translates to:
+  /// **'Live economic data'**
+  String get dataStatusLive;
+
+  /// No description provided for @dataStatusPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Some indicators use demo data'**
+  String get dataStatusPartial;
+
+  /// No description provided for @dataStatusDemo.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo economic data'**
+  String get dataStatusDemo;
+
+  /// No description provided for @dataStatusScenario.
+  ///
+  /// In en, this message translates to:
+  /// **'What-If — your assumption, not a forecast'**
+  String get dataStatusScenario;
+
+  /// No description provided for @dataStatusUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Live data currently unavailable'**
+  String get dataStatusUnavailable;
+
+  /// No description provided for @keyNumbersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Key numbers'**
+  String get keyNumbersTitle;
+
+  /// No description provided for @apiSourcesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources'**
+  String get apiSourcesTitle;
+
+  /// No description provided for @apiRecommendationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendations'**
+  String get apiRecommendationsTitle;
+
+  /// No description provided for @metricMonthlySavings.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly savings'**
+  String get metricMonthlySavings;
+
+  /// No description provided for @metricSavingsRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings rate'**
+  String get metricSavingsRate;
+
+  /// No description provided for @metricExpenseRatio.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense ratio'**
+  String get metricExpenseRatio;
+
+  /// No description provided for @metricRunwayMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency runway'**
+  String get metricRunwayMonths;
+
+  /// No description provided for @metricUnitMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'months'**
+  String get metricUnitMonths;
+
+  /// No description provided for @metricUnitBnUsd.
+  ///
+  /// In en, this message translates to:
+  /// **'bn USD'**
+  String get metricUnitBnUsd;
+
+  /// No description provided for @scenarioLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What-If Scenario'**
+  String get scenarioLabel;
+
+  /// No description provided for @scenarioNotForecast.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on your assumption — not a forecast.'**
+  String get scenarioNotForecast;
+
+  /// No description provided for @scenarioAssumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Assumption'**
+  String get scenarioAssumption;
+
+  /// No description provided for @scenarioCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Current situation'**
+  String get scenarioCurrent;
+
+  /// No description provided for @scenarioChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'What changes'**
+  String get scenarioChanges;
+
+  /// No description provided for @scenarioImpact.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated impact'**
+  String get scenarioImpact;
+
+  /// No description provided for @scenarioNextSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'Next steps'**
+  String get scenarioNextSteps;
+
+  /// No description provided for @scenarioLimitations.
+  ///
+  /// In en, this message translates to:
+  /// **'Limitations'**
+  String get scenarioLimitations;
+
+  /// No description provided for @scenarioSaveMoreAssumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Save {amount} more each month'**
+  String scenarioSaveMoreAssumption(String amount);
+
+  /// No description provided for @scenarioExpenseAssumptionIncrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses increase by {percent}%'**
+  String scenarioExpenseAssumptionIncrease(String percent);
+
+  /// No description provided for @scenarioExpenseAssumptionDecrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses decrease by {percent}%'**
+  String scenarioExpenseAssumptionDecrease(String percent);
+
+  /// No description provided for @scenarioRateAssumptionIncrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest rates increase by {points} percentage points'**
+  String scenarioRateAssumptionIncrease(String points);
+
+  /// No description provided for @scenarioRateAssumptionDecrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Interest rates decrease by {points} percentage points'**
+  String scenarioRateAssumptionDecrease(String points);
+
+  /// No description provided for @scenarioRowCurrentSavings.
+  ///
+  /// In en, this message translates to:
+  /// **'Current monthly savings'**
+  String get scenarioRowCurrentSavings;
+
+  /// No description provided for @scenarioRowNewSavings.
+  ///
+  /// In en, this message translates to:
+  /// **'New monthly savings'**
+  String get scenarioRowNewSavings;
+
+  /// No description provided for @scenarioRowAdditional.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional savings / month'**
+  String get scenarioRowAdditional;
+
+  /// No description provided for @scenarioRowAfterMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'After {months} months'**
+  String scenarioRowAfterMonths(num months);
+
+  /// No description provided for @scenarioRowCurrentRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Current savings rate'**
+  String get scenarioRowCurrentRate;
+
+  /// No description provided for @scenarioRowNewRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Projected savings rate'**
+  String get scenarioRowNewRate;
+
+  /// No description provided for @scenarioRowCurrentExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Current monthly expenses'**
+  String get scenarioRowCurrentExpenses;
+
+  /// No description provided for @scenarioRowNewExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'New monthly expenses'**
+  String get scenarioRowNewExpenses;
+
+  /// No description provided for @scenarioRowAdditionalExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional monthly expense'**
+  String get scenarioRowAdditionalExpense;
+
+  /// No description provided for @scenarioRowCurrentSurplus.
+  ///
+  /// In en, this message translates to:
+  /// **'Current monthly surplus'**
+  String get scenarioRowCurrentSurplus;
+
+  /// No description provided for @scenarioRowProjectedSurplus.
+  ///
+  /// In en, this message translates to:
+  /// **'Projected monthly surplus'**
+  String get scenarioRowProjectedSurplus;
+
+  /// No description provided for @scenarioRowCurrentRunway.
+  ///
+  /// In en, this message translates to:
+  /// **'Current emergency runway'**
+  String get scenarioRowCurrentRunway;
+
+  /// No description provided for @scenarioRowProjectedRunway.
+  ///
+  /// In en, this message translates to:
+  /// **'Projected emergency runway'**
+  String get scenarioRowProjectedRunway;
+
+  /// No description provided for @whatIfButton.
+  ///
+  /// In en, this message translates to:
+  /// **'What-If'**
+  String get whatIfButton;
+
+  /// No description provided for @whatIfTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Build a What-If question'**
+  String get whatIfTitle;
+
+  /// No description provided for @whatIfSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your assumption — Tadbeer calculates the impact deterministically. It is an illustration, not a forecast.'**
+  String get whatIfSubtitle;
+
+  /// No description provided for @whatIfSaveMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Save more'**
+  String get whatIfSaveMore;
+
+  /// No description provided for @whatIfExpenseChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense change'**
+  String get whatIfExpenseChange;
+
+  /// No description provided for @whatIfRateChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate change'**
+  String get whatIfRateChange;
+
+  /// No description provided for @whatIfAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra monthly savings (PKR)'**
+  String get whatIfAmountLabel;
+
+  /// No description provided for @whatIfMonthsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Months (optional)'**
+  String get whatIfMonthsLabel;
+
+  /// No description provided for @whatIfMonthsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty for 6 and 12 months'**
+  String get whatIfMonthsHint;
+
+  /// No description provided for @whatIfPercentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Change (%)'**
+  String get whatIfPercentLabel;
+
+  /// No description provided for @whatIfPointsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Change (percentage points)'**
+  String get whatIfPointsLabel;
+
+  /// No description provided for @whatIfIncrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase'**
+  String get whatIfIncrease;
+
+  /// No description provided for @whatIfDecrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease'**
+  String get whatIfDecrease;
+
+  /// No description provided for @whatIfRun.
+  ///
+  /// In en, this message translates to:
+  /// **'Run What-If'**
+  String get whatIfRun;
+
+  /// No description provided for @whatIfInvalidAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount greater than zero.'**
+  String get whatIfInvalidAmount;
+
+  /// No description provided for @whatIfInvalidPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a percentage between 0.1 and 100.'**
+  String get whatIfInvalidPercent;
+
+  /// No description provided for @whatIfMonthsInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a number of months between 1 and 600.'**
+  String get whatIfMonthsInvalid;
+
   /// No description provided for @profileTitle.
   ///
   /// In en, this message translates to:

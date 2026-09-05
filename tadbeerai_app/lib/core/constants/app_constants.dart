@@ -21,6 +21,7 @@ abstract final class AppConstants {
   static const prefThemeMode = 'theme_mode';
   static const prefFinanceData = 'mock_finance_data_v1';
   static const prefFinancialProfile = 'financial_profile_v1';
+  static const prefChatHistory = 'tadbeerai_chat_history_v1';
 
   // ── Timing ────────────────────────────────────────────────────────────
   static const splashDuration = Duration(milliseconds: 3000);

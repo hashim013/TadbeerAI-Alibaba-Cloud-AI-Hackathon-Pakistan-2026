@@ -42,6 +42,7 @@ class _FinancialProfileScreenState
   final _formKey = GlobalKey<FormState>();
   final _incomeController = TextEditingController();
   final _expensesController = TextEditingController();
+  final _savingsController = TextEditingController();
 
   int _currentStep = 1;
   Persona? _persona;
@@ -56,6 +57,7 @@ class _FinancialProfileScreenState
     super.initState();
     _incomeController.addListener(_onAmountChanged);
     _expensesController.addListener(_onAmountChanged);
+    _savingsController.addListener(_onAmountChanged);
   }
 
   void _prefill(FinancialProfile profile) {
@@ -72,6 +74,12 @@ class _FinancialProfileScreenState
         _expensesController.text = profile.monthlyEssentialExpenses! > 0 ||
                 profile.monthlyEssentialExpenses == 0
             ? profile.monthlyEssentialExpenses!.toStringAsFixed(0)
+            : '';
+      }
+      if (profile.totalSavings != null) {
+        _savingsController.text = profile.totalSavings! > 0 ||
+                profile.totalSavings == 0
+            ? profile.totalSavings!.toStringAsFixed(0)
             : '';
       }
     });
@@ -93,6 +101,7 @@ class _FinancialProfileScreenState
   void dispose() {
     _incomeController.dispose();
     _expensesController.dispose();
+    _savingsController.dispose();
     super.dispose();
   }
 
@@ -163,11 +172,13 @@ class _FinancialProfileScreenState
 
     final incomeText = _incomeController.text.replaceAll(',', '').trim();
     final expensesText = _expensesController.text.replaceAll(',', '').trim();
+    final savingsText = _savingsController.text.replaceAll(',', '').trim();
 
     final profile = FinancialProfile(
       persona: _persona,
       monthlyIncome: double.tryParse(incomeText) ?? 0,
       monthlyEssentialExpenses: double.tryParse(expensesText) ?? 0,
+      totalSavings: savingsText.isNotEmpty ? double.tryParse(savingsText) : null,
       primaryGoal: _goal,
       profileCompleted: true,
     );
@@ -561,6 +572,29 @@ class _FinancialProfileScreenState
                 ),
               ],
               const SizedBox(height: 24),
+              Text(
+                "What's your current total savings? (Optional)",
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 10),
+              _AmountInputCard(
+                label: 'Total Savings',
+                controller: _savingsController,
+                onChanged: _onAmountChanged,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Used to estimate your emergency fund runway in months.',
+                style: GoogleFonts.inter(
+                  color: AppColors.textOnDarkSecondary,
+                  fontSize: 13,
+                ),
+              ),
+              const SizedBox(height: 24),
               const _TipBanner(
                 text:
                     'You can update this information anytime from your profile.',
@@ -761,6 +795,9 @@ class _FinancialProfileScreenState
     final expensesStr = _expensesController.text.trim().isEmpty
         ? 'PKR 0'
         : _formatAmount(_expensesController.text);
+    final savingsStr = _savingsController.text.trim().isEmpty
+        ? 'Not specified'
+        : _formatAmount(_savingsController.text);
 
     return Column(
       children: [
@@ -809,7 +846,7 @@ class _FinancialProfileScreenState
               ),
               const SizedBox(height: 12),
 
-              // Summary Card with 4 Rows
+              // Summary Card with Rows
               Container(
                 decoration: BoxDecoration(
                   color: AppColors.navyCard,
@@ -843,6 +880,15 @@ class _FinancialProfileScreenState
                       icon: Icons.shopping_bag_outlined,
                       label: 'Essential Monthly Spending',
                       value: expensesStr,
+                    ),
+                    Divider(
+                      color: Colors.white.withValues(alpha: 0.06),
+                      height: 1,
+                    ),
+                    _SummaryRow(
+                      icon: Icons.savings_outlined,
+                      label: 'Current Savings',
+                      value: savingsStr,
                     ),
                     Divider(
                       color: Colors.white.withValues(alpha: 0.06),
@@ -1054,13 +1100,30 @@ class _FinancialProfileScreenState
             controller: _expensesController,
             validator: _validateExpenses,
             keyboardType: TextInputType.number,
-            textInputAction: TextInputAction.done,
+            textInputAction: TextInputAction.next,
           ),
           const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Text(
               l10n.profileExpensesHint,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: scheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          AppTextField(
+            label: 'Total Savings (Optional)',
+            controller: _savingsController,
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.done,
+          ),
+          const SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              'Used to estimate emergency runway (months). Leave blank if none.',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: scheme.onSurfaceVariant,
               ),

@@ -17,6 +17,7 @@ from agents.insight_extractor import extract_insight
 from agents.relevance_filter import score_and_filter
 from agents.rss_watcher import fetch_all_feeds
 from agents.simulation_agent import simulate_action
+from core.api_v1 import router as v1_router
 from core.llm_client import get_ai_provider, normalize_confidence
 from core.paths import get_data_dir
 from core.schemas import (
@@ -184,6 +185,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Versioned v1 API (provider-agnostic assistant stack)
+app.include_router(v1_router)
+
 
 # ==================== CORE ENDPOINTS ====================
 
@@ -198,6 +202,7 @@ def root():
         "endpoints": [
             "/feed", "/analyse", "/simulate", "/trace", "/health",
             "/register", "/users", "/notifications",
+            "/v1/health", "/v1/assistant/chat", "/v1/economy/snapshot",
         ],
     }
 
@@ -723,4 +728,6 @@ def get_notifications(limit: int = 50, authorization: Optional[str] = Header(Non
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("main:app", host="0.0.0.0", port=int(os.getenv("PORT", "8000")), reload=True)
+    host = os.getenv("API_HOST", "0.0.0.0")
+    port = int(os.getenv("API_PORT", os.getenv("PORT", "8000")))
+    uvicorn.run("main:app", host=host, port=port, reload=True)

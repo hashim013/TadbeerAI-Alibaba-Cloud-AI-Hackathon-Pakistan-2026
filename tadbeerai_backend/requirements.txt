@@ -1,5 +1,6 @@
 fastapi==0.111.0
 uvicorn==0.30.1
+langgraph==1.2.11
 feedparser==6.0.11
 google-generativeai==0.8.3
 apscheduler==3.10.4
@@ -11,3 +12,6 @@ pydantic==2.7.1
 firebase-admin==6.4.0
 twilio==9.2.3
 sendgrid==6.11.0
+
+# Testing (mock/fake LLM providers — tests never need real API keys)
+pytest==9.1.1

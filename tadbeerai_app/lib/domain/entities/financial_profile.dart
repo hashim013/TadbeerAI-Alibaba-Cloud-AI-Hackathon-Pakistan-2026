@@ -52,6 +52,7 @@ class FinancialProfile {
     this.persona,
     this.monthlyIncome,
     this.monthlyEssentialExpenses,
+    this.totalSavings,
     this.primaryGoal,
     this.profileCompleted = false,
   });
@@ -59,6 +60,7 @@ class FinancialProfile {
   final Persona? persona;
   final double? monthlyIncome;
   final double? monthlyEssentialExpenses;
+  final double? totalSavings;
   final PrimaryGoal? primaryGoal;
   final bool profileCompleted;
 
@@ -66,6 +68,7 @@ class FinancialProfile {
     Persona? persona,
     double? monthlyIncome,
     double? monthlyEssentialExpenses,
+    double? totalSavings,
     PrimaryGoal? primaryGoal,
     bool? profileCompleted,
   }) =>
@@ -74,6 +77,7 @@ class FinancialProfile {
         monthlyIncome: monthlyIncome ?? this.monthlyIncome,
         monthlyEssentialExpenses:
             monthlyEssentialExpenses ?? this.monthlyEssentialExpenses,
+        totalSavings: totalSavings ?? this.totalSavings,
         primaryGoal: primaryGoal ?? this.primaryGoal,
         profileCompleted: profileCompleted ?? this.profileCompleted,
       );
@@ -82,6 +86,7 @@ class FinancialProfile {
         'persona': persona?.storageKey,
         'monthlyIncome': monthlyIncome,
         'monthlyEssentialExpenses': monthlyEssentialExpenses,
+        'totalSavings': totalSavings,
         'primaryGoal': primaryGoal?.storageKey,
         'profileCompleted': profileCompleted,
       };
@@ -92,6 +97,7 @@ class FinancialProfile {
         monthlyIncome: (json['monthlyIncome'] as num?)?.toDouble(),
         monthlyEssentialExpenses:
             (json['monthlyEssentialExpenses'] as num?)?.toDouble(),
+        totalSavings: (json['totalSavings'] as num?)?.toDouble(),
         primaryGoal: PrimaryGoal.fromStorageKey(json['primaryGoal'] as String?),
         profileCompleted: (json['profileCompleted'] as bool?) ?? false,
       );
@@ -103,6 +109,7 @@ class FinancialProfile {
           other.persona == persona &&
           other.monthlyIncome == monthlyIncome &&
           other.monthlyEssentialExpenses == monthlyEssentialExpenses &&
+          other.totalSavings == totalSavings &&
           other.primaryGoal == primaryGoal &&
           other.profileCompleted == profileCompleted;
 
@@ -111,6 +118,7 @@ class FinancialProfile {
         persona,
         monthlyIncome,
         monthlyEssentialExpenses,
+        totalSavings,
         primaryGoal,
         profileCompleted,
       );
@@ -118,5 +126,6 @@ class FinancialProfile {
   @override
   String toString() => 'FinancialProfile(${persona?.name}, '
       'income: $monthlyIncome, expenses: $monthlyEssentialExpenses, '
-      'goal: ${primaryGoal?.name}, completed: $profileCompleted)';
+      'savings: $totalSavings, goal: ${primaryGoal?.name}, '
+      'completed: $profileCompleted)';
 }

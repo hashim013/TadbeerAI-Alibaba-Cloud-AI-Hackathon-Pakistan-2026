@@ -6,6 +6,7 @@ import '../../../core/utils/l10n_context.dart';
 import '../../../domain/entities/assistant_message.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../finance/finance_category_visuals.dart';
+import 'api_reply_content.dart';
 
 // ── Prompt / reply resolution ───────────────────────────────────────────────
 
@@ -169,6 +170,37 @@ class DemoAiBadge extends StatelessWidget {
   }
 }
 
+/// Same pill as [DemoAiBadge], but for the live backend engine.
+class LiveAiBadge extends StatelessWidget {
+  const LiveAiBadge({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: scheme.primary.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.auto_awesome_rounded, size: 12, color: scheme.primary),
+          const SizedBox(width: 6),
+          Text(
+            context.l10n.liveAiBadge,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: scheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Tappable question chip (starter prompts and follow-ups).
 class AssistantPromptChip extends StatelessWidget {
   const AssistantPromptChip({
@@ -267,12 +299,18 @@ class AssistantReplyBubble extends StatelessWidget {
     final tertiary =
         isDark ? AppColors.textOnDarkTertiary : AppColors.textOnLightSecondary;
 
+    // Backend replies render their own rich bubble (answer, scenario card,
+    // key numbers, sources, status footer).
+    if (reply.api != null) {
+      return ApiAssistantBubble(message: message);
+    }
+
     return Align(
       alignment: AlignmentDirectional.centerStart,
       child: Container(
         constraints: BoxConstraints(maxWidth: maxWidth),
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-        decoration: _assistantBubbleDecoration(context),
+        decoration: assistantBubbleDecoration(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -425,7 +463,7 @@ class _AssistantTypingIndicatorState extends State<AssistantTypingIndicator>
       alignment: AlignmentDirectional.centerStart,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: _assistantBubbleDecoration(context),
+        decoration: assistantBubbleDecoration(context),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -470,7 +508,7 @@ class _AssistantTypingIndicatorState extends State<AssistantTypingIndicator>
 }
 
 /// Shared surface for assistant-side bubbles.
-BoxDecoration _assistantBubbleDecoration(BuildContext context) {
+BoxDecoration assistantBubbleDecoration(BuildContext context) {
   final isDark = Theme.of(context).brightness == Brightness.dark;
   return BoxDecoration(
     color: isDark ? AppColors.navyCard : AppColors.lightCard,

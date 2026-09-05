@@ -1,11 +1,10 @@
+import 'assistant_api_models.dart';
+
 /// Direction an economic indicator is heading.
 enum TrendDirection { rising, falling, stable }
 
 /// Provenance of the numbers backing an indicator.
-///
-/// Phase 3 ships demo data only; a later phase adds a `live` variant when a
-/// real feed (e.g. State Bank of Pakistan) is connected.
-enum DataStatus { demo }
+typedef DataStatus = DataStatusKind;
 
 /// One historical observation of an indicator, at monthly granularity.
 class IndicatorPoint {
@@ -33,6 +32,8 @@ class EconomicIndicator {
     required this.dataStatus,
     required this.updatedAt,
     required this.history,
+    this.period = '',
+    this.notes = '',
   });
 
   /// 'inflation' | 'usdPkr' | 'policyRate' | 'kibor' | 'fxReserves'
@@ -58,6 +59,12 @@ class EconomicIndicator {
   final String source;
 
   final DataStatus dataStatus;
+
+  /// Reporting period (e.g. 'monthly', 'daily', 'bi-weekly').
+  final String period;
+
+  /// Technical notes or source methodology.
+  final String notes;
 
   /// When this value was (nominally) published.
   final DateTime updatedAt;

@@ -1037,6 +1037,211 @@ class AppLocalizationsUr extends AppLocalizations {
   String get retryAction => 'دوبارہ کوشش کریں';
 
   @override
+  String get errorAssistantNetwork =>
+      'اس وقت Tadbeer سے رابطہ نہیں ہو سکا۔ براہ کرم اپنا کنکشن چیک کر کے دوبارہ کوشش کریں۔';
+
+  @override
+  String get errorAssistantTimeout =>
+      'Tadbeer کو جواب میں زیادہ وقت لگ رہا ہے۔ براہ کرم دوبارہ کوشش کریں۔';
+
+  @override
+  String get errorAssistantServer =>
+      'Tadbeer کی سروس میں مسئلہ پیش آیا۔ براہ کرم تھوڑی دیر بعد دوبارہ کوشش کریں۔';
+
+  @override
+  String get errorAssistantMalformed =>
+      'Tadbeer جواب مکمل نہیں کر سکا۔ براہ کرم دوبارہ کوشش کریں۔';
+
+  @override
+  String get liveAiBadge => 'Tadbeer AI';
+
+  @override
+  String get dataStatusLive => 'لائیو معاشی ڈیٹا';
+
+  @override
+  String get dataStatusPartial => 'کچھ اشاریے ڈیمو ڈیٹا پر مبنی ہیں';
+
+  @override
+  String get dataStatusDemo => 'ڈیمو معاشی ڈیٹا';
+
+  @override
+  String get dataStatusScenario => 'What-If — آپ کا اندازہ، پیش گوئی نہیں';
+
+  @override
+  String get dataStatusUnavailable => 'لائیو ڈیٹا فی الحال دستیاب نہیں';
+
+  @override
+  String get keyNumbersTitle => 'اہم اعداد و شمار';
+
+  @override
+  String get apiSourcesTitle => 'ذرائع';
+
+  @override
+  String get apiRecommendationsTitle => 'تجاویز';
+
+  @override
+  String get metricMonthlySavings => 'ماہانہ بچت';
+
+  @override
+  String get metricSavingsRate => 'بچت کی شرح';
+
+  @override
+  String get metricExpenseRatio => 'اخراجات کی شرح';
+
+  @override
+  String get metricRunwayMonths => 'ایمرجنسی فنڈ کا عرصہ';
+
+  @override
+  String get metricUnitMonths => 'مہینے';
+
+  @override
+  String get metricUnitBnUsd => 'ارب ڈالر';
+
+  @override
+  String get scenarioLabel => 'What-If منظرنامہ';
+
+  @override
+  String get scenarioNotForecast =>
+      'یہ آپ کے مفروضے پر مبنی ہے — یہ پیش گوئی نہیں۔';
+
+  @override
+  String get scenarioAssumption => 'مفروضہ';
+
+  @override
+  String get scenarioCurrent => 'موجودہ صورتحال';
+
+  @override
+  String get scenarioChanges => 'کیا بدلے گا';
+
+  @override
+  String get scenarioImpact => 'متوقع اثر';
+
+  @override
+  String get scenarioNextSteps => 'اگلے اقدامات';
+
+  @override
+  String get scenarioLimitations => 'حدود';
+
+  @override
+  String scenarioSaveMoreAssumption(String amount) {
+    return 'ہر مہینے $amount زیادہ بچت کریں';
+  }
+
+  @override
+  String scenarioExpenseAssumptionIncrease(String percent) {
+    return 'اخراجات میں $percent% اضافہ';
+  }
+
+  @override
+  String scenarioExpenseAssumptionDecrease(String percent) {
+    return 'اخراجات میں $percent% کمی';
+  }
+
+  @override
+  String scenarioRateAssumptionIncrease(String points) {
+    return 'شرح سود میں $points فیصد پوائنٹ اضافہ';
+  }
+
+  @override
+  String scenarioRateAssumptionDecrease(String points) {
+    return 'شرح سود میں $points فیصد پوائنٹ کمی';
+  }
+
+  @override
+  String get scenarioRowCurrentSavings => 'موجودہ ماہانہ بچت';
+
+  @override
+  String get scenarioRowNewSavings => 'نئی ماہانہ بچت';
+
+  @override
+  String get scenarioRowAdditional => 'اضافی بچت / مہینہ';
+
+  @override
+  String scenarioRowAfterMonths(num months) {
+    return '$months مہینوں کے بعد';
+  }
+
+  @override
+  String get scenarioRowCurrentRate => 'موجودہ بچت کی شرح';
+
+  @override
+  String get scenarioRowNewRate => 'متوقع بچت کی شرح';
+
+  @override
+  String get scenarioRowCurrentExpenses => 'موجودہ ماہانہ اخراجات';
+
+  @override
+  String get scenarioRowNewExpenses => 'نئے ماہانہ اخراجات';
+
+  @override
+  String get scenarioRowAdditionalExpense => 'اضافی ماہانہ اخراجات';
+
+  @override
+  String get scenarioRowCurrentSurplus => 'موجودہ ماہانہ بقایا';
+
+  @override
+  String get scenarioRowProjectedSurplus => 'متوقع ماہانہ بقایا';
+
+  @override
+  String get scenarioRowCurrentRunway => 'موجودہ ایمرجنسی عرصہ';
+
+  @override
+  String get scenarioRowProjectedRunway => 'متوقع ایمرجنسی عرصہ';
+
+  @override
+  String get whatIfButton => 'What-If';
+
+  @override
+  String get whatIfTitle => 'What-If سوال بنائیں';
+
+  @override
+  String get whatIfSubtitle =>
+      'اپنا مفروضہ سیٹ کریں — Tadbeer اثر کا قطعی حساب لگائے گا۔ یہ ایک مثال ہے، پیش گوئی نہیں۔';
+
+  @override
+  String get whatIfSaveMore => 'زیادہ بچت';
+
+  @override
+  String get whatIfExpenseChange => 'اخراجات میں تبدیلی';
+
+  @override
+  String get whatIfRateChange => 'شرح سود میں تبدیلی';
+
+  @override
+  String get whatIfAmountLabel => 'اضافی ماہانہ بچت (PKR)';
+
+  @override
+  String get whatIfMonthsLabel => 'مہینے (اختیاری)';
+
+  @override
+  String get whatIfMonthsHint => '6 اور 12 مہینوں کے لیے خالی چھوڑیں';
+
+  @override
+  String get whatIfPercentLabel => 'تبدیلی (%)';
+
+  @override
+  String get whatIfPointsLabel => 'تبدیلی (فیصد پوائنٹس)';
+
+  @override
+  String get whatIfIncrease => 'اضافہ';
+
+  @override
+  String get whatIfDecrease => 'کمی';
+
+  @override
+  String get whatIfRun => 'What-If چلائیں';
+
+  @override
+  String get whatIfInvalidAmount => 'صفر سے زیادہ رقم درج کریں۔';
+
+  @override
+  String get whatIfInvalidPercent => '0.1 اور 100 کے درمیان فیصد درج کریں۔';
+
+  @override
+  String get whatIfMonthsInvalid =>
+      '1 اور 600 کے درمیان مہینوں کی تعداد درج کریں۔';
+
+  @override
   String get profileTitle => 'اپنا مالی پروفائل بنائیں';
 
   @override
@@ -2185,6 +2390,211 @@ class AppLocalizationsUrLatn extends AppLocalizationsUr {
 
   @override
   String get retryAction => 'Dobara koshish karein';
+
+  @override
+  String get errorAssistantNetwork =>
+      'Is waqt Tadbeer tak ras nahi ho saka. Apna connection check kar ke dobara koshish karein.';
+
+  @override
+  String get errorAssistantTimeout =>
+      'Tadbeer ko jawab mein zyada waqt lag raha hai. Dobara koshish karein.';
+
+  @override
+  String get errorAssistantServer =>
+      'Tadbeer ki service mein masla aa gaya. Thodi der baad dobara koshish karein.';
+
+  @override
+  String get errorAssistantMalformed =>
+      'Tadbeer jawab mukammal nahi kar saka. Dobara koshish karein.';
+
+  @override
+  String get liveAiBadge => 'Tadbeer AI';
+
+  @override
+  String get dataStatusLive => 'Live maashi data';
+
+  @override
+  String get dataStatusPartial => 'Kuch ashariye demo data par hain';
+
+  @override
+  String get dataStatusDemo => 'Demo maashi data';
+
+  @override
+  String get dataStatusScenario => 'What-If — aap ka andaza, forecast nahi';
+
+  @override
+  String get dataStatusUnavailable => 'Live data filhal maujood nahi';
+
+  @override
+  String get keyNumbersTitle => 'Ahem adaad';
+
+  @override
+  String get apiSourcesTitle => 'Zaraye';
+
+  @override
+  String get apiRecommendationsTitle => 'Tajaweez';
+
+  @override
+  String get metricMonthlySavings => 'Mahana bachat';
+
+  @override
+  String get metricSavingsRate => 'Bachat ki sharah';
+
+  @override
+  String get metricExpenseRatio => 'Kharchon ki sharah';
+
+  @override
+  String get metricRunwayMonths => 'Emergency runway';
+
+  @override
+  String get metricUnitMonths => 'mahine';
+
+  @override
+  String get metricUnitBnUsd => 'arab USD';
+
+  @override
+  String get scenarioLabel => 'What-If Scenario';
+
+  @override
+  String get scenarioNotForecast =>
+      'Aap ke andaze par based — yeh forecast nahi hai.';
+
+  @override
+  String get scenarioAssumption => 'Andaza';
+
+  @override
+  String get scenarioCurrent => 'Maujooda surat-e-hal';
+
+  @override
+  String get scenarioChanges => 'Kya badlega';
+
+  @override
+  String get scenarioImpact => 'Mutawaqqa asar';
+
+  @override
+  String get scenarioNextSteps => 'Agle qadam';
+
+  @override
+  String get scenarioLimitations => 'Hudood';
+
+  @override
+  String scenarioSaveMoreAssumption(String amount) {
+    return 'Har mahine $amount zyada bachat karein';
+  }
+
+  @override
+  String scenarioExpenseAssumptionIncrease(String percent) {
+    return 'Kharchon mein $percent% izafa';
+  }
+
+  @override
+  String scenarioExpenseAssumptionDecrease(String percent) {
+    return 'Kharchon mein $percent% kami';
+  }
+
+  @override
+  String scenarioRateAssumptionIncrease(String points) {
+    return 'Sood ki sharah mein $points percent point izafa';
+  }
+
+  @override
+  String scenarioRateAssumptionDecrease(String points) {
+    return 'Sood ki sharah mein $points percent point kami';
+  }
+
+  @override
+  String get scenarioRowCurrentSavings => 'Maujooda mahana bachat';
+
+  @override
+  String get scenarioRowNewSavings => 'Nayi mahana bachat';
+
+  @override
+  String get scenarioRowAdditional => 'Zyada bachat / mahina';
+
+  @override
+  String scenarioRowAfterMonths(num months) {
+    return '$months mahinon baad';
+  }
+
+  @override
+  String get scenarioRowCurrentRate => 'Maujooda bachat ki sharah';
+
+  @override
+  String get scenarioRowNewRate => 'Mutawaqqa bachat ki sharah';
+
+  @override
+  String get scenarioRowCurrentExpenses => 'Maujooda mahana kharche';
+
+  @override
+  String get scenarioRowNewExpenses => 'Naye mahana kharche';
+
+  @override
+  String get scenarioRowAdditionalExpense => 'Zyada mahana kharcha';
+
+  @override
+  String get scenarioRowCurrentSurplus => 'Maujooda mahana surplus';
+
+  @override
+  String get scenarioRowProjectedSurplus => 'Mutawaqqa mahana surplus';
+
+  @override
+  String get scenarioRowCurrentRunway => 'Maujooda emergency runway';
+
+  @override
+  String get scenarioRowProjectedRunway => 'Mutawaqqa emergency runway';
+
+  @override
+  String get whatIfButton => 'What-If';
+
+  @override
+  String get whatIfTitle => 'What-If sawal banayein';
+
+  @override
+  String get whatIfSubtitle =>
+      'Apna andaza set karein — Tadbeer asar ka tahqeeqi hisaab lagayega. Yeh misaal hai, forecast nahi.';
+
+  @override
+  String get whatIfSaveMore => 'Zyada bachat';
+
+  @override
+  String get whatIfExpenseChange => 'Kharchon mein tabdeeli';
+
+  @override
+  String get whatIfRateChange => 'Sood ki sharah mein tabdeeli';
+
+  @override
+  String get whatIfAmountLabel => 'Zyada mahana bachat (PKR)';
+
+  @override
+  String get whatIfMonthsLabel => 'Mahine (ikhtiyari)';
+
+  @override
+  String get whatIfMonthsHint => '6 aur 12 mahinon ke liye khali chhorein';
+
+  @override
+  String get whatIfPercentLabel => 'Tabdeeli (%)';
+
+  @override
+  String get whatIfPointsLabel => 'Tabdeeli (percent points)';
+
+  @override
+  String get whatIfIncrease => 'Izafa';
+
+  @override
+  String get whatIfDecrease => 'Kami';
+
+  @override
+  String get whatIfRun => 'What-If chalayein';
+
+  @override
+  String get whatIfInvalidAmount => 'Se zyada raqam darj karein.';
+
+  @override
+  String get whatIfInvalidPercent =>
+      '0.1 aur 100 ke darmiyan fi sadarj karein.';
+
+  @override
+  String get whatIfMonthsInvalid => '1 aur 600 ke darmiyan mahine darj karein.';
 
   @override
   String get profileTitle => 'Apna maali profile banaein';

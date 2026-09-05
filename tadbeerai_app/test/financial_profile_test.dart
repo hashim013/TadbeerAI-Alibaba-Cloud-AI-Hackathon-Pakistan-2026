@@ -76,6 +76,7 @@ void main() {
       expect(profile.persona, isNull);
       expect(profile.monthlyIncome, isNull);
       expect(profile.monthlyEssentialExpenses, isNull);
+      expect(profile.totalSavings, isNull);
       expect(profile.primaryGoal, isNull);
       expect(profile.profileCompleted, isFalse);
     });
@@ -85,6 +86,7 @@ void main() {
         persona: Persona.salaried,
         monthlyIncome: 80000,
         monthlyEssentialExpenses: 55000,
+        totalSavings: 200000,
         primaryGoal: PrimaryGoal.emergencyFund,
         profileCompleted: true,
       );
@@ -92,6 +94,7 @@ void main() {
       expect(profile.persona, Persona.salaried);
       expect(profile.monthlyIncome, 80000);
       expect(profile.monthlyEssentialExpenses, 55000);
+      expect(profile.totalSavings, 200000);
       expect(profile.primaryGoal, PrimaryGoal.emergencyFund);
       expect(profile.profileCompleted, isTrue);
     });
@@ -101,6 +104,7 @@ void main() {
         persona: Persona.student,
         monthlyIncome: 0,
         monthlyEssentialExpenses: 5000,
+        totalSavings: 10000,
         primaryGoal: PrimaryGoal.education,
         profileCompleted: true,
       );
@@ -110,6 +114,7 @@ void main() {
       expect(json['persona'], 'student');
       expect(json['monthlyIncome'], 0);
       expect(json['monthlyEssentialExpenses'], 5000);
+      expect(json['totalSavings'], 10000);
       expect(json['primaryGoal'], 'education');
       expect(json['profileCompleted'], true);
     });

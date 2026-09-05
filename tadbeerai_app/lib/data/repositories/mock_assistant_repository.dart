@@ -26,7 +26,11 @@ class MockAssistantRepository implements AssistantRepository {
   static const double _incomeDropTrimShare = 0.30;
 
   @override
-  Future<AssistantReply> respond(String question, AssistantContext context) {
+  Future<AssistantReply> respond(
+    String question,
+    AssistantContext context, {
+    String language = 'en',
+  }) {
     return Future<AssistantReply>.delayed(_latency, () {
       final intent = AssistantIntents.detect(question);
       final reply = switch (intent) {

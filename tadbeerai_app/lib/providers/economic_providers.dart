@@ -1,16 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/config/api_config.dart';
+import '../data/repositories/api_economic_repository.dart';
 import '../data/repositories/mock_economic_repository.dart';
 import '../domain/entities/economic_overview.dart';
 import '../domain/entities/finance_category.dart';
 import '../domain/repositories/economic_repository.dart';
 import '../domain/services/economic_impact_service.dart';
 import '../domain/services/finance_calculations.dart';
+import 'assistant_providers.dart';
 import 'finance_providers.dart';
 
-final economicRepositoryProvider = Provider<EconomicRepository>(
-  (ref) => MockEconomicRepository(),
-);
+final economicRepositoryProvider = Provider<EconomicRepository>((ref) {
+  if (ApiConfig.useMockEconomy) {
+    return MockEconomicRepository();
+  }
+  return ApiEconomicRepository(dio: ref.watch(apiDioProvider));
+});
 
 /// The economic snapshot rendered by the Economy tab.
 final economicPulseProvider = FutureProvider<EconomicOverview>(

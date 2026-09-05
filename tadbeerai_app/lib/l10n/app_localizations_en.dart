@@ -1038,6 +1038,211 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retryAction => 'Retry';
 
   @override
+  String get errorAssistantNetwork =>
+      'Unable to reach Tadbeer right now. Please check your connection and try again.';
+
+  @override
+  String get errorAssistantTimeout =>
+      'Tadbeer is taking longer than expected. Please try again.';
+
+  @override
+  String get errorAssistantServer =>
+      'Tadbeer\'s service hit a problem. Please try again in a moment.';
+
+  @override
+  String get errorAssistantMalformed =>
+      'Tadbeer couldn\'t complete its answer. Please try again.';
+
+  @override
+  String get liveAiBadge => 'Tadbeer AI';
+
+  @override
+  String get dataStatusLive => 'Live economic data';
+
+  @override
+  String get dataStatusPartial => 'Some indicators use demo data';
+
+  @override
+  String get dataStatusDemo => 'Demo economic data';
+
+  @override
+  String get dataStatusScenario => 'What-If — your assumption, not a forecast';
+
+  @override
+  String get dataStatusUnavailable => 'Live data currently unavailable';
+
+  @override
+  String get keyNumbersTitle => 'Key numbers';
+
+  @override
+  String get apiSourcesTitle => 'Sources';
+
+  @override
+  String get apiRecommendationsTitle => 'Recommendations';
+
+  @override
+  String get metricMonthlySavings => 'Monthly savings';
+
+  @override
+  String get metricSavingsRate => 'Savings rate';
+
+  @override
+  String get metricExpenseRatio => 'Expense ratio';
+
+  @override
+  String get metricRunwayMonths => 'Emergency runway';
+
+  @override
+  String get metricUnitMonths => 'months';
+
+  @override
+  String get metricUnitBnUsd => 'bn USD';
+
+  @override
+  String get scenarioLabel => 'What-If Scenario';
+
+  @override
+  String get scenarioNotForecast =>
+      'Based on your assumption — not a forecast.';
+
+  @override
+  String get scenarioAssumption => 'Assumption';
+
+  @override
+  String get scenarioCurrent => 'Current situation';
+
+  @override
+  String get scenarioChanges => 'What changes';
+
+  @override
+  String get scenarioImpact => 'Estimated impact';
+
+  @override
+  String get scenarioNextSteps => 'Next steps';
+
+  @override
+  String get scenarioLimitations => 'Limitations';
+
+  @override
+  String scenarioSaveMoreAssumption(String amount) {
+    return 'Save $amount more each month';
+  }
+
+  @override
+  String scenarioExpenseAssumptionIncrease(String percent) {
+    return 'Expenses increase by $percent%';
+  }
+
+  @override
+  String scenarioExpenseAssumptionDecrease(String percent) {
+    return 'Expenses decrease by $percent%';
+  }
+
+  @override
+  String scenarioRateAssumptionIncrease(String points) {
+    return 'Interest rates increase by $points percentage points';
+  }
+
+  @override
+  String scenarioRateAssumptionDecrease(String points) {
+    return 'Interest rates decrease by $points percentage points';
+  }
+
+  @override
+  String get scenarioRowCurrentSavings => 'Current monthly savings';
+
+  @override
+  String get scenarioRowNewSavings => 'New monthly savings';
+
+  @override
+  String get scenarioRowAdditional => 'Additional savings / month';
+
+  @override
+  String scenarioRowAfterMonths(num months) {
+    return 'After $months months';
+  }
+
+  @override
+  String get scenarioRowCurrentRate => 'Current savings rate';
+
+  @override
+  String get scenarioRowNewRate => 'Projected savings rate';
+
+  @override
+  String get scenarioRowCurrentExpenses => 'Current monthly expenses';
+
+  @override
+  String get scenarioRowNewExpenses => 'New monthly expenses';
+
+  @override
+  String get scenarioRowAdditionalExpense => 'Additional monthly expense';
+
+  @override
+  String get scenarioRowCurrentSurplus => 'Current monthly surplus';
+
+  @override
+  String get scenarioRowProjectedSurplus => 'Projected monthly surplus';
+
+  @override
+  String get scenarioRowCurrentRunway => 'Current emergency runway';
+
+  @override
+  String get scenarioRowProjectedRunway => 'Projected emergency runway';
+
+  @override
+  String get whatIfButton => 'What-If';
+
+  @override
+  String get whatIfTitle => 'Build a What-If question';
+
+  @override
+  String get whatIfSubtitle =>
+      'Set your assumption — Tadbeer calculates the impact deterministically. It is an illustration, not a forecast.';
+
+  @override
+  String get whatIfSaveMore => 'Save more';
+
+  @override
+  String get whatIfExpenseChange => 'Expense change';
+
+  @override
+  String get whatIfRateChange => 'Rate change';
+
+  @override
+  String get whatIfAmountLabel => 'Extra monthly savings (PKR)';
+
+  @override
+  String get whatIfMonthsLabel => 'Months (optional)';
+
+  @override
+  String get whatIfMonthsHint => 'Leave empty for 6 and 12 months';
+
+  @override
+  String get whatIfPercentLabel => 'Change (%)';
+
+  @override
+  String get whatIfPointsLabel => 'Change (percentage points)';
+
+  @override
+  String get whatIfIncrease => 'Increase';
+
+  @override
+  String get whatIfDecrease => 'Decrease';
+
+  @override
+  String get whatIfRun => 'Run What-If';
+
+  @override
+  String get whatIfInvalidAmount => 'Enter an amount greater than zero.';
+
+  @override
+  String get whatIfInvalidPercent => 'Enter a percentage between 0.1 and 100.';
+
+  @override
+  String get whatIfMonthsInvalid =>
+      'Enter a number of months between 1 and 600.';
+
+  @override
   String get profileTitle => 'Build Your Financial Profile';
 
   @override

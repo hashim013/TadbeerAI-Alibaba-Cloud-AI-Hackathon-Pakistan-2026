@@ -48,6 +48,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/profile/financial',
         builder: (context, state) => const FinancialProfileScreen(),
       ),
+      // Standalone route preserving the Market screen for future phases
+      GoRoute(
+        path: '/market',
+        builder: (context, state) => const MarketTab(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             MainShell(navigationShell: navigationShell),
@@ -103,14 +108,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                     ),
                   ),
                 ],
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/market',
-                builder: (context, state) => const MarketTab(),
               ),
             ],
           ),

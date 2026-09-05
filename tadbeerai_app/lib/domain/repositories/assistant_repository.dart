@@ -33,6 +33,7 @@ class AssistantContext {
     this.persona,
     this.profileIncome,
     this.profileExpenses,
+    this.profileSavings,
     this.primaryGoal,
   });
 
@@ -97,16 +98,27 @@ class AssistantContext {
   /// User-declared essential monthly expenses (from the profile form).
   final double? profileExpenses;
 
+  /// User-declared total savings (from the profile form).
+  final double? profileSavings;
+
   /// User's primary financial goal (null when no profile exists).
   final PrimaryGoal? primaryGoal;
 }
 
 /// Assistant data contract.
 ///
-/// Phase 3 ships a deterministic mock that answers from rule-based intents
-/// over [AssistantContext]; the multi-agent backend replaces it in a later
-/// phase without touching the chat UI.
+/// The offline mock answers from rule-based intents over [AssistantContext];
+/// the API implementation calls the multi-agent backend. Both return the
+/// same [AssistantReply] shape so the chat UI stays repository-agnostic.
 abstract interface class AssistantRepository {
   /// Answers [question] using the user's current [context].
-  Future<AssistantReply> respond(String question, AssistantContext context);
+  ///
+  /// [language] is the backend language code ("en", "ur", "ur_latn") derived
+  /// from the app locale — the mock ignores it (its templates are localized
+  /// by the UI), while the API forwards it so the backend answers in kind.
+  Future<AssistantReply> respond(
+    String question,
+    AssistantContext context, {
+    String language = 'en',
+  });
 }

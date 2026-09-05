@@ -7,6 +7,7 @@ import '../../../core/utils/currency_format.dart';
 import '../../../core/utils/l10n_context.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/data_status_badge.dart';
 import '../../../domain/entities/economic_overview.dart';
 import '../../../domain/services/economic_impact_service.dart';
 import '../../../providers/economic_providers.dart';
@@ -61,7 +62,7 @@ class _EconomicPulseContent extends ConsumerWidget {
                 style: theme.textTheme.headlineSmall,
               ),
             ),
-            const DemoDataBadge(),
+            DataStatusBadge(status: economy.status),
           ],
         ),
         const SizedBox(height: 4),

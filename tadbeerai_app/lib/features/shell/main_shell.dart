@@ -33,11 +33,6 @@ class MainShell extends StatelessWidget {
         label: l10n.tabEconomy,
       ),
       _NavDestination(
-        icon: Icons.candlestick_chart_outlined,
-        selectedIcon: Icons.candlestick_chart_rounded,
-        label: l10n.tabMarket,
-      ),
-      _NavDestination(
         icon: Icons.auto_awesome_outlined,
         selectedIcon: Icons.auto_awesome_rounded,
         label: l10n.tabAskTadbeer,

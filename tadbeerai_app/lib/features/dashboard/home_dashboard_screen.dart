@@ -112,7 +112,7 @@ class _DashboardContent extends ConsumerWidget {
                 ],
               ),
             ),
-            // Notification Bell with green alert dot
+            // Notification Bell
             Material(
               color: Colors.transparent,
               child: InkWell(
@@ -120,49 +120,28 @@ class _DashboardContent extends ConsumerWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text(
-                          'No new alerts. Your finances are running smoothly!'),
+                          'Notifications are not available in this regional build.'),
                       behavior: SnackBarBehavior.floating,
                       duration: Duration(seconds: 2),
                     ),
                   );
                 },
                 borderRadius: BorderRadius.circular(20),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: AppColors.navyCard,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.08),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.notifications_none_rounded,
-                        color: Colors.white,
-                        size: 22,
-                      ),
+                child: Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: AppColors.navyCard,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.08),
                     ),
-                    Positioned(
-                      top: 1,
-                      right: 1,
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF10B981),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.navyBg,
-                            width: 1.8,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
+                  child: const Icon(
+                    Icons.notifications_none_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
                 ),
               ),
             ),

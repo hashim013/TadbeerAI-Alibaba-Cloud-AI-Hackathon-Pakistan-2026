@@ -106,6 +106,22 @@ Future<void> _enterAmount(
   final label =
       isExpenses ? 'Essential Monthly Expenses' : 'Typical Monthly Income';
   final field = find.widgetWithText(TextFormField, label);
+  final scrollable = _formScrollable();
+  if (field.evaluate().isEmpty) {
+    try {
+      await tester.scrollUntilVisible(
+        field,
+        -100,
+        scrollable: scrollable,
+      );
+    } catch (_) {
+      await tester.scrollUntilVisible(
+        field,
+        100,
+        scrollable: scrollable,
+      );
+    }
+  }
   await tester.ensureVisible(field);
   await tester.pumpAndSettle();
   final editable = find.descendant(
@@ -675,10 +691,11 @@ void main() {
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
 
-      // Step 2: Enter income & expenses
+      // Step 2: Enter income, expenses & savings
       final textFields = find.byType(TextFormField);
-      await tester.enterText(textFields.first, '80000');
-      await tester.enterText(textFields.last, '54900');
+      await tester.enterText(textFields.at(0), '80000');
+      await tester.enterText(textFields.at(1), '54900');
+      await tester.enterText(textFields.at(2), '250000');
       await tester.pumpAndSettle();
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
@@ -698,6 +715,7 @@ void main() {
       expect(find.text('Salaried Employee'), findsOneWidget);
       expect(find.text('PKR 80,000'), findsOneWidget);
       expect(find.text('PKR 54,900'), findsOneWidget);
+      expect(find.text('PKR 250,000'), findsOneWidget);
       expect(find.text('Emergency Fund'), findsOneWidget);
 
       // Tap Complete Profile
@@ -708,6 +726,7 @@ void main() {
       expect(repo.lastSaved?.persona, Persona.salaried);
       expect(repo.lastSaved?.monthlyIncome, 80000);
       expect(repo.lastSaved?.monthlyEssentialExpenses, 54900);
+      expect(repo.lastSaved?.totalSavings, 250000);
       expect(repo.lastSaved?.primaryGoal, PrimaryGoal.emergencyFund);
       expect(repo.lastSaved?.profileCompleted, isTrue);
     });

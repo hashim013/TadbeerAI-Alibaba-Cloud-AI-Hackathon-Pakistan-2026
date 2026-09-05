@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/config/api_config.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/l10n_context.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../domain/entities/assistant_api_models.dart';
 import '../../../domain/entities/assistant_message.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../providers/assistant_providers.dart';
 import 'widgets/assistant_widgets.dart';
+import 'widgets/what_if_sheet.dart';
 
-/// Ask Tadbeer: the rule-based demo assistant chat.
+/// Ask Tadbeer: the assistant chat.
 ///
-/// Bubbles render structured [AssistantReply] payloads (localized here, in
-/// the UI layer) so a future real backend only has to produce the same
-/// structure — the screen itself stays untouched.
+/// Mock replies render structured [AssistantReply] payloads; backend
+/// replies (carrying the typed API payload) render their own rich bubble
+/// with the What-If scenario card, key numbers, sources and data status.
 class AskTadbeerScreen extends ConsumerStatefulWidget {
   const AskTadbeerScreen({super.key});
 
@@ -36,7 +40,10 @@ class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
     // is disabled then, so this only guards races (e.g. keyboard submit).
     if (ref.read(assistantChatProvider).isResponding) return;
     _inputController.clear();
-    ref.read(assistantChatProvider.notifier).send(question);
+    ref.read(assistantChatProvider.notifier).send(
+          question,
+          language: apiLanguageCode(Localizations.localeOf(context)),
+        );
   }
 
   @override
@@ -45,8 +52,8 @@ class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final state = ref.watch(assistantChatProvider);
-    // The assistant only answers from the demo profile — input stays off
-    // until finance + economy data is ready.
+    // The assistant only answers from a ready financial + economic context —
+    // input stays off until that data is loaded.
     final contextReady = ref.watch(assistantContextProvider) != null;
 
     return Scaffold(
@@ -80,7 +87,11 @@ class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const DemoAiBadge(),
+                  // The pill names the engine honestly — never demo for
+                  // live backend answers.
+                  ApiConfig.useMockAssistant
+                      ? const DemoAiBadge()
+                      : const LiveAiBadge(),
                   if (state.messages.isNotEmpty) ...[
                     const SizedBox(width: 4),
                     IconButton(
@@ -119,7 +130,7 @@ class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          l10n.errorTitle,
+                          _errorMessage(l10n, state.errorKind),
                           style: theme.textTheme.bodySmall,
                         ),
                       ),
@@ -142,6 +153,14 @@ class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+                  IconButton(
+                    tooltip: l10n.whatIfButton,
+                    icon: const Icon(Icons.tune_rounded),
+                    onPressed: contextReady && !state.isResponding
+                        ? () => showWhatIfSheet(context, _send)
+                        : null,
+                  ),
+                  const SizedBox(width: 4),
                   Expanded(
                     child: TextField(
                       controller: _inputController,
@@ -180,6 +199,17 @@ class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
       ),
     );
   }
+
+  /// Friendly, localized message for why the last ask failed — raw
+  /// exception details never reach the UI.
+  String _errorMessage(AppLocalizations l10n, AssistantErrorKind? kind) =>
+      switch (kind) {
+        AssistantErrorKind.network => l10n.errorAssistantNetwork,
+        AssistantErrorKind.timeout => l10n.errorAssistantTimeout,
+        AssistantErrorKind.server => l10n.errorAssistantServer,
+        AssistantErrorKind.malformed => l10n.errorAssistantMalformed,
+        null => l10n.errorTitle,
+      };
 }
 
 /// Newest-first list (reverse: true keeps it pinned to the bottom edge).

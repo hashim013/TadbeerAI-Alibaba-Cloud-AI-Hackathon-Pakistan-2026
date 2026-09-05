@@ -385,9 +385,9 @@ class _GoogleLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(18, 18),
-      painter: const _GoogleLogoPainter(),
+    return const CustomPaint(
+      size: Size(18, 18),
+      painter: _GoogleLogoPainter(),
     );
   }
 }
