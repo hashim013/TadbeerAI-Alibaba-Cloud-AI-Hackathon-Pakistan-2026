@@ -25,6 +25,9 @@ class ApiConfig {
   /// Endpoint of the macroeconomic indicators snapshot.
   static const String economySnapshotPath = '/v1/economy/snapshot';
 
+  /// Endpoint of the PBS SPI essential commodity prices.
+  static const String essentialPricesPath = '/v1/economy/essential-prices';
+
   /// Assistant data source: `live` (default) answers through the real
   /// backend; `demo` keeps the offline mock for UI development and tests.
   static const String assistantMode = String.fromEnvironment(
@@ -36,4 +39,13 @@ class ApiConfig {
 
   /// Economy data source: `live` (default) fetches from backend; `demo` uses offline mock.
   static bool get useMockEconomy => assistantMode == 'demo';
+
+  /// Authentication data source: `firebase` (default) connects to Firebase Auth;
+  /// `demo` keeps offline mock for headless unit tests.
+  static const String authMode = String.fromEnvironment(
+    'AUTH_MODE',
+    defaultValue: 'firebase',
+  );
+
+  static bool get useMockAuth => authMode == 'demo';
 }

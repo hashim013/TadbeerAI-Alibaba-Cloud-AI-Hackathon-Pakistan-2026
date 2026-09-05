@@ -565,5 +565,21 @@
   "homeProfileCtaButton": "Complete Profile",
   "homeProfileCompletedTitle": "Financial Profile",
   "homeProfileCompletedBody": "Personalized insights enabled",
-  "homeProfileEditButton": "Edit"
+  "homeProfileEditButton": "Edit",
+
+  "essentialPricesTitle": "Essential Prices",
+  "essentialPricesSubtitle": "Everyday items affecting household budgets",
+  "essentialPricesWhyTitle": "Why Everyday Prices Matter",
+  "essentialPricesWhyBody": "Weekly shifts in staple commodities like onions, chicken, and flour directly alter kitchen cash flow. Ask Tadbeer how these trends impact your personal surplus or test a grocery price shock.",
+  "essentialPricesAskImpact": "Ask Tadbeer",
+  "essentialPricesTryWhatIf": "Try What-If",
+  "essentialPricesViewAll": "View all",
+  "essentialPricesShowLess": "Show less",
+  "essentialPricesCategoryAll": "All",
+  "essentialPricesCategoryVegetables": "Vegetables",
+  "essentialPricesCategoryDairy": "Dairy & Poultry",
+  "essentialPricesCategoryStaples": "Food & Staples",
+  "essentialPricesCategoryPulses": "Pulses",
+  "essentialPricesCategoryCookingFuel": "Cooking & Fuel",
+  "essentialPricesUnavailable": "Essential price data temporarily unavailable"
 }

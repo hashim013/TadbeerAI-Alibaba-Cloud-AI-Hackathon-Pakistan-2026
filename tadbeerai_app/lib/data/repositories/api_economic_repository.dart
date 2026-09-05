@@ -2,9 +2,11 @@ import 'package:dio/dio.dart';
 
 import '../../core/config/api_config.dart';
 import '../../domain/entities/assistant_api_models.dart';
+import '../../domain/entities/commodity_price.dart';
 import '../../domain/entities/economic_indicator.dart';
 import '../../domain/entities/economic_overview.dart';
 import '../../domain/repositories/economic_repository.dart';
+import '../mock/mock_commodity_data.dart';
 import '../mock/mock_economic_data.dart';
 
 /// [EconomicRepository] backed by the FastAPI `/v1/economy/snapshot` endpoint.
@@ -192,5 +194,73 @@ class ApiEconomicRepository implements EconomicRepository {
   Future<EconomicIndicator?> getIndicator(String id) async {
     final overview = await getOverview();
     return overview.indicatorById(id);
+  }
+
+  @override
+  Future<CommodityOverview> getEssentialPrices({String? category}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (category != null &&
+          category.isNotEmpty &&
+          category.toLowerCase() != 'all') {
+        queryParams['category'] = category;
+      }
+      final response = await _dio.get(
+        ApiConfig.essentialPricesPath,
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+      );
+      final data = response.data;
+      if (data is! Map) {
+        throw const FormatException('Malformed essential prices payload');
+      }
+      final map = data.map((k, v) => MapEntry('$k', v));
+      return CommodityOverview.fromJson(map);
+    } catch (e) {
+      final seed = MockCommodityData.seed(DateTime.now());
+      if (category == null ||
+          category.isEmpty ||
+          category.toLowerCase() == 'all') {
+        return CommodityOverview(
+          items: seed.items,
+          period: seed.period,
+          sourceName: seed.sourceName,
+          sourceUrl: seed.sourceUrl,
+          sourceScope: seed.sourceScope,
+          status: DataStatusKind.demo,
+          updatedAt: seed.updatedAt,
+          fallbackReasons: {
+            'offline': 'Backend /v1/economy/essential-prices unavailable: $e',
+          },
+        );
+      }
+      return CommodityOverview(
+        items: seed.filterByCategory(category),
+        period: seed.period,
+        sourceName: seed.sourceName,
+        sourceUrl: seed.sourceUrl,
+        sourceScope: seed.sourceScope,
+        status: DataStatusKind.demo,
+        updatedAt: seed.updatedAt,
+        fallbackReasons: {
+          'offline': 'Backend /v1/economy/essential-prices unavailable: $e',
+        },
+      );
+    }
+  }
+
+  @override
+  Future<CommodityPrice?> getCommodity(String id) async {
+    try {
+      final response = await _dio.get('${ApiConfig.essentialPricesPath}/$id');
+      final data = response.data;
+      if (data is Map &&
+          data.containsKey('id') &&
+          data['id'] is String &&
+          (data['id'] as String).isNotEmpty) {
+        return CommodityPrice.fromJson(data.map((k, v) => MapEntry('$k', v)));
+      }
+    } catch (_) {}
+    final overview = await getEssentialPrices();
+    return overview.itemById(id);
   }
 }

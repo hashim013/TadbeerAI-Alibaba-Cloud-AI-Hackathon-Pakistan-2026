@@ -35,6 +35,16 @@ from .models import (
     overall_status,
     spec_for,
 )
+from .commodity_models import (
+    DEFAULT_SCOPE,
+    OFFICIAL_PBS_SOURCE,
+    OFFICIAL_PBS_URL,
+    CommodityOverview,
+    CommodityPrice,
+    compute_trend,
+    get_default_commodities,
+)
+from .pbs_commodity_client import PBSCommodityClient
 from .pbs_client import PBSGatewayClient
 from .sbp_client import SBPGatewayClient
 from .service import (
@@ -46,6 +56,9 @@ from .service import (
 from .worldbank_client import WorldBankClient
 
 __all__ = [
+    "CommodityOverview",
+    "CommodityPrice",
+    "DEFAULT_SCOPE",
     "DEMO_SOURCE",
     "EconomicDataClient",
     "EconomicDataError",
@@ -54,6 +67,9 @@ __all__ = [
     "INDICATOR_CATALOG",
     "Indicator",
     "IndicatorSpec",
+    "OFFICIAL_PBS_SOURCE",
+    "OFFICIAL_PBS_URL",
+    "PBSCommodityClient",
     "PBSGatewayClient",
     "SBPGatewayClient",
     "SNAPSHOT_DEMO",
@@ -64,7 +80,9 @@ __all__ = [
     "STATUS_LIVE",
     "STATUS_UNAVAILABLE",
     "WorldBankClient",
+    "compute_trend",
     "fetch_json",
+    "get_default_commodities",
     "get_economic_service",
     "overall_status",
     "parse_number",

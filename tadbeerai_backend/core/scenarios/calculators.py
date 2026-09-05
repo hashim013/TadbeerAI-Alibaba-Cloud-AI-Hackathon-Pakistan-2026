@@ -163,27 +163,50 @@ def calculate_savings_scenario(
 
 
 def calculate_expense_shock(
-    pct: Decimal, context: dict[str, Any]
+    pct: Decimal | None,
+    context: dict[str, Any],
+    amount_pkr: Decimal | None = None,
 ) -> ScenarioResult:
-    """Project a user-defined percentage change in monthly expenses."""
-    if not _valid_pct(pct):
+    """Project a user-defined percentage or absolute change in monthly expenses."""
+    if pct is not None:
+        if not _valid_pct(pct):
+            return _reject(
+                EXPENSE_SHOCK,
+                f"Invalid percentage ({pct}%) — must be greater than -100% and "
+                f"at most 100%.",
+            )
+    elif amount_pkr is not None:
+        if amount_pkr <= 0:
+            return _reject(
+                EXPENSE_SHOCK,
+                f"Invalid expense increase ({amount_pkr}) — must be a positive PKR amount.",
+            )
+    else:
         return _reject(
             EXPENSE_SHOCK,
-            f"Invalid percentage ({pct}%) — must be greater than -100% and "
-            f"at most 100%.",
+            "Either a percentage or an amount is required for an expense shock.",
         )
 
     income = _decimal(context.get("monthly_income"))
     expenses = _decimal(context.get("monthly_expenses"))
     savings = _decimal(context.get("total_savings"))
 
-    assumptions: dict[str, Any] = {"expense_change_pct": pct}
+    if pct is not None:
+        assumptions: dict[str, Any] = {"expense_change_pct": pct}
+        outputs: dict[str, Any] = {"expense_shock_pct": pct}
+        limitations = [
+            f"The {pct}% expense change is a user-defined scenario assumption, "
+            "not a forecast of actual inflation.",
+        ]
+    else:
+        assumptions = {"additional_monthly_expense_pkr": _money(amount_pkr)}
+        outputs = {"additional_monthly_expense": _money(amount_pkr)}
+        limitations = [
+            f"The PKR {amount_pkr} expense change is a user-defined scenario assumption, "
+            "not a forecast of actual inflation.",
+        ]
+
     inputs: dict[str, Any] = {}
-    outputs: dict[str, Any] = {"expense_shock_pct": pct}
-    limitations = [
-        f"The {pct}% expense change is a user-defined scenario assumption, "
-        "not a forecast of actual inflation.",
-    ]
 
     if income is not None:
         inputs["monthly_income"] = _money(income)
@@ -206,7 +229,12 @@ def calculate_expense_shock(
         )
 
     inputs["monthly_expenses"] = _money(expenses)
-    additional = _money(expenses * pct / 100)
+    if pct is not None:
+        additional = _money(expenses * pct / 100)
+    else:
+        additional = _money(amount_pkr)
+        outputs["expense_shock_pct"] = _round1(amount_pkr / expenses * 100)
+
     new_expenses = _money(expenses + additional)
     outputs["current_monthly_expenses"] = _money(expenses)
     outputs["additional_monthly_expense"] = additional
@@ -318,9 +346,12 @@ def run_scenario(
         return calculate_savings_scenario(
             params.amount_pkr, context, months=params.months
         )
-    if params.pct_change is not None:
-        if params.scenario_type == EXPENSE_SHOCK:
+    if params.scenario_type == EXPENSE_SHOCK:
+        if params.pct_change is not None:
             return calculate_expense_shock(params.pct_change, context)
+        if params.amount_pkr is not None:
+            return calculate_expense_shock(None, context, amount_pkr=params.amount_pkr)
+    if params.pct_change is not None:
         if params.scenario_type == RATE_SHOCK:
             return calculate_rate_scenario(params.pct_change, context)
     return _reject(

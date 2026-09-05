@@ -10,6 +10,9 @@ import '../../../domain/entities/economic_event.dart';
 import '../../../domain/entities/economic_indicator.dart';
 import '../../../l10n/app_localizations.dart';
 
+export 'commodity_card.dart';
+export 'commodity_detail_sheet.dart';
+
 // ── Indicator presentation helpers ─────────────────────────────────────────
 
 /// Localized display name for an indicator (stable id → string).

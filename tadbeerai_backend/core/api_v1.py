@@ -86,3 +86,32 @@ def v1_economy_snapshot(
         },
         "fallback_reasons": snapshot.fallback_reasons,
     }
+
+
+@router.get("/economy/essential-prices")
+def v1_essential_prices(
+    category: str | None = None,
+    location: str | None = None,
+    limit: int | None = None,
+    service: EconomicDataService = Depends(get_economic_service),
+) -> dict:
+    """Return the essential commodity prices monitored under the PBS SPI."""
+    overview = service.commodity_snapshot(
+        category=category, location=location, limit=limit
+    )
+    return overview.to_dict()
+
+
+@router.get("/economy/essential-prices/{item_id}")
+def v1_essential_price_detail(
+    item_id: str,
+    service: EconomicDataService = Depends(get_economic_service),
+) -> dict:
+    """Return price details and economic interpretation for a single commodity."""
+    item = service.commodity_detail(item_id)
+    if item is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Essential commodity '{item_id}' not found.",
+        )
+    return item.to_dict()

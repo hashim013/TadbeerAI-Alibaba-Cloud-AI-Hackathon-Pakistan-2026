@@ -19,7 +19,14 @@ from core.agents.state import AGENT_ORDER
 _INTENT_KEYWORDS: list[tuple[str, tuple[str, ...]]] = [
     (
         "inflation",
-        ("inflation", "mehngai", "مہنگائی", "price rise", "cost of living", "petrol price"),
+        (
+            "inflation", "mehngai", "مہنگائی", "price rise", "cost of living",
+            "petrol price", "grocery", "groceries", "chicken", "tamatar",
+            "tomato", "tomatoes", "onion", "onions", "pyaz", "atta", "wheat",
+            "flour", "oil", "ghee", "sugar", "cheeni", "prices", "rates",
+            "daal", "pulse", "eggs", "anda", "milk", "doodh", "sabzi",
+            "qeemat", "qimat", "قیمت", "راشن", "ration", "essential items",
+        ),
     ),
     (
         "savings",

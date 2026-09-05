@@ -78,7 +78,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _loading = true);
-    final success = await ref.read(authControllerProvider.notifier).signUp(
+    final authNotifier = ref.read(authControllerProvider.notifier);
+    final success = await authNotifier.signUp(
           name: _nameController.text.trim(),
           email: _emailController.text.trim(),
           password: _passwordController.text,
@@ -89,8 +90,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       context.go('/profile/financial');
     } else {
       setState(() => _loading = false);
+      final errorMsg =
+          authNotifier.lastErrorMessage ?? context.l10n.errorGeneric;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.errorGeneric)),
+        SnackBar(
+          content: Text(errorMsg),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     }
   }

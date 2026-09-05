@@ -417,5 +417,21 @@
   "homeProfileCtaButton": "پروفائل مکمل کریں",
   "homeProfileCompletedTitle": "مالیاتی پروفائل",
   "homeProfileCompletedBody": "ذاتی بصیرتیں فعال ہیں",
-  "homeProfileEditButton": "ترمیم"
+  "homeProfileEditButton": "ترمیم",
+
+  "essentialPricesTitle": "ضروری اشیاء کی قیمتیں",
+  "essentialPricesSubtitle": "گھریلو بجٹ پر اثر انداز ہونے والی روزمرہ اشیاء",
+  "essentialPricesWhyTitle": "روزمرہ اشیاء کی قیمتیں کیوں اہم ہیں؟",
+  "essentialPricesWhyBody": "پیاز، مرغی اور آٹے جیسی بنیادی اشیاء کی قیمتوں میں ہفتہ وار اتار چڑھاؤ براہ راست کچن کے اخراجات پر اثر انداز ہوتا ہے۔ تدبیر سے پوچھیں کہ یہ آپ کی بچت کو کیسے متاثر کرتا ہے۔",
+  "essentialPricesAskImpact": "تدبیر سے پوچھیں",
+  "essentialPricesTryWhatIf": "What-If آزمائیں",
+  "essentialPricesViewAll": "تمام دیکھیں",
+  "essentialPricesShowLess": "کم دکھائیں",
+  "essentialPricesCategoryAll": "تمام",
+  "essentialPricesCategoryVegetables": "سبزیاں",
+  "essentialPricesCategoryDairy": "دودھ اور پولٹری",
+  "essentialPricesCategoryStaples": "بنیادی خوراک",
+  "essentialPricesCategoryPulses": "دالیں",
+  "essentialPricesCategoryCookingFuel": "کوکنگ اور ایندھن",
+  "essentialPricesUnavailable": "قیمتوں کا ڈیٹا فی الوقت دستیاب نہیں ہے"
 }

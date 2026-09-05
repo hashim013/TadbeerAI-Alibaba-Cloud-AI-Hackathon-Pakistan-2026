@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/config/api_config.dart';
+import '../data/repositories/firebase_auth_repository.dart';
 import '../data/repositories/mock_auth_repository.dart';
 import '../data/repositories/prefs_financial_profile_repository.dart';
 import '../data/repositories/prefs_settings_repository.dart';
@@ -16,9 +19,23 @@ final sharedPrefsProvider = Provider<SharedPreferences>(
   ),
 );
 
-final authRepositoryProvider = Provider<AuthRepository>(
-  (ref) => MockAuthRepository(ref.watch(sharedPrefsProvider)),
-);
+/// Exposes the FirebaseAuth instance, or null when Firebase is not initialized
+/// (e.g. headless unit tests).
+final firebaseAuthProvider = Provider<fb.FirebaseAuth?>((ref) {
+  try {
+    return fb.FirebaseAuth.instance;
+  } catch (_) {
+    return null;
+  }
+});
+
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  final firebaseAuth = ref.watch(firebaseAuthProvider);
+  if (ApiConfig.useMockAuth || firebaseAuth == null) {
+    return MockAuthRepository(ref.watch(sharedPrefsProvider));
+  }
+  return FirebaseAuthRepository(firebaseAuth: firebaseAuth);
+});
 
 final settingsRepositoryProvider = Provider<SettingsRepository>(
   (ref) => PrefsSettingsRepository(ref.watch(sharedPrefsProvider)),

@@ -18,7 +18,9 @@ import 'widgets/what_if_sheet.dart';
 /// replies (carrying the typed API payload) render their own rich bubble
 /// with the What-If scenario card, key numbers, sources and data status.
 class AskTadbeerScreen extends ConsumerStatefulWidget {
-  const AskTadbeerScreen({super.key});
+  const AskTadbeerScreen({super.key, this.initialQuery});
+
+  final String? initialQuery;
 
   @override
   ConsumerState<AskTadbeerScreen> createState() => _AskTadbeerScreenState();
@@ -26,6 +28,14 @@ class AskTadbeerScreen extends ConsumerStatefulWidget {
 
 class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
   final TextEditingController _inputController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
+      _inputController.text = widget.initialQuery!;
+    }
+  }
 
   @override
   void dispose() {

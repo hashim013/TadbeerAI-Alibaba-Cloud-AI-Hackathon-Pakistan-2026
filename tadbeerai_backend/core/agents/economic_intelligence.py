@@ -44,6 +44,16 @@ _HEADLINE_INDICATORS: tuple[str, ...] = (
 )
 
 
+_COMMODITY_KEYWORDS: tuple[str, ...] = (
+    "grocery", "groceries", "chicken", "tamatar", "tomato", "tomatoes",
+    "onion", "onions", "pyaz", "atta", "wheat flour", "flour", "cooking oil",
+    "ghee", "sugar", "cheeni", "daal", "pulse", "pulses", "egg", "eggs",
+    "milk", "doodh", "sabzi", "vegetable", "vegetables", "ration", "rasan",
+    "commodity", "commodities", "essential prices", "essential items", "spi",
+    "food price", "food prices", "راشن", "سبزی", "گوشت", "آٹا",
+)
+
+
 def select_indicators(message: str, intent: str) -> list[str]:
     """Pick the indicator names relevant to the user's question."""
     text = f"{message} {intent}".lower()
@@ -58,14 +68,40 @@ def select_indicators(message: str, intent: str) -> list[str]:
     return selected
 
 
-def build_economic_prompt(
-    message: str, indicators: list[Indicator], language: str
-) -> str:
-    """Assemble the specialist prompt from the snapshot's indicators.
+def select_commodities(
+    message: str, intent: str, commodities: list[Any]
+) -> list[Any]:
+    """Pick relevant essential commodities for the user's inquiry."""
+    text = message.lower()
+    has_commodity_signal = any(kw in text for kw in _COMMODITY_KEYWORDS)
+    if not has_commodity_signal:
+        return []
 
-    Phase 2 compatibility: when every selected indicator is demo the header
-    keeps the original DEMO wording and each line stays "(demo data)".
-    """
+    matched: list[Any] = []
+    for c in commodities:
+        if (
+            c.id in text
+            or c.name.lower() in text
+            or c.normalized_name in text
+            or c.category.lower() in text
+        ):
+            matched.append(c)
+
+    # If general grocery inquiry without specific item named, select top movers & staples
+    if not matched:
+        top_ids = {"onions", "tomatoes", "chicken_broiler", "wheat_flour_bag", "cooking_oil"}
+        matched = [c for c in commodities if c.id in top_ids]
+
+    return matched
+
+
+def build_economic_prompt(
+    message: str,
+    indicators: list[Indicator],
+    language: str,
+    commodities: list[Any] | None = None,
+) -> str:
+    """Assemble the specialist prompt from the snapshot's indicators and commodities."""
     all_demo = bool(indicators) and all(
         ind.status == STATUS_DEMO for ind in indicators
     )
@@ -87,13 +123,23 @@ def build_economic_prompt(
         else:
             lines.append(f"- {ind.label}: unavailable from live sources")
 
+    if commodities:
+        lines.append("\nVerified Pakistan Bureau of Statistics (PBS) Essential Commodity Prices (SPI):")
+        for c in commodities:
+            chg = f"{c.change_percent:+.2f}%" if c.change_percent is not None else "0.0%"
+            lines.append(
+                f"- {c.name} ({c.unit}): PKR {c.price:.2f} ({chg} WoW trend: {c.trend}) "
+                f"— {c.why_it_matters}"
+            )
+        lines.append(f"Observation Period: {commodities[0].observation_period} | Source: {commodities[0].source_name}")
+
     facts_block = "\n".join(lines)
     return (
         f"User question: {message}\n\n"
         f"{header}\n{facts_block}\n\n"
         f"Language instruction: {language_instruction(language)}\n"
-        "Summarize what these indicators mean for an ordinary Pakistani "
-        "household. Use ONLY the values above."
+        "Summarize what these indicators and essential commodity prices mean for an ordinary Pakistani "
+        "household budget. Use ONLY the values above and explain why price movements matter without claiming exact individual spending unless stated."
     )
 
 
@@ -105,7 +151,9 @@ def economic_intelligence_node(state: AgentState, config) -> dict:
     language = state.get("language", "en")
 
     try:
-        snapshot: EconomicSnapshot = get_economic_service().snapshot()
+        service = get_economic_service()
+        snapshot: EconomicSnapshot = service.snapshot()
+        commodity_overview = service.commodity_snapshot()
     except Exception as exc:  # noqa: BLE001 — degrade, never crash the graph
         print(f"[Agent:economic_intelligence] data layer failed: {exc}")
         return {
@@ -123,7 +171,12 @@ def economic_intelligence_node(state: AgentState, config) -> dict:
     indicators = [snapshot.indicators[name] for name in names] or list(
         snapshot.indicators.values()
     )
-    prompt = build_economic_prompt(message, indicators, language)
+    relevant_commodities = select_commodities(
+        message, intent, commodity_overview.items
+    )
+    prompt = build_economic_prompt(
+        message, indicators, language, commodities=relevant_commodities
+    )
 
     try:
         payload = run_agent(
@@ -143,8 +196,21 @@ def economic_intelligence_node(state: AgentState, config) -> dict:
 
     # deterministic overrides: metrics, sources and status come from the
     # data layer in code, never from the LLM reply
-    payload["metrics"] = snapshot.metric_values(names or list(snapshot.indicators))
-    payload["sources"] = snapshot.sources(names)
+    metrics = snapshot.metric_values(names or list(snapshot.indicators))
+    if relevant_commodities:
+        for c in relevant_commodities:
+            metrics[f"price_{c.id}"] = c.price
+            if c.change_percent is not None:
+                metrics[f"wow_{c.id}"] = c.change_percent
+
+    sources = snapshot.sources(names)
+    if relevant_commodities:
+        pbs_src = f"{commodity_overview.source['name']} ({commodity_overview.period})"
+        if pbs_src not in sources:
+            sources.append(pbs_src)
+
+    payload["metrics"] = metrics
+    payload["sources"] = sources
     payload["data_status"] = overall_status(indicators)
 
     update: dict[str, Any] = {"agent_results": {"economic_intelligence": payload}}

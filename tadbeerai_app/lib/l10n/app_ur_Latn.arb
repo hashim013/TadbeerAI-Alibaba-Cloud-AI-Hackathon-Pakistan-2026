@@ -417,5 +417,21 @@
   "homeProfileCtaButton": "Profile mukammal karein",
   "homeProfileCompletedTitle": "Maaliyati Profile",
   "homeProfileCompletedBody": "Zaati baseeratein fa'al hain",
-  "homeProfileEditButton": "Tarmeem"
+  "homeProfileEditButton": "Tarmeem",
+
+  "essentialPricesTitle": "Zaroori Ashya ki Qeematein",
+  "essentialPricesSubtitle": "Gharelu budget par asar andaaz hone wali rozmarrah ashya",
+  "essentialPricesWhyTitle": "Rozmarrah ashya ki qeematein kyun ahem hain?",
+  "essentialPricesWhyBody": "Pyaz, chicken aur aatay jaisi bunyadi ashya ki qeematon mein hafta-waar utaar charhao seedha kitchen ke kharchon par asar daalta hai. Tadbeer se poochein yeh aap ki bachat ko kaise mutasir karta hai.",
+  "essentialPricesAskImpact": "Tadbeer se poochein",
+  "essentialPricesTryWhatIf": "What-If aazmayein",
+  "essentialPricesViewAll": "Tamam dekhein",
+  "essentialPricesShowLess": "Kam dikhayein",
+  "essentialPricesCategoryAll": "Tamam",
+  "essentialPricesCategoryVegetables": "Sabziyan",
+  "essentialPricesCategoryDairy": "Doodh aur Poultry",
+  "essentialPricesCategoryStaples": "Bunyadi Khurak",
+  "essentialPricesCategoryPulses": "Daalein",
+  "essentialPricesCategoryCookingFuel": "Cooking aur Fuel",
+  "essentialPricesUnavailable": "Qeematon ka data fil-waqt dastiyab nahi hai"
 }

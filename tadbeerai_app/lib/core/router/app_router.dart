@@ -115,7 +115,16 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/ask',
-                builder: (context, state) => const AskTadbeerScreen(),
+                builder: (context, state) {
+                  final extra = state.extra;
+                  String? initialQuery;
+                  if (extra is Map) {
+                    initialQuery = extra['initialQuery'] as String?;
+                  } else if (extra is String) {
+                    initialQuery = extra;
+                  }
+                  return AskTadbeerScreen(initialQuery: initialQuery);
+                },
               ),
             ],
           ),

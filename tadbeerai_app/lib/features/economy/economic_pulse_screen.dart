@@ -91,6 +91,10 @@ class _EconomicPulseContent extends ConsumerWidget {
         ..._indicatorGrid(context, economy),
         const SizedBox(height: 24),
 
+        // ── Essential Prices — Pakistan ──────────────────────────────────
+        const _EssentialPricesSection(),
+        const SizedBox(height: 24),
+
         // ── Trend charts for the headline indicators ─────────────────────
         SectionHeader(l10n.economyDetailHistory),
         ..._chartCards(context, economy),
@@ -297,6 +301,268 @@ class _EconomyErrorView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _EssentialPricesSection extends ConsumerStatefulWidget {
+  const _EssentialPricesSection();
+
+  @override
+  ConsumerState<_EssentialPricesSection> createState() =>
+      _EssentialPricesSectionState();
+}
+
+class _EssentialPricesSectionState
+    extends ConsumerState<_EssentialPricesSection> {
+  bool _expanded = false;
+
+  static const _categories = [
+    'All',
+    'Vegetables',
+    'Dairy & Poultry',
+    'Food & Staples',
+    'Pulses',
+    'Cooking & Fuel',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final l10n = context.l10n;
+    final selectedCategory = ref.watch(selectedCommodityCategoryProvider);
+    final pricesAsync = ref.watch(essentialPricesProvider);
+
+    return pricesAsync.when(
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 24),
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (e, _) => AppCard(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            const Icon(Icons.error_outline_rounded,
+                size: 32, color: AppColors.danger),
+            const SizedBox(height: 8),
+            Text(
+              l10n.essentialPricesUnavailable,
+              style: theme.textTheme.titleSmall,
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () => ref.invalidate(essentialPricesProvider),
+              child: Text(l10n.retryAction),
+            ),
+          ],
+        ),
+      ),
+      data: (overview) {
+        final items = overview.items;
+        final visibleItems = _expanded ? items : items.take(4).toList();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Section Title & Status ────────────────────────────────────
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.essentialPricesTitle,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${l10n.essentialPricesSubtitle} • ${overview.period}',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: isDark
+                              ? AppColors.textOnDarkTertiary
+                              : AppColors.textOnLightSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DataStatusBadge(status: overview.status),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // ── Category Pills ────────────────────────────────────────────
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _categories.map((category) {
+                  final isSelected = selectedCategory == category;
+                  final label = switch (category) {
+                    'All' => l10n.essentialPricesCategoryAll,
+                    'Vegetables' => l10n.essentialPricesCategoryVegetables,
+                    'Dairy & Poultry' => l10n.essentialPricesCategoryDairy,
+                    'Food & Staples' => l10n.essentialPricesCategoryStaples,
+                    'Pulses' => l10n.essentialPricesCategoryPulses,
+                    'Cooking & Fuel' =>
+                      l10n.essentialPricesCategoryCookingFuel,
+                    _ => category,
+                  };
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      label: Text(label),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        if (selected) {
+                          ref
+                              .read(selectedCommodityCategoryProvider.notifier)
+                              .state = category;
+                        }
+                      },
+                      labelStyle: TextStyle(
+                        fontSize: 12,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected
+                            ? (isDark ? Colors.black : Colors.white)
+                            : (isDark
+                                ? AppColors.textOnDark
+                                : AppColors.textOnLight),
+                      ),
+                      selectedColor: theme.colorScheme.primary,
+                      backgroundColor:
+                          isDark ? AppColors.navyCard : AppColors.lightCard,
+                      side: BorderSide(
+                        color: isSelected
+                            ? theme.colorScheme.primary
+                            : (isDark
+                                ? AppColors.borderDark
+                                : AppColors.borderLight),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      showCheckmark: false,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // ── Items List ────────────────────────────────────────────────
+            if (visibleItems.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: Text(
+                    'No commodities found in this category.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: isDark
+                          ? AppColors.textOnDarkTertiary
+                          : AppColors.textOnLightSecondary,
+                    ),
+                  ),
+                ),
+              )
+            else
+              ...visibleItems.map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: CommodityCard(
+                    commodity: item,
+                    onTap: () => CommodityDetailSheet.show(context, item),
+                  ),
+                ),
+              ),
+
+            // ── View All Toggle ───────────────────────────────────────────
+            if (items.length > 4)
+              Center(
+                child: TextButton.icon(
+                  icon: Icon(
+                    _expanded
+                        ? Icons.keyboard_arrow_up_rounded
+                        : Icons.keyboard_arrow_down_rounded,
+                    size: 18,
+                  ),
+                  label: Text(_expanded
+                      ? l10n.essentialPricesShowLess
+                      : '${l10n.essentialPricesViewAll} (${items.length})'),
+                  onPressed: () => setState(() => _expanded = !_expanded),
+                ),
+              ),
+            const SizedBox(height: 8),
+
+            // ── Why It Matters Card ───────────────────────────────────────
+            AppCard(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.info_outline_rounded,
+                          size: 18, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text(
+                        l10n.essentialPricesWhyTitle,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.essentialPricesWhyBody,
+                    style: theme.textTheme.bodySmall?.copyWith(height: 1.4),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          icon: const Icon(Icons.chat_bubble_outline_rounded,
+                              size: 16),
+                          label: Text(l10n.essentialPricesAskImpact),
+                          onPressed: () => context.go(
+                            '/ask',
+                            extra: {
+                              'initialQuery':
+                                  'How are recent grocery and essential price changes affecting my budget?'
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: FilledButton.tonalIcon(
+                          icon: const Icon(Icons.calculate_outlined, size: 16),
+                          label: Text(l10n.essentialPricesTryWhatIf),
+                          onPressed: () => context.go(
+                            '/ask',
+                            extra: {
+                              'initialQuery':
+                                  'What if my grocery expenses increase by 10%?'
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -2442,6 +2442,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit'**
   String get homeProfileEditButton;
+
+  /// No description provided for @essentialPricesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Essential Prices'**
+  String get essentialPricesTitle;
+
+  /// No description provided for @essentialPricesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyday items affecting household budgets'**
+  String get essentialPricesSubtitle;
+
+  /// No description provided for @essentialPricesWhyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Why Everyday Prices Matter'**
+  String get essentialPricesWhyTitle;
+
+  /// No description provided for @essentialPricesWhyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly shifts in staple commodities like onions, chicken, and flour directly alter kitchen cash flow. Ask Tadbeer how these trends impact your personal surplus or test a grocery price shock.'**
+  String get essentialPricesWhyBody;
+
+  /// No description provided for @essentialPricesAskImpact.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Tadbeer'**
+  String get essentialPricesAskImpact;
+
+  /// No description provided for @essentialPricesTryWhatIf.
+  ///
+  /// In en, this message translates to:
+  /// **'Try What-If'**
+  String get essentialPricesTryWhatIf;
+
+  /// No description provided for @essentialPricesViewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get essentialPricesViewAll;
+
+  /// No description provided for @essentialPricesShowLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get essentialPricesShowLess;
+
+  /// No description provided for @essentialPricesCategoryAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get essentialPricesCategoryAll;
+
+  /// No description provided for @essentialPricesCategoryVegetables.
+  ///
+  /// In en, this message translates to:
+  /// **'Vegetables'**
+  String get essentialPricesCategoryVegetables;
+
+  /// No description provided for @essentialPricesCategoryDairy.
+  ///
+  /// In en, this message translates to:
+  /// **'Dairy & Poultry'**
+  String get essentialPricesCategoryDairy;
+
+  /// No description provided for @essentialPricesCategoryStaples.
+  ///
+  /// In en, this message translates to:
+  /// **'Food & Staples'**
+  String get essentialPricesCategoryStaples;
+
+  /// No description provided for @essentialPricesCategoryPulses.
+  ///
+  /// In en, this message translates to:
+  /// **'Pulses'**
+  String get essentialPricesCategoryPulses;
+
+  /// No description provided for @essentialPricesCategoryCookingFuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cooking & Fuel'**
+  String get essentialPricesCategoryCookingFuel;
+
+  /// No description provided for @essentialPricesUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Essential price data temporarily unavailable'**
+  String get essentialPricesUnavailable;
 }
 
 class _AppLocalizationsDelegate

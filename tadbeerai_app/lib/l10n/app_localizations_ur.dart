@@ -1351,6 +1351,54 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get homeProfileEditButton => 'ترمیم';
+
+  @override
+  String get essentialPricesTitle => 'ضروری اشیاء کی قیمتیں';
+
+  @override
+  String get essentialPricesSubtitle =>
+      'گھریلو بجٹ پر اثر انداز ہونے والی روزمرہ اشیاء';
+
+  @override
+  String get essentialPricesWhyTitle => 'روزمرہ اشیاء کی قیمتیں کیوں اہم ہیں؟';
+
+  @override
+  String get essentialPricesWhyBody =>
+      'پیاز، مرغی اور آٹے جیسی بنیادی اشیاء کی قیمتوں میں ہفتہ وار اتار چڑھاؤ براہ راست کچن کے اخراجات پر اثر انداز ہوتا ہے۔ تدبیر سے پوچھیں کہ یہ آپ کی بچت کو کیسے متاثر کرتا ہے۔';
+
+  @override
+  String get essentialPricesAskImpact => 'تدبیر سے پوچھیں';
+
+  @override
+  String get essentialPricesTryWhatIf => 'What-If آزمائیں';
+
+  @override
+  String get essentialPricesViewAll => 'تمام دیکھیں';
+
+  @override
+  String get essentialPricesShowLess => 'کم دکھائیں';
+
+  @override
+  String get essentialPricesCategoryAll => 'تمام';
+
+  @override
+  String get essentialPricesCategoryVegetables => 'سبزیاں';
+
+  @override
+  String get essentialPricesCategoryDairy => 'دودھ اور پولٹری';
+
+  @override
+  String get essentialPricesCategoryStaples => 'بنیادی خوراک';
+
+  @override
+  String get essentialPricesCategoryPulses => 'دالیں';
+
+  @override
+  String get essentialPricesCategoryCookingFuel => 'کوکنگ اور ایندھن';
+
+  @override
+  String get essentialPricesUnavailable =>
+      'قیمتوں کا ڈیٹا فی الوقت دستیاب نہیں ہے';
 }
 
 /// The translations for Urdu, using the Latin script (`ur_Latn`).
@@ -2713,4 +2761,53 @@ class AppLocalizationsUrLatn extends AppLocalizationsUr {
 
   @override
   String get homeProfileEditButton => 'Tarmeem';
+
+  @override
+  String get essentialPricesTitle => 'Zaroori Ashya ki Qeematein';
+
+  @override
+  String get essentialPricesSubtitle =>
+      'Gharelu budget par asar andaaz hone wali rozmarrah ashya';
+
+  @override
+  String get essentialPricesWhyTitle =>
+      'Rozmarrah ashya ki qeematein kyun ahem hain?';
+
+  @override
+  String get essentialPricesWhyBody =>
+      'Pyaz, chicken aur aatay jaisi bunyadi ashya ki qeematon mein hafta-waar utaar charhao seedha kitchen ke kharchon par asar daalta hai. Tadbeer se poochein yeh aap ki bachat ko kaise mutasir karta hai.';
+
+  @override
+  String get essentialPricesAskImpact => 'Tadbeer se poochein';
+
+  @override
+  String get essentialPricesTryWhatIf => 'What-If aazmayein';
+
+  @override
+  String get essentialPricesViewAll => 'Tamam dekhein';
+
+  @override
+  String get essentialPricesShowLess => 'Kam dikhayein';
+
+  @override
+  String get essentialPricesCategoryAll => 'Tamam';
+
+  @override
+  String get essentialPricesCategoryVegetables => 'Sabziyan';
+
+  @override
+  String get essentialPricesCategoryDairy => 'Doodh aur Poultry';
+
+  @override
+  String get essentialPricesCategoryStaples => 'Bunyadi Khurak';
+
+  @override
+  String get essentialPricesCategoryPulses => 'Daalein';
+
+  @override
+  String get essentialPricesCategoryCookingFuel => 'Cooking aur Fuel';
+
+  @override
+  String get essentialPricesUnavailable =>
+      'Qeematon ka data fil-waqt dastiyab nahi hai';
 }

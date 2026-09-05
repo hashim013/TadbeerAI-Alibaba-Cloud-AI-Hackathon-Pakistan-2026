@@ -20,8 +20,19 @@ import time
 from datetime import datetime, timezone
 
 from .client import EconomicDataClient
+from .commodity_models import (
+    DEFAULT_SCOPE,
+    OFFICIAL_PBS_SOURCE,
+    OFFICIAL_PBS_URL,
+    CommodityOverview,
+    CommodityPrice,
+    get_default_commodities,
+)
 from .models import (
     INDICATOR_CATALOG,
+    STATUS_DEMO,
+    STATUS_LIVE,
+    STATUS_UNAVAILABLE,
     EconomicSnapshot,
     Indicator,
     demo_indicator,
@@ -29,6 +40,7 @@ from .models import (
     unavailable_indicator,
 )
 from .pbs_client import PBSGatewayClient
+from .pbs_commodity_client import PBSCommodityClient
 from .sbp_client import SBPGatewayClient
 from .worldbank_client import WorldBankClient
 
@@ -59,10 +71,12 @@ class EconomicDataService:
     def __init__(
         self,
         providers: list[EconomicDataClient] | None = None,
+        commodity_client: PBSCommodityClient | None = None,
         cache_seconds: float | None = None,
         allow_demo: bool | None = None,
     ) -> None:
         self._providers = list(providers or [])
+        self._commodity_client = commodity_client
         self._cache_seconds = (
             _env_cache_seconds() if cache_seconds is None else cache_seconds
         )
@@ -70,6 +84,8 @@ class EconomicDataService:
         self._lock = threading.Lock()
         self._cache: EconomicSnapshot | None = None
         self._cached_at: float = 0.0
+        self._commodity_cache: list[CommodityPrice] | None = None
+        self._commodity_cached_at: float = 0.0
 
     @property
     def allow_demo(self) -> bool:
@@ -89,11 +105,88 @@ class EconomicDataService:
             self._cached_at = now
             return built
 
+    def commodity_snapshot(
+        self,
+        category: str | None = None,
+        location: str | None = None,
+        limit: int | None = None,
+    ) -> CommodityOverview:
+        """Return the (cached) normalized essential commodity prices overview."""
+        now = time.monotonic()
+        with self._lock:
+            items: list[CommodityPrice]
+            if (
+                self._commodity_cache is not None
+                and now - self._commodity_cached_at < self._cache_seconds
+            ):
+                items = self._commodity_cache
+            else:
+                items = self._build_commodities()
+                self._commodity_cache = items
+                self._commodity_cached_at = now
+
+        filtered = list(items)
+        if category and category.strip().lower() not in ("", "all"):
+            cat_lower = category.strip().lower()
+            filtered = [
+                item for item in filtered if item.category.lower() == cat_lower
+            ]
+        if location and location.strip().lower() not in ("", "all", "pakistan"):
+            loc_lower = location.strip().lower()
+            filtered = [
+                item for item in filtered if loc_lower in item.location_scope.lower()
+            ]
+        if limit is not None and limit > 0:
+            filtered = filtered[:limit]
+
+        overall_status_val = (
+            items[0].data_status if items else (STATUS_DEMO if self._allow_demo else STATUS_UNAVAILABLE)
+        )
+        period_val = items[0].observation_period if items else "Week ended Sep 03, 2026"
+        scope_val = location if location else DEFAULT_SCOPE
+
+        return CommodityOverview(
+            items=filtered,
+            period=period_val,
+            source={
+                "name": OFFICIAL_PBS_SOURCE,
+                "url": OFFICIAL_PBS_URL,
+                "scope": scope_val,
+            },
+            data_status=overall_status_val,
+            updated_at=datetime.now(timezone.utc).isoformat(),
+        )
+
+    def commodity_detail(self, item_id: str) -> CommodityPrice | None:
+        """Return a single commodity by id (or normalized name)."""
+        overview = self.commodity_snapshot()
+        target = item_id.strip().lower()
+        for item in overview.items:
+            if item.id.lower() == target or item.normalized_name.lower() == target:
+                return item
+        return None
+
     def invalidate_cache(self) -> None:
-        """Drop the cached snapshot (used by tests and manual refresh)."""
+        """Drop the cached snapshot and commodity snapshot."""
         with self._lock:
             self._cache = None
             self._cached_at = 0.0
+            self._commodity_cache = None
+            self._commodity_cached_at = 0.0
+
+    def _build_commodities(self) -> list[CommodityPrice]:
+        """Fetch from live gateway if configured, else controlled verified baseline."""
+        if self._commodity_client is not None:
+            try:
+                live_items = self._commodity_client.fetch_commodities()
+                if live_items:
+                    return live_items
+            except Exception as exc:
+                print(f"[EconomicData] commodity gateway failed: {exc}")
+
+        if self._allow_demo:
+            return get_default_commodities(status=STATUS_DEMO)
+        return []
 
     # ------------------------------------------------------------------ #
     # merge logic
@@ -153,7 +246,7 @@ _SERVICE_LOCK = threading.Lock()
 
 def _default_service() -> EconomicDataService:
     """Production default: PBS gateway (if configured), SBP gateway (if
-    configured) and the keyless World Bank API."""
+    configured), keyless World Bank API, and PBS commodities client."""
     providers: list[EconomicDataClient] = []
     pbs = PBSGatewayClient.from_env()
     if pbs is not None:
@@ -162,7 +255,11 @@ def _default_service() -> EconomicDataService:
     if sbp is not None:
         providers.append(sbp)
     providers.append(WorldBankClient.from_env())
-    return EconomicDataService(providers=providers)
+    commodity_client = PBSCommodityClient.from_env()
+    return EconomicDataService(
+        providers=providers,
+        commodity_client=commodity_client,
+    )
 
 
 def get_economic_service() -> EconomicDataService:

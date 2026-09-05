@@ -1355,4 +1355,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeProfileEditButton => 'Edit';
+
+  @override
+  String get essentialPricesTitle => 'Essential Prices';
+
+  @override
+  String get essentialPricesSubtitle =>
+      'Everyday items affecting household budgets';
+
+  @override
+  String get essentialPricesWhyTitle => 'Why Everyday Prices Matter';
+
+  @override
+  String get essentialPricesWhyBody =>
+      'Weekly shifts in staple commodities like onions, chicken, and flour directly alter kitchen cash flow. Ask Tadbeer how these trends impact your personal surplus or test a grocery price shock.';
+
+  @override
+  String get essentialPricesAskImpact => 'Ask Tadbeer';
+
+  @override
+  String get essentialPricesTryWhatIf => 'Try What-If';
+
+  @override
+  String get essentialPricesViewAll => 'View all';
+
+  @override
+  String get essentialPricesShowLess => 'Show less';
+
+  @override
+  String get essentialPricesCategoryAll => 'All';
+
+  @override
+  String get essentialPricesCategoryVegetables => 'Vegetables';
+
+  @override
+  String get essentialPricesCategoryDairy => 'Dairy & Poultry';
+
+  @override
+  String get essentialPricesCategoryStaples => 'Food & Staples';
+
+  @override
+  String get essentialPricesCategoryPulses => 'Pulses';
+
+  @override
+  String get essentialPricesCategoryCookingFuel => 'Cooking & Fuel';
+
+  @override
+  String get essentialPricesUnavailable =>
+      'Essential price data temporarily unavailable';
 }

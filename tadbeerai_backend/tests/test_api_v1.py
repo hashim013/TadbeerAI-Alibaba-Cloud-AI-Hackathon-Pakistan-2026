@@ -381,3 +381,52 @@ class TestEconomySnapshot:
             assert "status" in ind
             assert "source" in ind
             assert ind["status"] in ("live", "demo", "unavailable")
+
+
+class TestEssentialPricesEndpoint:
+    """GET /v1/economy/essential-prices endpoint behavior and provenance."""
+
+    def test_essential_prices_list(self, make_client):
+        client = make_client(primary=ScriptedAgentProvider())
+        response = client.get("/v1/economy/essential-prices")
+        assert response.status_code == 200
+        body = response.json()
+        assert "items" in body
+        assert isinstance(body["items"], list)
+        assert len(body["items"]) >= 12
+        assert "period" in body
+        assert "source" in body
+        assert "Pakistan Bureau of Statistics" in body["source"]["name"]
+        assert body["data_status"] in ("live", "partial", "demo", "unavailable")
+
+        first = body["items"][0]
+        assert "id" in first
+        assert "name" in first
+        assert "price" in first
+        assert "unit" in first
+        assert "trend" in first
+        assert "what_changed" in first
+        assert "why_it_matters" in first
+
+    def test_essential_prices_category_filter(self, make_client):
+        client = make_client(primary=ScriptedAgentProvider())
+        response = client.get("/v1/economy/essential-prices?category=Vegetables")
+        assert response.status_code == 200
+        body = response.json()
+        assert len(body["items"]) > 0
+        assert all(item["category"] == "Vegetables" for item in body["items"])
+
+    def test_essential_price_detail_found(self, make_client):
+        client = make_client(primary=ScriptedAgentProvider())
+        response = client.get("/v1/economy/essential-prices/tomatoes")
+        assert response.status_code == 200
+        body = response.json()
+        assert body["id"] == "tomatoes"
+        assert body["name"] == "Tomatoes"
+        assert body["price"] > 0
+        assert body["source_name"] == "Pakistan Bureau of Statistics (PBS)"
+
+    def test_essential_price_detail_not_found(self, make_client):
+        client = make_client(primary=ScriptedAgentProvider())
+        response = client.get("/v1/economy/essential-prices/nonexistent_xyz")
+        assert response.status_code == 404

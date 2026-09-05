@@ -45,7 +45,8 @@ _DECREASE_WORDS: tuple[str, ...] = (
 
 _EXPENSE_WORDS: tuple[str, ...] = (
     "expense", "expenses", "kharcha", "kharche", "kharchay",
-    "مصارف", "اخراجات",
+    "grocery", "groceries", "food", "ration", "rasan", "sabzi", "daal",
+    "مصارف", "اخراجات", "راشن",
 )
 
 #: interest/policy/KIBOR wording (plural "rates" only, so "inflation rate"
@@ -53,6 +54,12 @@ _EXPENSE_WORDS: tuple[str, ...] = (
 _RATE_WORDS_RE = re.compile(
     r"\b(?:interest|policy\s+rate|kibor|rates)\b|شرح\s*سود",
     re.IGNORECASE,
+)
+
+#: "food expenses rise by 5000", "expenses increase by 5000", "kharcha 5000 barh jaye"
+_EXPENSE_AMOUNT_RE = re.compile(
+    r"(?:(?:expense|expenses|kharcha|food|grocery|ration)[^0-9]{0,25}?(?:rise|rises|increase|increases|go up|barh|barhte)[^0-9]{0,20}?(\d+(?:\.\d+)?))|"
+    r"(?:(?:rise|rises|increase|increases|barh)[^0-9]{0,20}?(?:by\s+)?(\d+(?:\.\d+)?)[^0-9]{0,20}?(?:expense|expenses|kharcha|food|grocery|ration))"
 )
 
 #: "save 5000", "saving pkr 5000", "cut my spending by 3000" (Phase 2 parity)
@@ -133,6 +140,12 @@ def extract_scenario_parameters(message: str) -> ScenarioParameters | None:
             return ScenarioParameters(RATE_SHOCK, pct_change=sign)
         if any(word in text for word in _EXPENSE_WORDS):
             return ScenarioParameters(EXPENSE_SHOCK, pct_change=sign)
+
+    exp_amt_match = _EXPENSE_AMOUNT_RE.search(text)
+    if exp_amt_match:
+        val = exp_amt_match.group(1) or exp_amt_match.group(2)
+        if val:
+            return ScenarioParameters(EXPENSE_SHOCK, amount_pkr=Decimal(val))
 
     amount = extract_save_amount(text)
     if amount is not None:

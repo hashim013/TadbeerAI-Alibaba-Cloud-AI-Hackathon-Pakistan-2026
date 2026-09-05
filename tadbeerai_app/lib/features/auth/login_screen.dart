@@ -60,7 +60,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _loading = true);
-    final success = await ref.read(authControllerProvider.notifier).signIn(
+    final authNotifier = ref.read(authControllerProvider.notifier);
+    final success = await authNotifier.signIn(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
@@ -70,8 +71,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       context.go('/home');
     } else {
       setState(() => _loading = false);
+      final errorMsg =
+          authNotifier.lastErrorMessage ?? context.l10n.errorGeneric;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.errorGeneric)),
+        SnackBar(
+          content: Text(errorMsg),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     }
   }
