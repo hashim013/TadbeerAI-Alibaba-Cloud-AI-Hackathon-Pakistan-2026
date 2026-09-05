@@ -57,6 +57,43 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<AppUser> signInAsGuest() async {
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+    const user = AppUser(
+      id: 'guest_user',
+      name: 'Guest User',
+      email: 'guest@tadbeer.ai',
+    );
+    await _persist(user);
+    return user;
+  }
+
+  final _activeResetCodes = <String, String>{};
+
+  @override
+  Future<void> sendPasswordResetCode({required String email}) async {
+    await Future<void>.delayed(const Duration(milliseconds: 350));
+    final normalized = email.trim().toLowerCase();
+    _activeResetCodes[normalized] = '842196';
+  }
+
+  @override
+  Future<bool> resetPasswordWithCode({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+    final normalized = email.trim().toLowerCase();
+    final expectedCode = _activeResetCodes[normalized] ?? '842196';
+    if (code.trim() == expectedCode || code.trim() == '842196') {
+      _activeResetCodes.remove(normalized);
+      return true;
+    }
+    return false;
+  }
+
+  @override
   Future<void> signOut() => _prefs.remove(AppConstants.prefSessionUser);
 
   Future<void> _persist(AppUser user) =>

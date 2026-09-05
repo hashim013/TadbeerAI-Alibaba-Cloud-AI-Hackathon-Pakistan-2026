@@ -1403,4 +1403,75 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get essentialPricesUnavailable =>
       'Essential price data temporarily unavailable';
+
+  @override
+  String get actionContinueAsGuest => 'Continue as Guest';
+
+  @override
+  String get loginGuestMode => 'Guest Mode';
+
+  @override
+  String get loginGuestSubtitle => 'Instant access to Economy & Finance tools';
+
+  @override
+  String get forgotPasswordTitle => 'Reset Password';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'Enter your email address to receive a secure 6-digit verification code.';
+
+  @override
+  String get actionForgotPassword => 'Forgot Password?';
+
+  @override
+  String get actionSendCode => 'Send Verification Code';
+
+  @override
+  String get actionResetPassword => 'Reset Password';
+
+  @override
+  String get actionResendCode => 'Resend Code';
+
+  @override
+  String get verifyCodeTitle => 'Verify Code';
+
+  @override
+  String get verifyCodeSubtitle => 'Enter the 6-digit code sent to your email.';
+
+  @override
+  String get codeSentTo => 'Code sent to';
+
+  @override
+  String get demoCodeHint => 'Demo code: 842196';
+
+  @override
+  String get fieldVerificationCode => 'Verification Code';
+
+  @override
+  String get validationCodeRequired => 'Please enter the 6-digit code.';
+
+  @override
+  String get validationCodeInvalid => 'Invalid or expired verification code.';
+
+  @override
+  String get newPasswordTitle => 'New Password';
+
+  @override
+  String get newPasswordSubtitle =>
+      'Create a strong new password for your account.';
+
+  @override
+  String get passwordResetSuccessTitle => 'Password Reset Successfully!';
+
+  @override
+  String get passwordResetSuccessSubtitle =>
+      'Your password has been securely updated. You can now sign in with your new password.';
+
+  @override
+  String get backToSignIn => 'Back to Sign In';
+
+  @override
+  String codeResendIn(int seconds) {
+    return 'Resend code in ${seconds}s';
+  }
 }

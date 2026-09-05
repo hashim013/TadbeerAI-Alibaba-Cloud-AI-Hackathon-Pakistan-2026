@@ -89,6 +89,33 @@ class _FakeFirebaseAuth implements fb.FirebaseAuth {
   }
 
   @override
+  Future<fb.UserCredential> signInAnonymously() async {
+    final user = _FakeUser(
+      uid: 'uid-guest-999',
+      email: null,
+      displayName: 'Guest User',
+    );
+    currentUserMock = user;
+    return _FakeUserCredential(user);
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail({
+    required String email,
+    fb.ActionCodeSettings? actionCodeSettings,
+  }) async {}
+
+  @override
+  Future<void> confirmPasswordReset({
+    required String code,
+    required String newPassword,
+  }) async {
+    if (code != '842196') {
+      throw fb.FirebaseAuthException(code: 'invalid-action-code');
+    }
+  }
+
+  @override
   Future<void> signOut() async {
     didSignOut = true;
     currentUserMock = null;
@@ -258,6 +285,18 @@ void main() {
       );
     });
 
+    test('signInAsGuest creates anonymous session with guest properties',
+        () async {
+      final fakeAuth = _FakeFirebaseAuth();
+      final repo = FirebaseAuthRepository(firebaseAuth: fakeAuth);
+
+      final guestUser = await repo.signInAsGuest();
+      expect(guestUser.id, 'uid-guest-999');
+      expect(guestUser.name, 'Guest User');
+      expect(guestUser.email, 'guest@tadbeer.ai');
+      expect(guestUser.isGuest, isTrue);
+    });
+
     test('signOut clears session', () async {
       final fakeAuth = _FakeFirebaseAuth(
         currentUserMock: _FakeUser(
@@ -272,6 +311,29 @@ void main() {
       await repo.signOut();
       expect(fakeAuth.didSignOut, isTrue);
       expect(await repo.currentUser(), isNull);
+    });
+
+    test(
+        'sendPasswordResetCode and resetPasswordWithCode succeed with valid code',
+        () async {
+      final fakeAuth = _FakeFirebaseAuth();
+      final repo = FirebaseAuthRepository(firebaseAuth: fakeAuth);
+
+      await repo.sendPasswordResetCode(email: 'user@tadbeer.ai');
+
+      final success = await repo.resetPasswordWithCode(
+        email: 'user@tadbeer.ai',
+        code: '842196',
+        newPassword: 'newSecretPass123',
+      );
+      expect(success, isTrue);
+
+      final fail = await repo.resetPasswordWithCode(
+        email: 'user@tadbeer.ai',
+        code: '000000',
+        newPassword: 'newSecretPass123',
+      );
+      expect(fail, isFalse);
     });
   });
 

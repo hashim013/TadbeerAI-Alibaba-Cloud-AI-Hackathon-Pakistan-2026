@@ -80,10 +80,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     setState(() => _loading = true);
     final authNotifier = ref.read(authControllerProvider.notifier);
     final success = await authNotifier.signUp(
-          name: _nameController.text.trim(),
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
+      name: _nameController.text.trim(),
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
     if (!mounted) return;
 
     if (success) {
@@ -111,273 +111,285 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     );
   }
 
+  void _onBack() {
+    if (_loading) return;
+    context.go('/login');
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return Scaffold(
-      backgroundColor: AppColors.navyBg,
-      body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.light.copyWith(
-          statusBarColor: Colors.transparent,
-          systemNavigationBarColor: Colors.transparent,
-          systemNavigationBarDividerColor: Colors.transparent,
-          systemNavigationBarIconBrightness: Brightness.light,
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // ── Ambient Background Vignette Glow ───────────────────────────
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: const Alignment(0, -0.45),
-                    radius: 1.1,
-                    colors: [
-                      const Color(0xFF061A2E).withValues(alpha: 0.35),
-                      AppColors.navyBg,
-                    ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, dynamic result) {
+        if (didPop) return;
+        _onBack();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.navyBg,
+        body: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.light.copyWith(
+            statusBarColor: Colors.transparent,
+            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarDividerColor: Colors.transparent,
+            systemNavigationBarIconBrightness: Brightness.light,
+          ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // ── Ambient Background Vignette Glow ───────────────────────────
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const Alignment(0, -0.45),
+                      radius: 1.1,
+                      colors: [
+                        const Color(0xFF061A2E).withValues(alpha: 0.35),
+                        AppColors.navyBg,
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // ── Main Scrollable Content ────────────────────────────────────
-            SafeArea(
-              child: SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Top Row: Circular Back Button
-                      Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap:
-                                _loading ? null : () => context.go('/login'),
-                            borderRadius: BorderRadius.circular(20),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.06),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.10),
+              // ── Main Scrollable Content ────────────────────────────────────
+              SafeArea(
+                child: SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Top Row: Circular Back Button
+                        Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: _loading ? null : _onBack,
+                              borderRadius: BorderRadius.circular(20),
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.06),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.10),
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                  color: Colors.white,
+                                  size: 16,
                                 ),
                               ),
-                              child: const Icon(
-                                Icons.arrow_back_ios_new_rounded,
-                                color: Colors.white,
-                                size: 16,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        // App Transparent Logo Perfectly Aligned
+                        Center(
+                          child: Image.asset(
+                            AppConstants.assetLogoTransparent,
+                            width: 64,
+                            height: 64,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Header Title & Subtitle
+                        Text(
+                          l10n.signupTitle,
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.2,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.signupSubtitle,
+                          style: GoogleFonts.inter(
+                            color: AppColors.textOnDarkSecondary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                            letterSpacing: 0.1,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // Full Name Field
+                        AppTextField(
+                          label: l10n.fieldFullName,
+                          hintText: 'John Doe',
+                          controller: _nameController,
+                          validator: _validateName,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [AutofillHints.name],
+                          prefixIcon: const Icon(
+                            Icons.person_outline_rounded,
+                            color: AppColors.textOnDarkSecondary,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Email Field
+                        AppTextField(
+                          label: l10n.fieldEmail,
+                          hintText: 'name@example.com',
+                          controller: _emailController,
+                          validator: _validateEmail,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [AutofillHints.email],
+                          prefixIcon: const Icon(
+                            Icons.mail_outline_rounded,
+                            color: AppColors.textOnDarkSecondary,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Password Field
+                        AppTextField(
+                          label: l10n.fieldPassword,
+                          hintText: '••••••••',
+                          controller: _passwordController,
+                          validator: _validatePassword,
+                          obscure: true,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [AutofillHints.newPassword],
+                          prefixIcon: const Icon(
+                            Icons.lock_outline_rounded,
+                            color: AppColors.textOnDarkSecondary,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Confirm Password Field
+                        AppTextField(
+                          label: l10n.fieldConfirmPassword,
+                          hintText: '••••••••',
+                          controller: _confirmController,
+                          validator: _validateConfirm,
+                          obscure: true,
+                          textInputAction: TextInputAction.done,
+                          autofillHints: const [AutofillHints.newPassword],
+                          prefixIcon: const Icon(
+                            Icons.shield_outlined,
+                            color: AppColors.textOnDarkSecondary,
+                            size: 20,
+                          ),
+                        ),
+
+                        const SizedBox(height: 28),
+
+                        // Primary Call to Action Button with Arrow
+                        AppButton(
+                          label: l10n.actionCreateAccount,
+                          onPressed: _submit,
+                          loading: _loading,
+                          trailingIcon: const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 20,
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // "or continue with" Divider
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                color: Colors.white.withValues(alpha: 0.10),
+                                thickness: 1,
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      // App Transparent Logo Perfectly Aligned
-                      Center(
-                        child: Image.asset(
-                          AppConstants.assetLogoTransparent,
-                          width: 64,
-                          height: 64,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Header Title & Subtitle
-                      Text(
-                        l10n.signupTitle,
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.2,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.signupSubtitle,
-                        style: GoogleFonts.inter(
-                          color: AppColors.textOnDarkSecondary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          letterSpacing: 0.1,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // Full Name Field
-                      AppTextField(
-                        label: l10n.fieldFullName,
-                        hintText: 'John Doe',
-                        controller: _nameController,
-                        validator: _validateName,
-                        textInputAction: TextInputAction.next,
-                        autofillHints: const [AutofillHints.name],
-                        prefixIcon: const Icon(
-                          Icons.person_outline_rounded,
-                          color: AppColors.textOnDarkSecondary,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Email Field
-                      AppTextField(
-                        label: l10n.fieldEmail,
-                        hintText: 'name@example.com',
-                        controller: _emailController,
-                        validator: _validateEmail,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
-                        autofillHints: const [AutofillHints.email],
-                        prefixIcon: const Icon(
-                          Icons.mail_outline_rounded,
-                          color: AppColors.textOnDarkSecondary,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Password Field
-                      AppTextField(
-                        label: l10n.fieldPassword,
-                        hintText: '••••••••',
-                        controller: _passwordController,
-                        validator: _validatePassword,
-                        obscure: true,
-                        textInputAction: TextInputAction.next,
-                        autofillHints: const [AutofillHints.newPassword],
-                        prefixIcon: const Icon(
-                          Icons.lock_outline_rounded,
-                          color: AppColors.textOnDarkSecondary,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Confirm Password Field
-                      AppTextField(
-                        label: l10n.fieldConfirmPassword,
-                        hintText: '••••••••',
-                        controller: _confirmController,
-                        validator: _validateConfirm,
-                        obscure: true,
-                        textInputAction: TextInputAction.done,
-                        autofillHints: const [AutofillHints.newPassword],
-                        prefixIcon: const Icon(
-                          Icons.shield_outlined,
-                          color: AppColors.textOnDarkSecondary,
-                          size: 20,
-                        ),
-                      ),
-
-                      const SizedBox(height: 28),
-
-                      // Primary Call to Action Button with Arrow
-                      AppButton(
-                        label: l10n.actionCreateAccount,
-                        onPressed: _submit,
-                        loading: _loading,
-                        trailingIcon: const Icon(
-                          Icons.arrow_forward_rounded,
-                          size: 20,
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // "or continue with" Divider
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Divider(
-                              color: Colors.white.withValues(alpha: 0.10),
-                              thickness: 1,
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 14),
+                              child: Text(
+                                'or continue with',
+                                style: GoogleFonts.inter(
+                                  color: AppColors.textOnDarkSecondary,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 14),
-                            child: Text(
-                              'or continue with',
+                            Expanded(
+                              child: Divider(
+                                color: Colors.white.withValues(alpha: 0.12),
+                                thickness: 1,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // Social Sign-up Card: Google
+                        _SocialAuthCard(
+                          logo: const _GoogleLogo(),
+                          label: 'Continue with Google',
+                          onTap: () => _socialAuth('Google'),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // Footer Navigation: Already have an account? Sign In
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 6,
+                          children: [
+                            Text(
+                              l10n.loginHaveAccount,
                               style: GoogleFonts.inter(
                                 color: AppColors.textOnDarkSecondary,
-                                fontSize: 13,
+                                fontSize: 14.5,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                          ),
-                          Expanded(
-                            child: Divider(
-                              color: Colors.white.withValues(alpha: 0.12),
-                              thickness: 1,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Social Sign-up Card: Google
-                      _SocialAuthCard(
-                        logo: const _GoogleLogo(),
-                        label: 'Continue with Google',
-                        onTap: () => _socialAuth('Google'),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Footer Navigation: Already have an account? Sign In
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            l10n.loginHaveAccount,
-                            style: GoogleFonts.inter(
-                              color: AppColors.textOnDarkSecondary,
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          GestureDetector(
-                            onTap:
-                                _loading ? null : () => context.go('/login'),
-                            child: Text(
-                              l10n.actionSignIn,
-                              style: GoogleFonts.inter(
-                                color: AppColors.teal,
-                                fontSize: 14.5,
-                                fontWeight: FontWeight.w700,
+                            GestureDetector(
+                              onTap: _loading ? null : _onBack,
+                              child: Text(
+                                l10n.actionSignIn,
+                                style: GoogleFonts.inter(
+                                  color: AppColors.teal,
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
 
-                      const SizedBox(height: 12),
-                    ],
-                  ).animate().fadeIn(duration: 350.ms),
+                        const SizedBox(height: 12),
+                      ],
+                    ).animate().fadeIn(duration: 350.ms),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -415,15 +427,20 @@ class _SocialAuthCard extends StatelessWidget {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               logo,
               const SizedBox(width: 10),
-              Text(
-                label,
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w600,
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],

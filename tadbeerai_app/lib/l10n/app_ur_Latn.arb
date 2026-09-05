@@ -433,5 +433,34 @@
   "essentialPricesCategoryStaples": "Bunyadi Khurak",
   "essentialPricesCategoryPulses": "Daalein",
   "essentialPricesCategoryCookingFuel": "Cooking aur Fuel",
-  "essentialPricesUnavailable": "Qeematon ka data fil-waqt dastiyab nahi hai"
+  "essentialPricesUnavailable": "Qeematon ka data fil-waqt dastiyab nahi hai",
+  "actionContinueAsGuest": "Bator Mehmaan Jaari Rakhein",
+  "loginGuestMode": "Mehmaan Mode",
+  "loginGuestSubtitle": "Economy aur Finance tools tak fori rasaai",
+  "forgotPasswordTitle": "Password Reset Karein",
+  "forgotPasswordSubtitle": "6-hindsay ka tasdeeqi code hasil karne ke liye apna email darj karein.",
+  "actionForgotPassword": "Password bhool gaye?",
+  "actionSendCode": "Tasdeeqi Code Bheinjein",
+  "actionResetPassword": "Password Tabdeel Karein",
+  "actionResendCode": "Code Dobara Bheinjein",
+  "verifyCodeTitle": "Code Ki Tasdeeq",
+  "verifyCodeSubtitle": "Apne email par bheja gaya 6-hindsay ka code darj karein.",
+  "codeSentTo": "Code is email par bheja gaya",
+  "demoCodeHint": "Demo code: 842196",
+  "fieldVerificationCode": "Tasdeeqi Code",
+  "validationCodeRequired": "Barah-e-karam poora 6-hindsay ka code darj karein.",
+  "validationCodeInvalid": "Ghalat ya expired tasdeeqi code.",
+  "newPasswordTitle": "Naya Password",
+  "newPasswordSubtitle": "Apne account ke liye naya aur mehfooz password banayein.",
+  "passwordResetSuccessTitle": "Password Kamyabi Se Tabdeel Ho Gaya!",
+  "passwordResetSuccessSubtitle": "Aap ka password mehfooz tareeqay se update ho gaya hai. Ab aap sign in kar sakte hain.",
+  "backToSignIn": "Sign In Par Wapis Jayein",
+  "codeResendIn": "{seconds}s mein dobara bheinjein",
+  "@codeResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -10,6 +10,11 @@ class AppUser {
   final String name;
   final String email;
 
+  bool get isGuest =>
+      email == 'guest@tadbeer.ai' ||
+      id.startsWith('guest') ||
+      name.toLowerCase().contains('guest');
+
   Map<String, dynamic> toJson() => {'id': id, 'name': name, 'email': email};
 
   factory AppUser.fromJson(Map<String, dynamic> json) => AppUser(

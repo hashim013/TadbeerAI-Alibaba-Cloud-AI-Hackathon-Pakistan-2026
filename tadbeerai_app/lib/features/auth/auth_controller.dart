@@ -58,6 +58,53 @@ class AuthController extends Notifier<AppUser?> {
     }
   }
 
+  Future<bool> signInAsGuest() async {
+    _lastErrorMessage = null;
+    try {
+      state = await ref.read(authRepositoryProvider).signInAsGuest();
+      return true;
+    } catch (e) {
+      _lastErrorMessage = e.toString();
+      return false;
+    }
+  }
+
+  Future<bool> sendPasswordResetCode(String email) async {
+    _lastErrorMessage = null;
+    try {
+      await ref
+          .read(authRepositoryProvider)
+          .sendPasswordResetCode(email: email);
+      return true;
+    } catch (e) {
+      _lastErrorMessage = e.toString();
+      return false;
+    }
+  }
+
+  Future<bool> resetPasswordWithCode({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    _lastErrorMessage = null;
+    try {
+      final success =
+          await ref.read(authRepositoryProvider).resetPasswordWithCode(
+                email: email,
+                code: code,
+                newPassword: newPassword,
+              );
+      if (!success) {
+        _lastErrorMessage = 'Invalid or expired verification code.';
+      }
+      return success;
+    } catch (e) {
+      _lastErrorMessage = e.toString();
+      return false;
+    }
+  }
+
   Future<void> signOut() async {
     _lastErrorMessage = null;
     await ref.read(authRepositoryProvider).signOut();

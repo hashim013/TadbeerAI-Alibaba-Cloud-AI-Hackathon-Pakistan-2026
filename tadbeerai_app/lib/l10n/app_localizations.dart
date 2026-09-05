@@ -2532,6 +2532,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Essential price data temporarily unavailable'**
   String get essentialPricesUnavailable;
+
+  /// No description provided for @actionContinueAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as Guest'**
+  String get actionContinueAsGuest;
+
+  /// No description provided for @loginGuestMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Mode'**
+  String get loginGuestMode;
+
+  /// No description provided for @loginGuestSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant access to Economy & Finance tools'**
+  String get loginGuestSubtitle;
+
+  /// No description provided for @forgotPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get forgotPasswordTitle;
+
+  /// No description provided for @forgotPasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email address to receive a secure 6-digit verification code.'**
+  String get forgotPasswordSubtitle;
+
+  /// No description provided for @actionForgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password?'**
+  String get actionForgotPassword;
+
+  /// No description provided for @actionSendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Verification Code'**
+  String get actionSendCode;
+
+  /// No description provided for @actionResetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get actionResetPassword;
+
+  /// No description provided for @actionResendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Code'**
+  String get actionResendCode;
+
+  /// No description provided for @verifyCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Code'**
+  String get verifyCodeTitle;
+
+  /// No description provided for @verifyCodeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code sent to your email.'**
+  String get verifyCodeSubtitle;
+
+  /// No description provided for @codeSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Code sent to'**
+  String get codeSentTo;
+
+  /// No description provided for @demoCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo code: 842196'**
+  String get demoCodeHint;
+
+  /// No description provided for @fieldVerificationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Code'**
+  String get fieldVerificationCode;
+
+  /// No description provided for @validationCodeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the 6-digit code.'**
+  String get validationCodeRequired;
+
+  /// No description provided for @validationCodeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid or expired verification code.'**
+  String get validationCodeInvalid;
+
+  /// No description provided for @newPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPasswordTitle;
+
+  /// No description provided for @newPasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a strong new password for your account.'**
+  String get newPasswordSubtitle;
+
+  /// No description provided for @passwordResetSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Password Reset Successfully!'**
+  String get passwordResetSuccessTitle;
+
+  /// No description provided for @passwordResetSuccessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password has been securely updated. You can now sign in with your new password.'**
+  String get passwordResetSuccessSubtitle;
+
+  /// No description provided for @backToSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Sign In'**
+  String get backToSignIn;
+
+  /// No description provided for @codeResendIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in {seconds}s'**
+  String codeResendIn(int seconds);
 }
 
 class _AppLocalizationsDelegate

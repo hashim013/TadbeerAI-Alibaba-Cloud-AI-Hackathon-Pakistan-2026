@@ -581,5 +581,34 @@
   "essentialPricesCategoryStaples": "Food & Staples",
   "essentialPricesCategoryPulses": "Pulses",
   "essentialPricesCategoryCookingFuel": "Cooking & Fuel",
-  "essentialPricesUnavailable": "Essential price data temporarily unavailable"
+  "essentialPricesUnavailable": "Essential price data temporarily unavailable",
+  "actionContinueAsGuest": "Continue as Guest",
+  "loginGuestMode": "Guest Mode",
+  "loginGuestSubtitle": "Instant access to Economy & Finance tools",
+  "forgotPasswordTitle": "Reset Password",
+  "forgotPasswordSubtitle": "Enter your email address to receive a secure 6-digit verification code.",
+  "actionForgotPassword": "Forgot Password?",
+  "actionSendCode": "Send Verification Code",
+  "actionResetPassword": "Reset Password",
+  "actionResendCode": "Resend Code",
+  "verifyCodeTitle": "Verify Code",
+  "verifyCodeSubtitle": "Enter the 6-digit code sent to your email.",
+  "codeSentTo": "Code sent to",
+  "demoCodeHint": "Demo code: 842196",
+  "fieldVerificationCode": "Verification Code",
+  "validationCodeRequired": "Please enter the 6-digit code.",
+  "validationCodeInvalid": "Invalid or expired verification code.",
+  "newPasswordTitle": "New Password",
+  "newPasswordSubtitle": "Create a strong new password for your account.",
+  "passwordResetSuccessTitle": "Password Reset Successfully!",
+  "passwordResetSuccessSubtitle": "Your password has been securely updated. You can now sign in with your new password.",
+  "backToSignIn": "Back to Sign In",
+  "codeResendIn": "Resend code in {seconds}s",
+  "@codeResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  }
 }

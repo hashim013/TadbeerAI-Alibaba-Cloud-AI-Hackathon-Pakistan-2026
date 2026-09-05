@@ -6,11 +6,54 @@ import '../../core/theme/app_colors.dart';
 import '../../core/utils/l10n_context.dart';
 
 /// Main app shell hosting the five primary areas with an ultra-modern,
-/// professionally aligned bottom navigation bar.
-class MainShell extends StatelessWidget {
+/// professionally aligned bottom navigation bar and silky-smooth tab switching.
+class MainShell extends StatefulWidget {
   const MainShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
+
+  @override
+  State<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends State<MainShell>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _fadeController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOutCubic,
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.012),
+      end: Offset.zero,
+    ).animate(_fadeAnimation);
+    _fadeController.value = 1.0;
+  }
+
+  @override
+  void didUpdateWidget(covariant MainShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.navigationShell.currentIndex !=
+        oldWidget.navigationShell.currentIndex) {
+      _fadeController.forward(from: 0.0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +84,18 @@ class MainShell extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.navyBg,
-      body: navigationShell,
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: SlideTransition(
+          position: _slideAnimation,
+          child: widget.navigationShell,
+        ),
+      ),
       bottomNavigationBar: _ModernBottomNavBar(
-        currentIndex: navigationShell.currentIndex,
-        onDestinationSelected: (index) => navigationShell.goBranch(
+        currentIndex: widget.navigationShell.currentIndex,
+        onDestinationSelected: (index) => widget.navigationShell.goBranch(
           index,
-          initialLocation: index == navigationShell.currentIndex,
+          initialLocation: index == widget.navigationShell.currentIndex,
         ),
         destinations: destinations,
       ),
@@ -142,7 +191,7 @@ class _NavItem extends StatelessWidget {
           children: [
             // Top active glowing pill indicator
             AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 220),
               curve: Curves.easeOutCubic,
               width: isSelected ? 22 : 0,
               height: 3,
@@ -153,7 +202,8 @@ class _NavItem extends StatelessWidget {
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: const Color(0xFF2DD4BF).withValues(alpha: 0.55),
+                          color:
+                              const Color(0xFF2DD4BF).withValues(alpha: 0.55),
                           blurRadius: 6,
                           spreadRadius: 0.5,
                         ),
@@ -167,24 +217,36 @@ class _NavItem extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    isSelected
-                        ? destination.selectedIcon
-                        : destination.icon,
-                    size: 22,
-                    color: isSelected
-                        ? const Color(0xFF2DD4BF)
-                        : const Color(0xFF64748B),
+                  AnimatedScale(
+                    scale: isSelected ? 1.08 : 1.0,
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOutCubic,
+                    child: TweenAnimationBuilder<Color?>(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOutCubic,
+                      tween: ColorTween(
+                        begin: const Color(0xFF64748B),
+                        end: isSelected
+                            ? const Color(0xFF2DD4BF)
+                            : const Color(0xFF64748B),
+                      ),
+                      builder: (context, color, _) {
+                        return Icon(
+                          isSelected
+                              ? destination.selectedIcon
+                              : destination.icon,
+                          size: 22,
+                          color: color,
+                        );
+                      },
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 2),
-                    child: Text(
-                      destination.label,
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
+                    child: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOutCubic,
                       style: GoogleFonts.inter(
                         fontSize: 11,
                         fontWeight:
@@ -194,6 +256,13 @@ class _NavItem extends StatelessWidget {
                             : const Color(0xFF94A3B8),
                         letterSpacing: 0.1,
                         height: 1.15,
+                      ),
+                      child: Text(
+                        destination.label,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),

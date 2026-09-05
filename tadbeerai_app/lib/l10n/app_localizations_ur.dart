@@ -1399,6 +1399,79 @@ class AppLocalizationsUr extends AppLocalizations {
   @override
   String get essentialPricesUnavailable =>
       'قیمتوں کا ڈیٹا فی الوقت دستیاب نہیں ہے';
+
+  @override
+  String get actionContinueAsGuest => 'بطور مہمان جاری رکھیں';
+
+  @override
+  String get loginGuestMode => 'مہمان موڈ';
+
+  @override
+  String get loginGuestSubtitle => 'معیشت اور مالیاتی ٹولز تک فوری رسائی';
+
+  @override
+  String get forgotPasswordTitle => 'پاس ورڈ دوبارہ ترتیب دیں';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      '6 ہندسوں کا تصدیقی کوڈ حاصل کرنے کے لیے اپنا ای میل درج کریں۔';
+
+  @override
+  String get actionForgotPassword => 'پاس ورڈ بھول گئے؟';
+
+  @override
+  String get actionSendCode => 'تصدیقی کوڈ بھیجیں';
+
+  @override
+  String get actionResetPassword => 'پاس ورڈ تبدیل کریں';
+
+  @override
+  String get actionResendCode => 'کوڈ دوبارہ بھیجیں';
+
+  @override
+  String get verifyCodeTitle => 'کوڈ کی تصدیق';
+
+  @override
+  String get verifyCodeSubtitle =>
+      'اپنے ای میل پر بھیجا گیا 6 ہندسوں کا کوڈ درج کریں۔';
+
+  @override
+  String get codeSentTo => 'کوڈ اس ای میل پر بھیجا گیا';
+
+  @override
+  String get demoCodeHint => 'ڈیمو کوڈ: 842196';
+
+  @override
+  String get fieldVerificationCode => 'تصدیقی کوڈ';
+
+  @override
+  String get validationCodeRequired =>
+      'براہ کرم پورا 6 ہندسوں کا کوڈ درج کریں۔';
+
+  @override
+  String get validationCodeInvalid => 'غلط یا زائد المیعاد تصدیقی کوڈ۔';
+
+  @override
+  String get newPasswordTitle => 'نیا پاس ورڈ';
+
+  @override
+  String get newPasswordSubtitle =>
+      'اپنے اکاؤنٹ کے لیے نیا اور محفوظ پاس ورڈ درج کریں۔';
+
+  @override
+  String get passwordResetSuccessTitle => 'پاس ورڈ کامیابی سے تبدیل ہو گیا!';
+
+  @override
+  String get passwordResetSuccessSubtitle =>
+      'آپ کا پاس ورڈ محفوظ طریقے سے اپ ڈیٹ کر دیا گیا ہے۔ اب آپ سائن ان کر سکتے ہیں۔';
+
+  @override
+  String get backToSignIn => 'سائن ان پر واپس جائیں';
+
+  @override
+  String codeResendIn(int seconds) {
+    return '$seconds سیکنڈ میں دوبارہ بھیجیں';
+  }
 }
 
 /// The translations for Urdu, using the Latin script (`ur_Latn`).
@@ -2810,4 +2883,78 @@ class AppLocalizationsUrLatn extends AppLocalizationsUr {
   @override
   String get essentialPricesUnavailable =>
       'Qeematon ka data fil-waqt dastiyab nahi hai';
+
+  @override
+  String get actionContinueAsGuest => 'Bator Mehmaan Jaari Rakhein';
+
+  @override
+  String get loginGuestMode => 'Mehmaan Mode';
+
+  @override
+  String get loginGuestSubtitle => 'Economy aur Finance tools tak fori rasaai';
+
+  @override
+  String get forgotPasswordTitle => 'Password Reset Karein';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      '6-hindsay ka tasdeeqi code hasil karne ke liye apna email darj karein.';
+
+  @override
+  String get actionForgotPassword => 'Password bhool gaye?';
+
+  @override
+  String get actionSendCode => 'Tasdeeqi Code Bheinjein';
+
+  @override
+  String get actionResetPassword => 'Password Tabdeel Karein';
+
+  @override
+  String get actionResendCode => 'Code Dobara Bheinjein';
+
+  @override
+  String get verifyCodeTitle => 'Code Ki Tasdeeq';
+
+  @override
+  String get verifyCodeSubtitle =>
+      'Apne email par bheja gaya 6-hindsay ka code darj karein.';
+
+  @override
+  String get codeSentTo => 'Code is email par bheja gaya';
+
+  @override
+  String get demoCodeHint => 'Demo code: 842196';
+
+  @override
+  String get fieldVerificationCode => 'Tasdeeqi Code';
+
+  @override
+  String get validationCodeRequired =>
+      'Barah-e-karam poora 6-hindsay ka code darj karein.';
+
+  @override
+  String get validationCodeInvalid => 'Ghalat ya expired tasdeeqi code.';
+
+  @override
+  String get newPasswordTitle => 'Naya Password';
+
+  @override
+  String get newPasswordSubtitle =>
+      'Apne account ke liye naya aur mehfooz password banayein.';
+
+  @override
+  String get passwordResetSuccessTitle =>
+      'Password Kamyabi Se Tabdeel Ho Gaya!';
+
+  @override
+  String get passwordResetSuccessSubtitle =>
+      'Aap ka password mehfooz tareeqay se update ho gaya hai. Ab aap sign in kar sakte hain.';
+
+  @override
+  String get backToSignIn => 'Sign In Par Wapis Jayein';
+
+  @override
+  String codeResendIn(int seconds) {
+    return '${seconds}s mein dobara bheinjein';
+  }
 }

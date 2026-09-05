@@ -61,6 +61,31 @@ void main() {
 
       expect(await repo.currentUser(), isNull);
     });
+
+    test('sendPasswordResetCode and resetPasswordWithCode succeed with valid code',
+        () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repo = MockAuthRepository(prefs);
+
+      await repo.sendPasswordResetCode(email: 'user@tadbeer.ai');
+
+      // Valid code
+      final success = await repo.resetPasswordWithCode(
+        email: 'user@tadbeer.ai',
+        code: '842196',
+        newPassword: 'newSecret123',
+      );
+      expect(success, isTrue);
+
+      // Incorrect code fails
+      final fail = await repo.resetPasswordWithCode(
+        email: 'user@tadbeer.ai',
+        code: '000000',
+        newPassword: 'newSecret123',
+      );
+      expect(fail, isFalse);
+    });
   });
 
   group('PrefsSettingsRepository', () {

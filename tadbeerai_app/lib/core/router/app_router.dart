@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/assistant/ask_tadbeer_screen.dart';
+import '../../features/auth/forgot_password_screen.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/auth/signup_screen.dart';
 import '../../features/dashboard/home_dashboard_screen.dart';
@@ -19,6 +21,72 @@ import '../../features/shell/main_shell.dart';
 import '../../features/shell/tabs.dart';
 import '../../features/splash/splash_screen.dart';
 
+/// Smooth fade + subtle horizontal slide transition for primary screen switches.
+CustomTransitionPage<void> _buildSmoothTransitionPage({
+  required GoRouterState state,
+  required Widget child,
+  Offset slideOffset = const Offset(0.04, 0),
+  Duration duration = const Duration(milliseconds: 280),
+}) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: duration,
+    reverseTransitionDuration: duration,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      );
+      final fade = Tween<double>(begin: 0.0, end: 1.0).animate(curved);
+      final slide =
+          Tween<Offset>(begin: slideOffset, end: Offset.zero).animate(curved);
+      return FadeTransition(
+        opacity: fade,
+        child: SlideTransition(
+          position: slide,
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
+/// Slide + fade transition for sub-routes / detail views.
+CustomTransitionPage<void> _buildDetailTransitionPage({
+  required GoRouterState state,
+  required Widget child,
+  Duration duration = const Duration(milliseconds: 280),
+}) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: duration,
+    reverseTransitionDuration: duration,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      );
+      final slide = Tween<Offset>(
+        begin: const Offset(0.06, 0),
+        end: Offset.zero,
+      ).animate(curved);
+      final fade = Tween<double>(begin: 0.0, end: 1.0).animate(curved);
+
+      return FadeTransition(
+        opacity: fade,
+        child: SlideTransition(
+          position: slide,
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
 /// App navigation graph.
 ///
 /// `/splash` gates the first-launch flow (onboarding → login → shell);
@@ -34,24 +102,52 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => const OnboardingScreen(),
+        pageBuilder: (context, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const OnboardingScreen(),
+        ),
       ),
       GoRoute(
         path: '/login',
-        builder: (context, state) => const LoginScreen(),
+        pageBuilder: (context, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const LoginScreen(),
+          slideOffset: const Offset(-0.04, 0),
+        ),
       ),
       GoRoute(
         path: '/signup',
-        builder: (context, state) => const SignupScreen(),
+        pageBuilder: (context, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const SignupScreen(),
+          slideOffset: const Offset(0.04, 0),
+        ),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        pageBuilder: (context, state) {
+          final email = state.extra as String?;
+          return _buildSmoothTransitionPage(
+            state: state,
+            child: ForgotPasswordScreen(initialEmail: email),
+            slideOffset: const Offset(0.04, 0),
+          );
+        },
       ),
       GoRoute(
         path: '/profile/financial',
-        builder: (context, state) => const FinancialProfileScreen(),
+        pageBuilder: (context, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const FinancialProfileScreen(),
+        ),
       ),
       // Standalone route preserving the Market screen for future phases
       GoRoute(
         path: '/market',
-        builder: (context, state) => const MarketTab(),
+        pageBuilder: (context, state) => _buildSmoothTransitionPage(
+          state: state,
+          child: const MarketTab(),
+        ),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -73,23 +169,38 @@ final routerProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'health',
-                    builder: (context, state) => const FinancialHealthScreen(),
+                    pageBuilder: (context, state) => _buildDetailTransitionPage(
+                      state: state,
+                      child: const FinancialHealthScreen(),
+                    ),
                   ),
                   GoRoute(
                     path: 'finances',
-                    builder: (context, state) => const MyFinancesScreen(),
+                    pageBuilder: (context, state) => _buildDetailTransitionPage(
+                      state: state,
+                      child: const MyFinancesScreen(),
+                    ),
                   ),
                   GoRoute(
                     path: 'expenses',
-                    builder: (context, state) => const ExpensesScreen(),
+                    pageBuilder: (context, state) => _buildDetailTransitionPage(
+                      state: state,
+                      child: const ExpensesScreen(),
+                    ),
                   ),
                   GoRoute(
                     path: 'budget',
-                    builder: (context, state) => const BudgetScreen(),
+                    pageBuilder: (context, state) => _buildDetailTransitionPage(
+                      state: state,
+                      child: const BudgetScreen(),
+                    ),
                   ),
                   GoRoute(
                     path: 'goals',
-                    builder: (context, state) => const GoalsScreen(),
+                    pageBuilder: (context, state) => _buildDetailTransitionPage(
+                      state: state,
+                      child: const GoalsScreen(),
+                    ),
                   ),
                 ],
               ),
@@ -103,8 +214,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'indicator/:id',
-                    builder: (context, state) => EconomicDetailScreen(
-                      indicatorId: state.pathParameters['id']!,
+                    pageBuilder: (context, state) => _buildDetailTransitionPage(
+                      state: state,
+                      child: EconomicDetailScreen(
+                        indicatorId: state.pathParameters['id']!,
+                      ),
                     ),
                   ),
                 ],

@@ -433,5 +433,34 @@
   "essentialPricesCategoryStaples": "بنیادی خوراک",
   "essentialPricesCategoryPulses": "دالیں",
   "essentialPricesCategoryCookingFuel": "کوکنگ اور ایندھن",
-  "essentialPricesUnavailable": "قیمتوں کا ڈیٹا فی الوقت دستیاب نہیں ہے"
+  "essentialPricesUnavailable": "قیمتوں کا ڈیٹا فی الوقت دستیاب نہیں ہے",
+  "actionContinueAsGuest": "بطور مہمان جاری رکھیں",
+  "loginGuestMode": "مہمان موڈ",
+  "loginGuestSubtitle": "معیشت اور مالیاتی ٹولز تک فوری رسائی",
+  "forgotPasswordTitle": "پاس ورڈ دوبارہ ترتیب دیں",
+  "forgotPasswordSubtitle": "6 ہندسوں کا تصدیقی کوڈ حاصل کرنے کے لیے اپنا ای میل درج کریں۔",
+  "actionForgotPassword": "پاس ورڈ بھول گئے؟",
+  "actionSendCode": "تصدیقی کوڈ بھیجیں",
+  "actionResetPassword": "پاس ورڈ تبدیل کریں",
+  "actionResendCode": "کوڈ دوبارہ بھیجیں",
+  "verifyCodeTitle": "کوڈ کی تصدیق",
+  "verifyCodeSubtitle": "اپنے ای میل پر بھیجا گیا 6 ہندسوں کا کوڈ درج کریں۔",
+  "codeSentTo": "کوڈ اس ای میل پر بھیجا گیا",
+  "demoCodeHint": "ڈیمو کوڈ: 842196",
+  "fieldVerificationCode": "تصدیقی کوڈ",
+  "validationCodeRequired": "براہ کرم پورا 6 ہندسوں کا کوڈ درج کریں۔",
+  "validationCodeInvalid": "غلط یا زائد المیعاد تصدیقی کوڈ۔",
+  "newPasswordTitle": "نیا پاس ورڈ",
+  "newPasswordSubtitle": "اپنے اکاؤنٹ کے لیے نیا اور محفوظ پاس ورڈ درج کریں۔",
+  "passwordResetSuccessTitle": "پاس ورڈ کامیابی سے تبدیل ہو گیا!",
+  "passwordResetSuccessSubtitle": "آپ کا پاس ورڈ محفوظ طریقے سے اپ ڈیٹ کر دیا گیا ہے۔ اب آپ سائن ان کر سکتے ہیں۔",
+  "backToSignIn": "سائن ان پر واپس جائیں",
+  "codeResendIn": "{seconds} سیکنڈ میں دوبارہ بھیجیں",
+  "@codeResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  }
 }

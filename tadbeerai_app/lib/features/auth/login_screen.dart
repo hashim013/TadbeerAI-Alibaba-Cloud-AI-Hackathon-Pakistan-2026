@@ -14,10 +14,6 @@ import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_text_field.dart';
 import 'auth_controller.dart';
 
-/// Modern, professional Sign-in screen for Tadbeer AI 2.0.
-///
-/// Matches the provided dark blue reference with card input fields,
-/// password toggle, forgot password link, social auth, and gradient CTA.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -32,12 +28,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _loading = false;
+  bool _guestLoading = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _continueAsGuest() async {
+    if (_loading || _guestLoading) return;
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() => _guestLoading = true);
+
+    final authNotifier = ref.read(authControllerProvider.notifier);
+    final success = await authNotifier.signInAsGuest();
+    if (!mounted) return;
+
+    if (success) {
+      context.go('/home');
+    } else {
+      setState(() => _guestLoading = false);
+      final errorMsg =
+          authNotifier.lastErrorMessage ?? context.l10n.errorGeneric;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMsg),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   String? _validateEmail(String? value) {
@@ -62,9 +83,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _loading = true);
     final authNotifier = ref.read(authControllerProvider.notifier);
     final success = await authNotifier.signIn(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
     if (!mounted) return;
 
     if (success) {
@@ -83,14 +104,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _forgotPassword() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content:
-            Text('Password reset link sent to registered email in demo mode.'),
-        behavior: SnackBarBehavior.floating,
-        duration: Duration(seconds: 2),
-      ),
-    );
+    final currentEmail = _emailController.text.trim();
+    if (currentEmail.isNotEmpty) {
+      context.push('/forgot-password', extra: currentEmail);
+    } else {
+      context.push('/forgot-password');
+    }
   }
 
   void _socialAuth(String provider) {
@@ -146,7 +165,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 20),
 
                       // App Transparent Brand Mark
                       Center(
@@ -224,11 +243,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Align(
                         alignment: AlignmentDirectional.centerEnd,
                         child: GestureDetector(
-                          onTap: _forgotPassword,
+                          onTap: _loading ? null : _forgotPassword,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             child: Text(
-                              'Forgot Password?',
+                              l10n.actionForgotPassword,
                               style: GoogleFonts.inter(
                                 color: AppColors.teal,
                                 fontSize: 14,
@@ -292,11 +311,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         onTap: () => _socialAuth('Google'),
                       ),
 
+                      const SizedBox(height: 12),
+
+                      // Guest Sign-in Card
+                      _SocialAuthCard(
+                        logo: const Icon(
+                          Icons.person_outline_rounded,
+                          size: 20,
+                          color: AppColors.teal,
+                        ),
+                        label: l10n.actionContinueAsGuest,
+                        onTap: _continueAsGuest,
+                        loading: _guestLoading,
+                      ),
+
                       const SizedBox(height: 32),
 
                       // Footer Navigation: Don't have an account? Sign Up
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 6,
                         children: [
                           Text(
                             l10n.loginNoAccount,
@@ -306,7 +341,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          const SizedBox(width: 6),
                           GestureDetector(
                             onTap:
                                 _loading ? null : () => context.go('/signup'),
@@ -335,24 +369,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 }
 
-/// Social Sign-in card with dark container styling.
+/// Social / Alternative Sign-in card with dark container styling.
 class _SocialAuthCard extends StatelessWidget {
   const _SocialAuthCard({
     required this.logo,
     required this.label,
     required this.onTap,
+    this.loading = false,
   });
 
   final Widget logo;
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
+        onTap: loading ? null : onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
           height: 52,
@@ -364,21 +400,37 @@ class _SocialAuthCard extends StatelessWidget {
               width: 1.2,
             ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              logo,
-              const SizedBox(width: 10),
-              Text(
-                label,
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w600,
+          child: loading
+              ? const Center(
+                  child: SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.teal,
+                    ),
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    logo,
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );

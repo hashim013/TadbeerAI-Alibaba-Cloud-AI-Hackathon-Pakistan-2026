@@ -19,5 +19,17 @@ abstract interface class AuthRepository {
     required String password,
   });
 
+  Future<AppUser> signInAsGuest();
+
+  /// Sends a 6-digit verification code to the given [email] to reset password.
+  Future<void> sendPasswordResetCode({required String email});
+
+  /// Verifies the [code] sent to [email] and resets the account password to [newPassword].
+  Future<bool> resetPasswordWithCode({
+    required String email,
+    required String code,
+    required String newPassword,
+  });
+
   Future<void> signOut();
 }

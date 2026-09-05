@@ -72,6 +72,21 @@ class _TestAuthRepo implements AuthRepository {
       AppUser(id: '1', name: name, email: email);
 
   @override
+  Future<AppUser> signInAsGuest() async => const AppUser(
+      id: 'guest_1', name: 'Guest User', email: 'guest@tadbeer.ai');
+
+  @override
+  Future<void> sendPasswordResetCode({required String email}) async {}
+
+  @override
+  Future<bool> resetPasswordWithCode({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async =>
+      true;
+
+  @override
   Future<void> signOut() async {}
 }
 

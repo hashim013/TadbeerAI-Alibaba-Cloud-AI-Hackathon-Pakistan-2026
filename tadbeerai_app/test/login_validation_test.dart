@@ -102,4 +102,18 @@ void main() {
 
     expect(find.byType(LoginScreen), findsNothing);
   });
+
+  testWidgets('Continue as Guest card signs in as guest and navigates to /home',
+      (tester) async {
+    await _pumpLogin(tester);
+
+    final guestCard = find.text('Continue as Guest');
+    expect(guestCard, findsOneWidget);
+
+    await tester.ensureVisible(guestCard);
+    await tester.tap(guestCard);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LoginScreen), findsNothing);
+  });
 }
