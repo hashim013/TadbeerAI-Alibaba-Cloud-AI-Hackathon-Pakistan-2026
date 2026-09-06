@@ -24,6 +24,7 @@ from core.schemas import (
     AnalyseRequest,
     SimulateRequest,
     RegisterUserRequest,
+    UserPersonaRequest,
     UpdateUserRequest,
     FcmTokenRequest,
 )
@@ -508,23 +509,29 @@ def register_user(request: RegisterUserRequest, authorization: Optional[str] = H
     try:
         from datetime import datetime
         user_id = request.user_id
+        is_guest = request.is_guest if request.is_guest is not None else (request.mode == "guest" or not (request.email or request.phone))
+        mode = "guest" if is_guest else "account"
+        eligible_for_alerts = False if is_guest else True
+
         user_data = {
             "user_id": user_id,
-            "category": request.category,
-            "name": request.name,
-            "email": request.email,
-            "phone": request.phone,
+            "category": request.category or "General",
+            "name": request.name or ("Guest User" if is_guest else "User"),
+            "email": request.email or "",
+            "phone": request.phone or "",
             "fcm_token": request.fcm_token or "",
             "profile_data": request.profile_data or {},
             "created_at": datetime.utcnow().isoformat(),
-            "mode": "account" if (request.email or request.phone) else "guest"
+            "mode": mode,
+            "is_guest": is_guest,
+            "eligible_for_alerts": eligible_for_alerts,
         }
         
         # Save to Firestore /users/{user_id}/
         client = get_firestore_client()
         if client.available:
             client.db.collection("users").document(user_id).set(user_data)
-            print(f"[Register] Saved user {user_id} to Firestore")
+            print(f"[Register] Saved user {user_id} to Firestore (mode: {mode}, eligible_for_alerts: {eligible_for_alerts})")
         else:
             # Save to local JSON fallback
             registry = get_user_registry()
@@ -538,11 +545,106 @@ def register_user(request: RegisterUserRequest, authorization: Optional[str] = H
             if not found:
                 users.append(user_data)
             registry._write_json(users)
-            print(f"[Register] Saved user {user_id} to JSON fallback")
+            print(f"[Register] Saved user {user_id} to JSON fallback (mode: {mode}, eligible_for_alerts: {eligible_for_alerts})")
             
-        return {"success": True, "user_id": user_id}
+        return {
+            "success": True,
+            "user_id": user_id,
+            "mode": mode,
+            "is_guest": is_guest,
+            "eligible_for_alerts": eligible_for_alerts,
+        }
     except Exception as e:
         print(f"[Register] Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/users/persona")
+def save_user_persona(request: UserPersonaRequest, authorization: Optional[str] = Header(None)):
+    """POST /users/persona — Save or update user financial persona.
+    
+    In guest mode, preferences are recorded locally / marked as guest, and user
+    is explicitly NOT eligible for alerts.
+    For registered accounts (Email/Password or Google), user is marked eligible for alerts.
+    """
+    auth_uid = get_authenticated_user_id(authorization)
+    if auth_uid and auth_uid != request.user_id:
+        raise HTTPException(status_code=403, detail="Forbidden: Cannot update persona for another user")
+    try:
+        from datetime import datetime
+        user_id = request.user_id
+        is_guest = bool(request.is_guest or (not request.email and not request.phone))
+        mode = "guest" if is_guest else "account"
+        eligible_for_alerts = not is_guest
+
+        persona_data = {
+            "user_id": user_id,
+            "persona": request.persona,
+            "primary_goal": request.primary_goal,
+            "monthly_income": request.monthly_income,
+            "monthly_essential_expenses": request.monthly_essential_expenses,
+            "total_savings": request.total_savings,
+            "name": request.name or ("Guest User" if is_guest else "User"),
+            "email": request.email or "",
+            "phone": request.phone or "",
+            "is_guest": is_guest,
+            "mode": mode,
+            "eligible_for_alerts": eligible_for_alerts,
+            "updated_at": datetime.utcnow().isoformat(),
+        }
+
+        client = get_firestore_client()
+        if client.available:
+            client.db.collection("users").document(user_id).set(persona_data, merge=True)
+            print(f"[Persona] Synced persona for {user_id} (is_guest: {is_guest}, eligible_for_alerts: {eligible_for_alerts})")
+        
+        registry = get_user_registry()
+        registry.update_user(user_id, persona_data)
+
+        return {
+            "status": "success",
+            "user_id": user_id,
+            "is_guest": is_guest,
+            "eligible_for_alerts": eligible_for_alerts,
+            "persona": request.persona,
+            "message": (
+                "Preferences saved locally on device. Alerts are reserved for registered users."
+                if is_guest
+                else "Persona updated successfully. Real-time alerts activated."
+            ),
+        }
+    except Exception as e:
+        print(f"[Persona] Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/users/{user_id}/alerts-eligibility")
+def check_alerts_eligibility(user_id: str, authorization: Optional[str] = Header(None)):
+    """GET /users/{user_id}/alerts-eligibility — Check whether a user is eligible for real-time alerts."""
+    try:
+        registry = get_user_registry()
+        user = registry.get_user(user_id)
+        if not user:
+            return {
+                "user_id": user_id,
+                "is_guest": True,
+                "eligible_for_alerts": False,
+                "reason": "Guest mode: preferences saved locally on device. Account registration required to receive alerts.",
+            }
+        is_guest = bool(user.get("is_guest", False) or user.get("mode") == "guest")
+        eligible = bool(user.get("eligible_for_alerts", not is_guest) and not is_guest)
+        return {
+            "user_id": user_id,
+            "is_guest": is_guest,
+            "eligible_for_alerts": eligible,
+            "reason": (
+                "Guest mode: preferences saved locally on device. Account registration required to receive alerts."
+                if is_guest
+                else "Registered account: eligible for real-time market and commodity alerts."
+            ),
+        }
+    except Exception as e:
+        print(f"[Alerts Eligibility] Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

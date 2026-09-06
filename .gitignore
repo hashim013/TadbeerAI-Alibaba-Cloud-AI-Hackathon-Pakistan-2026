@@ -20,6 +20,8 @@ credentials*.json
 
 # --- Android / iOS Keys & Keystores ---
 **/key.properties
+**/gradle.properties
+gradle.properties
 *.jks
 *.keystore
 *.p12

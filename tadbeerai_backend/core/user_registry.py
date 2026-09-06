@@ -138,6 +138,9 @@ class UserRegistry:
                     for doc in docs:
                         d = doc.to_dict()
                         uid = d.get("uid") or doc.id
+                        is_guest = bool(d.get("is_guest") or (d.get("mode") == "guest"))
+                        has_contact = bool(d.get("phone") or d.get("email") or d.get("fcm_token"))
+                        eligible = False if is_guest or not has_contact else d.get("eligible_for_alerts", True)
                         users.append({
                             "user_id": uid,
                             "name": d.get("display_name") or d.get("name") or "User",
@@ -148,7 +151,10 @@ class UserRegistry:
                             "notify_push": d.get("notify_push") if d.get("notify_push") is not None else True,
                             "fcm_token": d.get("fcm_token") or "",
                             "domains": d.get("domains") or ["all"],
-                            "mode": d.get("mode") or "account"
+                            "mode": "guest" if is_guest else (d.get("mode") or "account"),
+                            "is_guest": is_guest,
+                            "eligible_for_alerts": eligible,
+                            "persona": d.get("persona") or d.get("profile_data", {}).get("persona") if isinstance(d.get("profile_data"), dict) else d.get("persona"),
                         })
                 except Exception as e_users:
                     logger.error(f"[UserRegistry] Failed to fetch from 'users' collection: {e_users}")
@@ -161,6 +167,9 @@ class UserRegistry:
                         d = doc.to_dict()
                         uid = d.get("user_id") or doc.id
                         if uid not in registered_uids:
+                            is_guest = bool(d.get("is_guest") or (d.get("mode") == "guest"))
+                            has_contact = bool(d.get("phone") or d.get("email") or d.get("fcm_token"))
+                            eligible = False if is_guest or not has_contact else d.get("eligible_for_alerts", True)
                             users.append({
                                 "user_id": uid,
                                 "name": d.get("name") or "User",
@@ -171,7 +180,10 @@ class UserRegistry:
                                 "notify_push": d.get("notify_push") if d.get("notify_push") is not None else True,
                                 "fcm_token": d.get("fcm_token") or "",
                                 "domains": d.get("domains") or ["all"],
-                                "mode": d.get("mode") or "account"
+                                "mode": "guest" if is_guest else (d.get("mode") or "account"),
+                                "is_guest": is_guest,
+                                "eligible_for_alerts": eligible,
+                                "persona": d.get("persona") or d.get("profile_data", {}).get("persona") if isinstance(d.get("profile_data"), dict) else d.get("persona"),
                             })
                 except Exception as e_reg:
                     logger.error(f"[UserRegistry] Failed to fetch from 'registered_users' collection: {e_reg}")
@@ -200,6 +212,9 @@ class UserRegistry:
                 doc = self._firestore.db.collection("users").document(user_id).get()
                 if doc.exists:
                     d = doc.to_dict()
+                    is_guest = bool(d.get("is_guest") or (d.get("mode") == "guest"))
+                    has_contact = bool(d.get("phone") or d.get("email") or d.get("fcm_token"))
+                    eligible = False if is_guest or not has_contact else d.get("eligible_for_alerts", True)
                     return {
                         "user_id": d.get("uid") or doc.id,
                         "name": d.get("display_name") or d.get("name") or "User",
@@ -210,13 +225,19 @@ class UserRegistry:
                         "notify_push": d.get("notify_push") if d.get("notify_push") is not None else True,
                         "fcm_token": d.get("fcm_token") or "",
                         "domains": d.get("domains") or ["all"],
-                        "mode": d.get("mode") or "account"
+                        "mode": "guest" if is_guest else (d.get("mode") or "account"),
+                        "is_guest": is_guest,
+                        "eligible_for_alerts": eligible,
+                        "persona": d.get("persona") or (d.get("profile_data", {}).get("persona") if isinstance(d.get("profile_data"), dict) else None),
                     }
                 
                 # Try 'registered_users' second
                 doc = self._firestore.db.collection("registered_users").document(user_id).get()
                 if doc.exists:
                     d = doc.to_dict()
+                    is_guest = bool(d.get("is_guest") or (d.get("mode") == "guest"))
+                    has_contact = bool(d.get("phone") or d.get("email") or d.get("fcm_token"))
+                    eligible = False if is_guest or not has_contact else d.get("eligible_for_alerts", True)
                     return {
                         "user_id": d.get("user_id") or doc.id,
                         "name": d.get("name") or "User",
@@ -227,7 +248,10 @@ class UserRegistry:
                         "notify_push": d.get("notify_push") if d.get("notify_push") is not None else True,
                         "fcm_token": d.get("fcm_token") or "",
                         "domains": d.get("domains") or ["all"],
-                        "mode": d.get("mode") or "account"
+                        "mode": "guest" if is_guest else (d.get("mode") or "account"),
+                        "is_guest": is_guest,
+                        "eligible_for_alerts": eligible,
+                        "persona": d.get("persona") or (d.get("profile_data", {}).get("persona") if isinstance(d.get("profile_data"), dict) else None),
                     }
             except Exception as e:
                 logger.error(f"[UserRegistry] ❌ Firestore read failed: {e}")
@@ -264,19 +288,19 @@ class UserRegistry:
 
         if self._firestore_available:
             try:
-                # Update in 'users' collection if document exists
+                # Update/set in 'users' collection if document exists
                 try:
-                    self._firestore.db.collection("users").document(user_id).update(normalized_updates)
+                    self._firestore.db.collection("users").document(user_id).set(normalized_updates, merge=True)
                 except Exception:
                     pass
 
-                # Update in 'registered_users' collection if document exists
+                # Update/set in 'registered_users' collection
                 try:
-                    self._firestore.db.collection("registered_users").document(user_id).update(updates)
+                    self._firestore.db.collection("registered_users").document(user_id).set(updates, merge=True)
                 except Exception:
                     pass
 
-                logger.info(f"[UserRegistry] ✅ Updated {user_id} in Firestore")
+                logger.info(f"[UserRegistry] ✅ Updated/Set {user_id} in Firestore")
                 return self.get_user(user_id) or updates
             except Exception as e:
                 logger.error(f"[UserRegistry] ❌ Firestore update failed: {e}")
@@ -290,8 +314,12 @@ class UserRegistry:
                 logger.info(f"[UserRegistry] ✅ Updated {user_id} in JSON")
                 return users[i]
 
-        logger.warning(f"[UserRegistry] User {user_id} not found for update")
-        return updates
+        new_entry = dict(updates)
+        new_entry["user_id"] = user_id
+        users.append(new_entry)
+        self._write_json(users)
+        logger.info(f"[UserRegistry] ✅ Upserted {user_id} in JSON")
+        return new_entry
 
     def delete_user(self, user_id: str) -> bool:
         """
@@ -325,6 +353,7 @@ class UserRegistry:
     def get_users_for_domain(self, domain: str) -> List[Dict[str, Any]]:
         """
         Get users subscribed to a specific domain.
+        Excludes guest users since alerts are sent to registered users only.
 
         Args:
             domain: Business domain (e.g., 'Energy', 'Currency')
@@ -335,6 +364,13 @@ class UserRegistry:
         all_users = self.get_all_users()
         result = []
         for user in all_users:
+            # Strictly exclude guest users from alerts
+            if user.get("is_guest") or user.get("mode") == "guest" or not user.get("eligible_for_alerts", True):
+                continue
+            # Also require at least some contact method (email, phone, or fcm)
+            if not user.get("phone") and not user.get("email") and not user.get("fcm_token"):
+                continue
+
             user_domains = user.get("domains", ["all"])
             if "all" in user_domains or domain in user_domains:
                 result.append(user)
@@ -353,6 +389,13 @@ class UserRegistry:
                     u["notify_push"] = True
                 if "fcm_token" not in u:
                     u["fcm_token"] = ""
+                is_guest = bool(u.get("is_guest") or (u.get("mode") == "guest"))
+                has_contact = bool(u.get("phone") or u.get("email") or u.get("fcm_token"))
+                u["is_guest"] = is_guest
+                if "mode" not in u:
+                    u["mode"] = "guest" if is_guest else "account"
+                if "eligible_for_alerts" not in u:
+                    u["eligible_for_alerts"] = False if is_guest or not has_contact else True
             return users
         except (FileNotFoundError, json.JSONDecodeError):
             return []

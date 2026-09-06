@@ -60,13 +60,28 @@ class SimulateRequest(BaseModel):
 class RegisterUserRequest(BaseModel):
     """Register a user for notification alerts. All fields optional for guest mode."""
     user_id: str
-    category: str
-    name: str
-    email: str
-    phone: str
+    category: Optional[str] = "General"
+    name: Optional[str] = "User"
+    email: Optional[str] = ""
+    phone: Optional[str] = ""
     fcm_token: Optional[str] = ""
     profile_data: Optional[dict] = None
+    mode: Optional[str] = None
+    is_guest: Optional[bool] = None
 
+
+class UserPersonaRequest(BaseModel):
+    """Save or update user financial persona and alert eligibility."""
+    user_id: str
+    persona: Optional[str] = None
+    primary_goal: Optional[str] = None
+    monthly_income: Optional[float] = None
+    monthly_essential_expenses: Optional[float] = None
+    total_savings: Optional[float] = None
+    is_guest: bool = False
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
 
 
 class UpdateUserRequest(BaseModel):
@@ -79,9 +94,12 @@ class UpdateUserRequest(BaseModel):
     notify_push: Optional[bool] = None
     fcm_token: Optional[str] = None
     domains: Optional[list[str]] = None
+    eligible_for_alerts: Optional[bool] = None
+    mode: Optional[str] = None
 
 
 class FcmTokenRequest(BaseModel):
     """FCM token registration/sync request."""
     user_id: str
     fcm_token: str
+

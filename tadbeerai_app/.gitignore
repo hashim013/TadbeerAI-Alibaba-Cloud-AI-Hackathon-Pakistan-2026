@@ -54,6 +54,8 @@ app.*.map.json
 *.pem
 key.properties
 **/key.properties
+gradle.properties
+**/gradle.properties
 
 # Google Services / Firebase Config
 google-services.json

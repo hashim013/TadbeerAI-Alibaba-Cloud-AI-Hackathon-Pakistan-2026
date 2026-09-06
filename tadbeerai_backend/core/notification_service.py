@@ -239,9 +239,23 @@ class NotificationService:
 
             if user_id:
                 single_user = registry.get_user(user_id)
+                if single_user and (single_user.get("is_guest") or single_user.get("mode") == "guest" or not single_user.get("eligible_for_alerts", True)):
+                    msg = "Guest users are not eligible for real-time alerts. Register an account to receive alerts."
+                    logger.info(f"[Notifications] ℹ️ {msg} (user: {user_id})")
+                    guest_report = {
+                        "sms_recipients": 0,
+                        "email_recipients": 0,
+                        "push_recipients": 0,
+                        "status": "guest_ineligible",
+                        "eligible_for_alerts": False,
+                        "sms_skipped": True,
+                        "email_skipped": True,
+                        "push_skipped": True,
+                    }
+                    return 0, 0, 0, 0, msg, guest_report
                 users = [single_user] if single_user else []
             else:
-                # Get users subscribed to this domain
+                # Get users subscribed to this domain (already excludes guest users)
                 users = registry.get_users_for_domain(domain)
 
             if not users:
@@ -252,9 +266,10 @@ class NotificationService:
                     "email_recipients": 0,
                     "push_recipients": 0,
                     "status": "guest",
+                    "eligible_for_alerts": False,
                     "sms_skipped": True,
                     "email_skipped": True,
-                    "push_skipped": True
+                    "push_skipped": True,
                 }
                 return 0, 0, 0, 0, msg, empty_report
 
