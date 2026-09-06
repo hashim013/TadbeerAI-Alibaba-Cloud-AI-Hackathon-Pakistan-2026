@@ -89,6 +89,10 @@ class UpdateUserRequest(BaseModel):
     name: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
+    persona: Optional[str] = None
+    primary_goal: Optional[str] = None
+    preferred_language: Optional[str] = None
+    theme_mode: Optional[str] = None
     notify_sms: Optional[bool] = None
     notify_email: Optional[bool] = None
     notify_push: Optional[bool] = None

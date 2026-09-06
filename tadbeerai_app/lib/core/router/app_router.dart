@@ -18,6 +18,7 @@ import '../../features/finance/goals_screen.dart';
 import '../../features/finance/my_finances_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/profile/financial_profile_screen.dart';
+import '../../features/profile/user_profile_screen.dart';
 import '../../features/shell/main_shell.dart';
 import '../../features/shell/tabs.dart';
 import '../../features/splash/splash_screen.dart';
@@ -248,6 +249,14 @@ final routerProvider = Provider<GoRouter>((ref) {
                   }
                   return AskTadbeerScreen(initialQuery: initialQuery);
                 },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const UserProfileScreen(),
               ),
             ],
           ),

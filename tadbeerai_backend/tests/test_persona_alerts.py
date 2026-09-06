@@ -122,3 +122,40 @@ def test_notification_service_skips_guest_alerts():
     assert report["status"] == "guest_ineligible"
     assert report["eligible_for_alerts"] is False
     assert "guest users are not eligible" in summary.lower()
+
+
+def test_get_and_update_user_profile():
+    user_id = "profile_test_user_005"
+    # Register user first
+    reg_res = client.post("/register", json={
+        "user_id": user_id,
+        "name": "Ali Khan",
+        "email": "ali.khan@example.com",
+        "phone": "+923001234567",
+        "is_guest": False,
+    })
+    assert reg_res.status_code == 200
+
+    # GET user profile
+    get_res = client.get(f"/users/{user_id}")
+    assert get_res.status_code == 200
+    user_data = get_res.json()
+    assert user_data["user_id"] == user_id
+    assert user_data["name"] == "Ali Khan"
+    assert user_data["email"] == "ali.khan@example.com"
+
+    # PUT user profile update (persona, language, theme)
+    update_res = client.put(f"/users/{user_id}", json={
+        "name": "Ali Khan Updated",
+        "persona": "salaried",
+        "preferred_language": "ur",
+        "theme_mode": "dark",
+        "notify_sms": True,
+    })
+    assert update_res.status_code == 200
+    assert update_res.json()["status"] == "updated"
+    updated_user = update_res.json()["user"]
+    assert updated_user["name"] == "Ali Khan Updated"
+    assert updated_user["persona"] == "salaried"
+    assert updated_user["preferred_language"] == "ur"
+

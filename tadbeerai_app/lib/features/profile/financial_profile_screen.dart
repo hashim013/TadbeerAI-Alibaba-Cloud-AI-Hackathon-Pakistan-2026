@@ -45,6 +45,7 @@ class FinancialProfileScreen extends ConsumerStatefulWidget {
 class _FinancialProfileScreenState
     extends ConsumerState<FinancialProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _incomeController = TextEditingController();
   final _expensesController = TextEditingController();
   final _savingsController = TextEditingController();
@@ -63,10 +64,24 @@ class _FinancialProfileScreenState
     _incomeController.addListener(_onAmountChanged);
     _expensesController.addListener(_onAmountChanged);
     _savingsController.addListener(_onAmountChanged);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final user = ref.read(authControllerProvider);
+      if (user != null &&
+          user.name.isNotEmpty &&
+          user.name != 'Guest User' &&
+          _nameController.text.isEmpty) {
+        setState(() => _nameController.text = user.name);
+      }
+    });
   }
 
   void _prefill(FinancialProfile profile) {
     setState(() {
+      if (profile.name != null && profile.name!.trim().isNotEmpty) {
+        _nameController.text = profile.name!;
+      }
       _persona = profile.persona;
       _goal = profile.primaryGoal;
       if (profile.monthlyIncome != null) {
@@ -104,6 +119,7 @@ class _FinancialProfileScreenState
 
   @override
   void dispose() {
+    _nameController.dispose();
     _incomeController.dispose();
     _expensesController.dispose();
     _savingsController.dispose();
@@ -179,7 +195,9 @@ class _FinancialProfileScreenState
     final expensesText = _expensesController.text.replaceAll(',', '').trim();
     final savingsText = _savingsController.text.replaceAll(',', '').trim();
 
+    final nameText = _nameController.text.trim();
     final profile = FinancialProfile(
+      name: nameText.isNotEmpty ? nameText : null,
       persona: _persona,
       monthlyIncome: double.tryParse(incomeText) ?? 0,
       monthlyEssentialExpenses: double.tryParse(expensesText) ?? 0,
@@ -194,6 +212,10 @@ class _FinancialProfileScreenState
           .read(financialProfileControllerProvider.notifier)
           .saveProfile(profile);
       if (!mounted) return;
+
+      if (nameText.isNotEmpty) {
+        ref.read(authControllerProvider.notifier).updateUserName(nameText);
+      }
 
       final currentUser = ref.read(authControllerProvider);
       if (currentUser != null && !currentUser.isGuest) {
@@ -242,7 +264,7 @@ class _FinancialProfileScreenState
           'monthly_essential_expenses': profile.monthlyEssentialExpenses,
           'total_savings': profile.totalSavings,
           'is_guest': false,
-          'name': user.name,
+          'name': profile.name ?? user.name,
           'email': user.email,
         },
       ).catchError((_) {
@@ -496,7 +518,30 @@ class _FinancialProfileScreenState
                   height: 1.4,
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 22),
+
+              // Full Name Input
+              Text(
+                'What should Tadbeer call you?',
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 16.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              AppTextField(
+                label: 'Your Name',
+                controller: _nameController,
+                hintText: 'e.g. Hashim',
+                prefixIcon: const Icon(
+                  Icons.person_outline_rounded,
+                  color: Color(0xFF10B981),
+                ),
+                textInputAction: TextInputAction.next,
+              ),
+              const SizedBox(height: 24),
+
               Text(
                 'What best describes you?',
                 style: GoogleFonts.inter(
@@ -973,6 +1018,17 @@ class _FinancialProfileScreenState
                 ),
                 child: Column(
                   children: [
+                    if (_nameController.text.trim().isNotEmpty) ...[
+                      _SummaryRow(
+                        icon: Icons.badge_outlined,
+                        label: 'Full Name',
+                        value: _nameController.text.trim(),
+                      ),
+                      Divider(
+                        color: Colors.white.withValues(alpha: 0.06),
+                        height: 1,
+                      ),
+                    ],
                     _SummaryRow(
                       icon: Icons.person_outline_rounded,
                       label: 'You are',
@@ -1273,7 +1329,18 @@ class _FinancialProfileScreenState
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 20),
+          AppTextField(
+            label: 'Your Name',
+            controller: _nameController,
+            hintText: 'e.g. Hashim Khan',
+            prefixIcon: const Icon(
+              Icons.person_outline_rounded,
+              color: AppColors.teal,
+            ),
+            textInputAction: TextInputAction.next,
+          ),
+          const SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: Text(

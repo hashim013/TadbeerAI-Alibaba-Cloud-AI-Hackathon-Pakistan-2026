@@ -124,6 +124,24 @@ class AuthController extends Notifier<AppUser?> {
     }
   }
 
+  void updateUserName(String newName) {
+    if (state != null && newName.trim().isNotEmpty) {
+      state = state!.copyWith(name: newName.trim());
+    }
+  }
+
+  void updateUserProfile({String? name, String? phone, String? photoUrl}) {
+    if (state != null) {
+      state = state!.copyWith(
+        name: (name != null && name.trim().isNotEmpty)
+            ? name.trim()
+            : state!.name,
+        phone: phone != null ? phone.trim() : state!.phone,
+        photoUrl: photoUrl != null ? photoUrl.trim() : state!.photoUrl,
+      );
+    }
+  }
+
   Future<void> signOut() async {
     _lastErrorMessage = null;
     await ref.read(authRepositoryProvider).signOut();

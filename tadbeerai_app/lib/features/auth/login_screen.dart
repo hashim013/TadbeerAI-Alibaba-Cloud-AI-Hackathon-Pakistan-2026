@@ -30,6 +30,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _loading = false;
   bool _guestLoading = false;
+  bool _googleLoading = false;
 
   @override
   void dispose() {
@@ -39,7 +40,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _continueAsGuest() async {
-    if (_loading || _guestLoading) return;
+    if (_loading || _guestLoading || _googleLoading) return;
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _guestLoading = true);
 
@@ -77,16 +78,46 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return null;
   }
 
-  Future<void> _submit() async {
+  Future<void> _signInWithGoogle() async {
+    if (_loading || _guestLoading || _googleLoading) return;
     FocusManager.instance.primaryFocus?.unfocus();
-    if (!_formKey.currentState!.validate()) return;
+    setState(() => _googleLoading = true);
 
+    final authNotifier = ref.read(authControllerProvider.notifier);
+    final success = await authNotifier.signInWithGoogle();
+    if (!mounted) return;
+
+    if (success) {
+      await _navigatePostAuth();
+    } else {
+      setState(() => _googleLoading = false);
+      final errorMsg = authNotifier.lastErrorMessage;
+      if (errorMsg != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _submit() async {
+    final form = _formKey.currentState;
+    if (form == null || !form.validate()) return;
+    if (_loading || _guestLoading || _googleLoading) return;
+
+    FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _loading = true);
+
     final authNotifier = ref.read(authControllerProvider.notifier);
     final success = await authNotifier.signIn(
       email: _emailController.text.trim(),
       password: _passwordController.text,
     );
+
     if (!mounted) return;
 
     if (success) {
@@ -126,7 +157,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _socialAuth(String provider) {
     if (provider == 'Google') {
-      context.push('/auth/google');
+      _signInWithGoogle();
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
@@ -325,6 +356,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         logo: const _GoogleLogo(),
                         label: 'Continue with Google',
                         onTap: () => _socialAuth('Google'),
+                        loading: _googleLoading,
                       ),
 
                       const SizedBox(height: 12),

@@ -74,7 +74,11 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
   void _onCancel() {
     if (_signingInEmail != null) return;
     HapticFeedback.lightImpact();
-    context.pop();
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/login');
+    }
   }
 
   Future<void> _selectAccount(String email, {String? name}) async {

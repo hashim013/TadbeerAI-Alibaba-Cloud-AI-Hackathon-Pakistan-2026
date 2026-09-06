@@ -229,6 +229,9 @@ class UserRegistry:
                         "is_guest": is_guest,
                         "eligible_for_alerts": eligible,
                         "persona": d.get("persona") or (d.get("profile_data", {}).get("persona") if isinstance(d.get("profile_data"), dict) else None),
+                        "primary_goal": d.get("primary_goal") or (d.get("profile_data", {}).get("primary_goal") if isinstance(d.get("profile_data"), dict) else None),
+                        "preferred_language": d.get("preferred_language") or "en",
+                        "theme_mode": d.get("theme_mode") or "dark",
                     }
                 
                 # Try 'registered_users' second
@@ -252,6 +255,9 @@ class UserRegistry:
                         "is_guest": is_guest,
                         "eligible_for_alerts": eligible,
                         "persona": d.get("persona") or (d.get("profile_data", {}).get("persona") if isinstance(d.get("profile_data"), dict) else None),
+                        "primary_goal": d.get("primary_goal") or (d.get("profile_data", {}).get("primary_goal") if isinstance(d.get("profile_data"), dict) else None),
+                        "preferred_language": d.get("preferred_language") or "en",
+                        "theme_mode": d.get("theme_mode") or "dark",
                     }
             except Exception as e:
                 logger.error(f"[UserRegistry] ❌ Firestore read failed: {e}")

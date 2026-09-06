@@ -49,6 +49,7 @@ enum PrimaryGoal {
 ///   and is surfaced as a friendly UI warning, never a hard block.
 class FinancialProfile {
   const FinancialProfile({
+    this.name,
     this.persona,
     this.monthlyIncome,
     this.monthlyEssentialExpenses,
@@ -57,6 +58,7 @@ class FinancialProfile {
     this.profileCompleted = false,
   });
 
+  final String? name;
   final Persona? persona;
   final double? monthlyIncome;
   final double? monthlyEssentialExpenses;
@@ -65,6 +67,7 @@ class FinancialProfile {
   final bool profileCompleted;
 
   FinancialProfile copyWith({
+    String? name,
     Persona? persona,
     double? monthlyIncome,
     double? monthlyEssentialExpenses,
@@ -73,6 +76,7 @@ class FinancialProfile {
     bool? profileCompleted,
   }) =>
       FinancialProfile(
+        name: name ?? this.name,
         persona: persona ?? this.persona,
         monthlyIncome: monthlyIncome ?? this.monthlyIncome,
         monthlyEssentialExpenses:
@@ -83,6 +87,7 @@ class FinancialProfile {
       );
 
   Map<String, dynamic> toJson() => {
+        'name': name,
         'persona': persona?.storageKey,
         'monthlyIncome': monthlyIncome,
         'monthlyEssentialExpenses': monthlyEssentialExpenses,
@@ -93,6 +98,7 @@ class FinancialProfile {
 
   factory FinancialProfile.fromJson(Map<String, dynamic> json) =>
       FinancialProfile(
+        name: json['name'] as String?,
         persona: Persona.fromStorageKey(json['persona'] as String?),
         monthlyIncome: (json['monthlyIncome'] as num?)?.toDouble(),
         monthlyEssentialExpenses:
@@ -106,6 +112,7 @@ class FinancialProfile {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is FinancialProfile &&
+          other.name == name &&
           other.persona == persona &&
           other.monthlyIncome == monthlyIncome &&
           other.monthlyEssentialExpenses == monthlyEssentialExpenses &&
@@ -115,6 +122,7 @@ class FinancialProfile {
 
   @override
   int get hashCode => Object.hash(
+        name,
         persona,
         monthlyIncome,
         monthlyEssentialExpenses,
@@ -124,7 +132,7 @@ class FinancialProfile {
       );
 
   @override
-  String toString() => 'FinancialProfile(${persona?.name}, '
+  String toString() => 'FinancialProfile($name, ${persona?.name}, '
       'income: $monthlyIncome, expenses: $monthlyEssentialExpenses, '
       'savings: $totalSavings, goal: ${primaryGoal?.name}, '
       'completed: $profileCompleted)';

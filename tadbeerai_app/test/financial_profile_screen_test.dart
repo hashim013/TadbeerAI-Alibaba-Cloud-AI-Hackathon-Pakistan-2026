@@ -519,7 +519,7 @@ void main() {
       final repo = _MockProfileRepo();
       await _pumpProfile(tester, repo);
 
-      await tester.tap(find.text('Business Owner'));
+      await _scrollAndTap(tester, find.text('Business Owner'));
       await _scrollAndTap(tester, find.text('Business Growth'));
 
       await _enterAmount(tester, text: '200000', isExpenses: false);
@@ -540,7 +540,7 @@ void main() {
       final repo = _MockProfileRepo();
       await _pumpProfile(tester, repo);
 
-      await tester.tap(find.text('Shop Owner'));
+      await _scrollAndTap(tester, find.text('Shop Owner'));
       await _scrollAndTap(tester, find.text('Emergency Fund'));
       await _enterAmount(tester, text: '100000', isExpenses: false);
       await _enterAmount(tester, text: '70000', isExpenses: true);
@@ -729,6 +729,42 @@ void main() {
       expect(repo.lastSaved?.totalSavings, 250000);
       expect(repo.lastSaved?.primaryGoal, PrimaryGoal.emergencyFund);
       expect(repo.lastSaved?.profileCompleted, isTrue);
+    });
+
+    testWidgets('Step 1 allows entering full name and saves it with profile',
+        (tester) async {
+      final repo = _MockProfileRepo();
+      await pumpSteppedWizard(tester, repo);
+
+      // Step 1: Enter name and select persona
+      expect(find.text('What should Tadbeer call you?'), findsOneWidget);
+      await tester.enterText(find.byType(TextFormField).first, 'Hashim Khan');
+      await tester.tap(find.text('Student'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
+      // Step 2: Finances
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
+      // Step 3: Goal
+      await tester.tap(find.text('Emergency\nFund'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
+      // Step 4: Summary displays Full Name
+      expect(find.text('Full Name'), findsOneWidget);
+      expect(find.text('Hashim Khan'), findsOneWidget);
+
+      await tester.tap(find.text('Complete Profile'));
+      await tester.pumpAndSettle();
+
+      expect(repo.saveCount, 1);
+      expect(repo.lastSaved?.name, 'Hashim Khan');
+      expect(repo.lastSaved?.persona, Persona.student);
+      expect(repo.lastSaved?.primaryGoal, PrimaryGoal.emergencyFund);
     });
   });
 }

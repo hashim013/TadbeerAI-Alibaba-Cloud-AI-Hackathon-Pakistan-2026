@@ -145,6 +145,39 @@ class _DashboardContent extends ConsumerWidget {
                 ),
               ),
             ),
+            const SizedBox(width: 10),
+            // User Profile Avatar Button
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => context.push('/profile'),
+                borderRadius: BorderRadius.circular(21),
+                child: Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: AppColors.navyCard,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.teal.withValues(alpha: 0.4),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      (user?.name.trim().isNotEmpty == true)
+                          ? user!.name.trim()[0].toUpperCase()
+                          : 'U',
+                      style: GoogleFonts.inter(
+                        color: AppColors.teal,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 18),

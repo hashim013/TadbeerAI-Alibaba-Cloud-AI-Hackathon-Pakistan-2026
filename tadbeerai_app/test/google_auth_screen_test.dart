@@ -158,12 +158,7 @@ void main() {
   });
 
   testWidgets('cancel button pops back to previous screen', (tester) async {
-    // Start at /login, then tap Continue with Google to navigate to /auth/google
-    await _pumpGoogleAuthScreen(tester, initialLocation: '/login');
-
-    expect(find.text('Continue with Google'), findsOneWidget);
-    await tester.tap(find.text('Continue with Google'));
-    await tester.pumpAndSettle();
+    await _pumpGoogleAuthScreen(tester, initialLocation: '/auth/google');
 
     expect(find.text('Sign in with Google'), findsOneWidget);
 
