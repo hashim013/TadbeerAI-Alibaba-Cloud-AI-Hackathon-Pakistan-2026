@@ -1,6 +1,6 @@
 # TadbeerAI Notification API Contract
 
-When extending the App Engine backend, support the following so the Flutter client can use server-side delivery reports.
+When extending the backend (deployed on Vercel), support the following so the Flutter client can use server-side delivery reports.
 
 ## POST /simulate
 
