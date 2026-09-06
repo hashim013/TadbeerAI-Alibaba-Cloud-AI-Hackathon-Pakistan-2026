@@ -54,7 +54,7 @@ def send_email_alert(to_email, subject, insight, action=None):
             msg.attach(part1)
             msg.attach(part2)
 
-            # Connect using SSL on port 465 (App Engine friendly)
+            # Connect using SSL on port 465 (works on Vercel and most SMTP hosts)
             with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
                 server.login(gmail_user, gmail_password)
                 server.sendmail(gmail_user, to_email, msg.as_string())

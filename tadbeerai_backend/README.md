@@ -30,9 +30,19 @@ Ensure the API key allows **Generative Language API** (Google AI Studio). If you
 
 `GET /health` should return `{"status":"ok",...,"ai_provider":"gemini"}` (or `groq` if `AI_PROVIDER=groq`).
 
-## Deploy to Google Cloud
+## Deploy to Vercel
 
-Step-by-step: **[DEPLOY_GCP.md](DEPLOY_GCP.md)** (App Engine + env vars + Flutter URL).
+The backend runs as a serverless Python (ASGI) function via [`vercel.json`](vercel.json)
+— `@vercel/python` picks up the `app = FastAPI(...)` in `main.py`. Set the Vercel project
+**Root Directory** to `tadbeerai_backend`, then add the environment variables:
+`FIREBASE_SERVICE_ACCOUNT_JSON`, `GOOGLE_CLOUD_PROJECT=tadbeerai2`, `GEMINI_API_KEY`,
+`GROQ_API_KEY`, `AI_PROVIDER`, `DATA_DIR=/tmp/tadbeerai_data`, `APP_ENV=production`, plus
+notification creds. The RSS scheduler is disabled on Vercel (feed refreshes on-demand).
+Build the Flutter app with `--dart-define=API_BASE_URL=https://<project>.vercel.app`.
+
+> Firebase (Firestore + Auth) still runs on Google Cloud and is required — Vercel only
+> hosts the Python code; the finance ledger, user data and ID-token verification all
+> connect to the `tadbeerai2` Firebase project.
 
 ## Run locally
 

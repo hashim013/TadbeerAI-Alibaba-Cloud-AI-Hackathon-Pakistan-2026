@@ -107,3 +107,17 @@ class FcmTokenRequest(BaseModel):
     user_id: str
     fcm_token: str
 
+
+class FinanceLedgerRequest(BaseModel):
+    """Whole-snapshot replace for PUT /v1/finance.
+
+    Pure pass-through — the backend stores exactly what the Flutter client
+    sends (``FinanceData.toJson()``) without domain interpretation, so the
+    offline-first whole-snapshot last-write-wins sync model stays trivial.
+    Field names match the Dart JSON keys (camelCase) verbatim.
+    """
+    transactions: list[dict[str, Any]] = Field(default_factory=list)
+    budgets: list[dict[str, Any]] = Field(default_factory=list)
+    goals: list[dict[str, Any]] = Field(default_factory=list)
+    openingSavingsBalance: float = 0.0
+

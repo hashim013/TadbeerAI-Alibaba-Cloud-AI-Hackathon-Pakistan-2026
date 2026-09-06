@@ -13,12 +13,20 @@ Architecture::
 
 from __future__ import annotations
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from .assistant_service import AssistantService
+from .auth import get_authenticated_user_id
 from .economic_data import EconomicDataService, get_economic_service
+from .finance_store import get_finance_store
 from .llm import LLMError, LLMRegistry, get_llm_registry
-from .schemas import AssistantChatRequest, AssistantChatResponse
+from .schemas import (
+    AssistantChatRequest,
+    AssistantChatResponse,
+    FinanceLedgerRequest,
+)
 
 router = APIRouter(prefix="/v1")
 
@@ -115,3 +123,36 @@ def v1_essential_price_detail(
             detail=f"Essential commodity '{item_id}' not found.",
         )
     return item.to_dict()
+
+
+# ==================== FINANCE LEDGER (per-user, Firestore-backed) ====================
+
+
+@router.get("/finance")
+def get_finance_ledger(
+    user_id: Optional[str] = Depends(get_authenticated_user_id),
+) -> dict:
+    """Return the authenticated user's ledger snapshot (empty defaults if none).
+
+    Requires a valid Firebase ID token; 401 otherwise. The snapshot mirrors the
+    Flutter ``FinanceData.toJson()`` shape so the client can parse it directly.
+    """
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    return get_finance_store().get_ledger(user_id)
+
+
+@router.put("/finance")
+def put_finance_ledger(
+    request: FinanceLedgerRequest,
+    user_id: Optional[str] = Depends(get_authenticated_user_id),
+) -> dict:
+    """Replace the authenticated user's ledger with the given snapshot.
+
+    Whole-snapshot last-write-wins: the client sends its full local ledger and
+    the stored doc is overwritten, then the persisted snapshot is returned.
+    Requires a valid Firebase ID token; 401 otherwise.
+    """
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    return get_finance_store().put_ledger(user_id, request.model_dump())

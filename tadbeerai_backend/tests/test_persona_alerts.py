@@ -158,4 +158,13 @@ def test_get_and_update_user_profile():
     assert updated_user["name"] == "Ali Khan Updated"
     assert updated_user["persona"] == "salaried"
     assert updated_user["preferred_language"] == "ur"
+    assert updated_user.get("theme_mode") == "dark"
+
+    # PUT user profile update to light theme
+    light_res = client.put(f"/users/{user_id}", json={
+        "theme_mode": "light",
+    })
+    assert light_res.status_code == 200
+    assert light_res.json()["user"]["theme_mode"] == "light"
+
 

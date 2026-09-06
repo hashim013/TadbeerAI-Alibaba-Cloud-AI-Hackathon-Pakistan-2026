@@ -33,6 +33,7 @@ from core.trace_builder import (
     build_analyse_trace,
     build_feed_trace,
 )
+from core.auth import get_authenticated_user_id
 from core.firestore_client import init_firestore, get_firestore_client
 from core.user_registry import get_user_registry
 from core.notification_service import get_notification_service
@@ -46,40 +47,6 @@ POLL_MINUTES = int(os.getenv("POLL_INTERVAL_MINUTES", "15"))
 
 _feed_trace: list[dict] = []
 
-def get_authenticated_user_id(authorization: Optional[str] = Header(None)) -> Optional[str]:
-    """Helper to verify ID token and extract user_id (supporting local fallback if Firebase is disabled)."""
-    if not authorization or not authorization.startswith("Bearer "):
-        return None
-    id_token = authorization.split("Bearer ")[1]
-    
-    try:
-        from firebase_admin import auth
-        decoded_token = auth.verify_id_token(id_token)
-        return decoded_token["uid"]
-    except Exception as e:
-        client = get_firestore_client()
-        if client.available:
-            print(f"[Auth] Firebase verify_id_token failed in live environment: {e}")
-            raise HTTPException(status_code=401, detail="Invalid authorization token")
-            
-        print(f"[Auth] Firebase verify_id_token failed: {e}. Attempting local JWT decode fallback for development/testing...")
-        try:
-            import base64
-            import json
-            parts = id_token.split('.')
-            if len(parts) >= 2:
-                payload_b64 = parts[1]
-                padding = len(payload_b64) % 4
-                if padding:
-                    payload_b64 += '=' * (4 - padding)
-                payload_bytes = base64.urlsafe_b64decode(payload_b64)
-                decoded_token = json.loads(payload_bytes.decode('utf-8'))
-                user_id = decoded_token.get("uid") or decoded_token.get("user_id") or decoded_token.get("sub")
-                if user_id:
-                    return user_id
-            return id_token
-        except Exception:
-            raise HTTPException(status_code=401, detail="Invalid authorization token format")
 
 def get_trace_log_path(user_id: Optional[str]) -> str:
     if not user_id:
@@ -167,14 +134,19 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"[Startup] [WARN] MockDatabase reset warning: {e}")
     
-    scheduler.add_job(refresh_feed, "interval", minutes=POLL_MINUTES)
-    scheduler.start()
-    try:
-        refresh_feed()
-    except Exception as e:
-        print(f"[Startup] Feed refresh failed: {e}")
+    # Vercel (serverless) freezes/kills background threads between invocations,
+    # so the RSS scheduler and the blocking startup refresh only run off-Vercel.
+    # On Vercel the feed refreshes on-demand via the stale-cache logic in /feed.
+    if not os.getenv("VERCEL"):
+        scheduler.add_job(refresh_feed, "interval", minutes=POLL_MINUTES)
+        scheduler.start()
+        try:
+            refresh_feed()
+        except Exception as e:
+            print(f"[Startup] Feed refresh failed: {e}")
     yield
-    scheduler.shutdown(wait=False)
+    if not os.getenv("VERCEL"):
+        scheduler.shutdown(wait=False)
 
 
 app = FastAPI(title="TadbeerAI API", version="2.0.0", lifespan=lifespan)
