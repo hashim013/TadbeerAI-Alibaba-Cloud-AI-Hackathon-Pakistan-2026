@@ -76,6 +76,17 @@ class _TestAuthRepo implements AuthRepository {
       id: 'guest_1', name: 'Guest User', email: 'guest@tadbeer.ai');
 
   @override
+  Future<AppUser?> signInWithGoogle({
+    String? email,
+    String? name,
+  }) async =>
+      AppUser(
+        id: 'google_1',
+        name: name ?? 'Google User',
+        email: email ?? 'google@tadbeer.ai',
+      );
+
+  @override
   Future<void> sendPasswordResetCode({required String email}) async {}
 
   @override

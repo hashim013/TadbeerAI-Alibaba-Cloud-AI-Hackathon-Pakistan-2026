@@ -62,7 +62,8 @@ void main() {
       expect(await repo.currentUser(), isNull);
     });
 
-    test('sendPasswordResetCode and resetPasswordWithCode succeed with valid code',
+    test(
+        'sendPasswordResetCode and resetPasswordWithCode succeed with valid code',
         () async {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
@@ -85,6 +86,24 @@ void main() {
         newPassword: 'newSecret123',
       );
       expect(fail, isFalse);
+    });
+
+    test('signInWithGoogle authenticates and persists session', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final repo = MockAuthRepository(prefs);
+
+      final user = await repo.signInWithGoogle(
+        email: 'ahsan.khan@gmail.com',
+        name: 'Ahsan Khan',
+      );
+
+      expect(user?.email, 'ahsan.khan@gmail.com');
+      expect(user?.name, 'Ahsan Khan');
+      expect(user?.id, isNotEmpty);
+
+      final current = await repo.currentUser();
+      expect(current?.email, 'ahsan.khan@gmail.com');
     });
   });
 

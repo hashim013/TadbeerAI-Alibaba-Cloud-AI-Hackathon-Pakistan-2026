@@ -68,6 +68,28 @@ class MockAuthRepository implements AuthRepository {
     return user;
   }
 
+  @override
+  Future<AppUser?> signInWithGoogle({
+    String? email,
+    String? name,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    final resolvedEmail = (email != null && email.trim().isNotEmpty)
+        ? email.trim().toLowerCase()
+        : 'ahsan.khan@gmail.com';
+    final resolvedName = (name != null && name.trim().isNotEmpty)
+        ? name.trim()
+        : _nameFromEmail(resolvedEmail);
+
+    final user = AppUser(
+      id: _localId(resolvedEmail),
+      name: resolvedName,
+      email: resolvedEmail,
+    );
+    await _persist(user);
+    return user;
+  }
+
   final _activeResetCodes = <String, String>{};
 
   @override

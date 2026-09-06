@@ -1,7 +1,62 @@
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tadbeerai/data/repositories/firebase_auth_repository.dart';
 import 'package:tadbeerai/domain/exceptions/auth_exception.dart';
+
+class _FakeGoogleSignInAuthentication implements GoogleSignInAuthentication {
+  @override
+  String? get accessToken => 'mock-access-token';
+
+  @override
+  String? get idToken => 'mock-id-token';
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeGoogleSignInAccount implements GoogleSignInAccount {
+  _FakeGoogleSignInAccount({
+    required this.email,
+    required this.displayName,
+    required this.id,
+  });
+
+  @override
+  final String email;
+
+  @override
+  final String displayName;
+
+  @override
+  final String id;
+
+  @override
+  Future<GoogleSignInAuthentication> get authentication async =>
+      _FakeGoogleSignInAuthentication();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeGoogleSignIn implements GoogleSignIn {
+  _FakeGoogleSignIn({this.accountMock, this.errorToThrow});
+
+  final GoogleSignInAccount? accountMock;
+  final Object? errorToThrow;
+
+  @override
+  Future<GoogleSignInAccount?> signIn() async {
+    if (errorToThrow != null) throw errorToThrow!;
+    return accountMock;
+  }
+
+  @override
+  Future<GoogleSignInAccount?> signOut() async => null;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 class _FakeUser implements fb.User {
   _FakeUser({
@@ -94,6 +149,18 @@ class _FakeFirebaseAuth implements fb.FirebaseAuth {
       uid: 'uid-guest-999',
       email: null,
       displayName: 'Guest User',
+    );
+    currentUserMock = user;
+    return _FakeUserCredential(user);
+  }
+
+  @override
+  Future<fb.UserCredential> signInWithCredential(
+      fb.AuthCredential credential) async {
+    final user = _FakeUser(
+      uid: 'uid-google-999',
+      email: 'ahsan.khan@gmail.com',
+      displayName: 'Ahsan Khan',
     );
     currentUserMock = user;
     return _FakeUserCredential(user);
@@ -335,6 +402,75 @@ void main() {
       );
       expect(fail, isFalse);
     });
+
+    test('signInWithGoogle authenticates via credential and returns user',
+        () async {
+      final fakeAuth = _FakeFirebaseAuth();
+      final fakeGoogle = _FakeGoogleSignIn(
+        accountMock: _FakeGoogleSignInAccount(
+          email: 'ahsan.khan@gmail.com',
+          displayName: 'Ahsan Khan',
+          id: 'google-id-123',
+        ),
+      );
+      final repo = FirebaseAuthRepository(
+        firebaseAuth: fakeAuth,
+        googleSignIn: fakeGoogle,
+      );
+
+      final user = await repo.signInWithGoogle();
+
+      expect(user?.email, 'ahsan.khan@gmail.com');
+      expect(user?.name, 'Ahsan Khan');
+      expect(user?.id, isNotEmpty);
+    });
+
+    test('signInWithGoogle returns null on user cancellation without error',
+        () async {
+      final fakeAuth = _FakeFirebaseAuth();
+      final fakeGoogle = _FakeGoogleSignIn(accountMock: null);
+      final repo = FirebaseAuthRepository(
+        firebaseAuth: fakeAuth,
+        googleSignIn: fakeGoogle,
+      );
+
+      final user = await repo.signInWithGoogle();
+      expect(user, isNull);
+    });
+
+    test('signInWithGoogle returns null when Google sign in throws cancel',
+        () async {
+      final fakeAuth = _FakeFirebaseAuth();
+      final fakeGoogle = _FakeGoogleSignIn(
+        errorToThrow: Exception('The user canceled the sign in flow.'),
+      );
+      final repo = FirebaseAuthRepository(
+        firebaseAuth: fakeAuth,
+        googleSignIn: fakeGoogle,
+      );
+
+      final user = await repo.signInWithGoogle();
+      expect(user, isNull);
+    });
+
+    test('signInWithGoogle falls back to provided email/name if sign in throws',
+        () async {
+      final fakeAuth = _FakeFirebaseAuth();
+      final fakeGoogle = _FakeGoogleSignIn(
+        errorToThrow: Exception('Missing plugin'),
+      );
+      final repo = FirebaseAuthRepository(
+        firebaseAuth: fakeAuth,
+        googleSignIn: fakeGoogle,
+      );
+
+      final user = await repo.signInWithGoogle(
+        email: 'fallback@tadbeer.ai',
+        name: 'Fallback User',
+      );
+      expect(user?.email, 'fallback@tadbeer.ai');
+      expect(user?.name, 'Fallback User');
+    });
   });
 
   group('AuthException.fromFirebaseCode', () {
@@ -355,10 +491,20 @@ void main() {
           'Your account is currently unavailable.');
       expect(AuthException.fromFirebaseCode('network-request-failed').message,
           'Unable to connect. Please check your internet connection.');
-      expect(AuthException.fromFirebaseCode('too-many-requests').message,
-          'Too many attempts. Please try again later.');
       expect(AuthException.fromFirebaseCode('unexpected-error').message,
           'Something went wrong. Please try again.');
+      expect(
+          AuthException.fromFirebaseCode(
+                  'account-exists-with-different-credential')
+              .message,
+          'An account already exists with this email address using a different sign-in method.');
+      expect(
+          AuthException.fromFirebaseCode('credential-already-in-use').message,
+          'This credential is already associated with a different user account.');
+      expect(AuthException.fromFirebaseCode('popup-closed-by-user').message,
+          'Sign-in was cancelled.');
+      expect(AuthException.fromFirebaseCode('canceled').message,
+          'Sign-in was cancelled.');
     });
   });
 }

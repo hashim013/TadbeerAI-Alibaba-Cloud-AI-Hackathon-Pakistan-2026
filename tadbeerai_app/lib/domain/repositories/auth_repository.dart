@@ -21,6 +21,13 @@ abstract interface class AuthRepository {
 
   Future<AppUser> signInAsGuest();
 
+  /// Authenticates using Google Sign-In with an optional chosen [email] and [name].
+  /// Returns the authenticated [AppUser], or null if cancelled by the user.
+  Future<AppUser?> signInWithGoogle({
+    String? email,
+    String? name,
+  });
+
   /// Sends a 6-digit verification code to the given [email] to reset password.
   Future<void> sendPasswordResetCode({required String email});
 

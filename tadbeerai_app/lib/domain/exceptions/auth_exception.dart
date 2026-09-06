@@ -59,6 +59,24 @@ class AuthException implements Exception {
           message: 'Email/password authentication is not enabled.',
           code: 'operation_not_allowed',
         );
+      case 'account-exists-with-different-credential':
+        return const AuthException(
+          message:
+              'An account already exists with this email address using a different sign-in method.',
+          code: 'account_exists_with_different_credential',
+        );
+      case 'credential-already-in-use':
+        return const AuthException(
+          message:
+              'This credential is already associated with a different user account.',
+          code: 'credential_already_in_use',
+        );
+      case 'popup-closed-by-user':
+      case 'canceled':
+        return const AuthException(
+          message: 'Sign-in was cancelled.',
+          code: 'cancelled',
+        );
       default:
         return const AuthException(
           message: 'Something went wrong. Please try again.',

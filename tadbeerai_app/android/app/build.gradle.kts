@@ -32,10 +32,26 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("tadbeerai2Debug") {
+            storeFile = file("tadbeerai2-debug.keystore")
+            storePassword = providers.gradleProperty("TADBEER_DEBUG_STORE_PASSWORD")
+                .orElse(providers.environmentVariable("TADBEER_DEBUG_STORE_PASSWORD"))
+                .orNull
+            keyAlias = "tadbeerai2"
+            keyPassword = providers.gradleProperty("TADBEER_DEBUG_KEY_PASSWORD")
+                .orElse(providers.environmentVariable("TADBEER_DEBUG_KEY_PASSWORD"))
+                .orNull
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("tadbeerai2Debug")
+        }
+
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // Keep current release behavior unchanged for now.
             signingConfig = signingConfigs.getByName("debug")
         }
     }

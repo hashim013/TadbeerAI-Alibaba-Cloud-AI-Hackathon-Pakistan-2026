@@ -102,6 +102,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   }
 
   void _socialAuth(String provider) {
+    if (provider == 'Google') {
+      context.push('/auth/google');
+      return;
+    }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('$provider sign-up selected for demo mode.'),

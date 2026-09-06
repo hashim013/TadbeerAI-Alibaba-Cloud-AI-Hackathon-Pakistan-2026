@@ -462,5 +462,14 @@
         "type": "int"
       }
     }
-  }
+  },
+  "googleSignInTitle": "گوگل کے ساتھ سائن ان کریں",
+  "googleSignInSubtitle": "تدبیر اے آئی پر جاری رکھنے کے لیے ایک اکاؤنٹ منتخب کریں",
+  "googleChooseAccount": "اکاؤنٹ منتخب کریں",
+  "googleUseAnotherAccount": "دوسرا اکاؤنٹ استعمال کریں",
+  "googleEnterEmailHint": "گوگل ای میل ایڈریس درج کریں",
+  "googleContinueButton": "جاری رکھیں",
+  "googlePrivacyNotice": "جاری رکھنے کے لیے، گوگل آپ کا نام، ای میل ایڈریس، زبان کی ترجیح، اور پروفائل تصویر تدبیر اے آئی کے ساتھ شیئر کرے گا۔",
+  "googleSigningIn": "گوگل سے منسلک ہو رہا ہے...",
+  "googleCancel": "منسوخ کریں"
 }

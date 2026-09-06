@@ -1,17 +1,22 @@
 import 'dart:math' as math;
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../core/config/api_config.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/utils/l10n_context.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_text_field.dart';
+import '../../domain/entities/app_user.dart';
 import '../../domain/entities/financial_profile.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/profile_providers.dart';
+import '../auth/auth_controller.dart';
 
 /// User Persona & Financial Profile setup screen.
 ///
@@ -77,10 +82,10 @@ class _FinancialProfileScreenState
             : '';
       }
       if (profile.totalSavings != null) {
-        _savingsController.text = profile.totalSavings! > 0 ||
-                profile.totalSavings == 0
-            ? profile.totalSavings!.toStringAsFixed(0)
-            : '';
+        _savingsController.text =
+            profile.totalSavings! > 0 || profile.totalSavings == 0
+                ? profile.totalSavings!.toStringAsFixed(0)
+                : '';
       }
     });
   }
@@ -178,7 +183,8 @@ class _FinancialProfileScreenState
       persona: _persona,
       monthlyIncome: double.tryParse(incomeText) ?? 0,
       monthlyEssentialExpenses: double.tryParse(expensesText) ?? 0,
-      totalSavings: savingsText.isNotEmpty ? double.tryParse(savingsText) : null,
+      totalSavings:
+          savingsText.isNotEmpty ? double.tryParse(savingsText) : null,
       primaryGoal: _goal,
       profileCompleted: true,
     );
@@ -188,6 +194,11 @@ class _FinancialProfileScreenState
           .read(financialProfileControllerProvider.notifier)
           .saveProfile(profile);
       if (!mounted) return;
+
+      final currentUser = ref.read(authControllerProvider);
+      if (currentUser != null && !currentUser.isGuest) {
+        _syncPersonaToBackend(currentUser, profile);
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -210,6 +221,34 @@ class _FinancialProfileScreenState
         ),
       );
     }
+  }
+
+  void _syncPersonaToBackend(AppUser user, FinancialProfile profile) {
+    try {
+      final dio = Dio(
+        BaseOptions(
+          baseUrl: ApiConfig.baseUrl,
+          connectTimeout: const Duration(seconds: 4),
+          receiveTimeout: const Duration(seconds: 4),
+        ),
+      );
+      dio.post(
+        '/users/persona',
+        data: {
+          'user_id': user.id,
+          'persona': profile.persona?.name,
+          'primary_goal': profile.primaryGoal?.name,
+          'monthly_income': profile.monthlyIncome,
+          'monthly_essential_expenses': profile.monthlyEssentialExpenses,
+          'total_savings': profile.totalSavings,
+          'is_guest': false,
+          'name': user.name,
+          'email': user.email,
+        },
+      ).catchError((_) {
+        return Response(requestOptions: RequestOptions(path: ''));
+      });
+    } catch (_) {}
   }
 
   // ── Stepped Navigation Handlers ────────────────────────────────────────
@@ -267,6 +306,9 @@ class _FinancialProfileScreenState
       },
     );
 
+    final currentUser = ref.watch(authControllerProvider);
+    final isGuest = currentUser?.isGuest ?? false;
+
     return Scaffold(
       backgroundColor: AppColors.navyBg,
       body: SafeArea(
@@ -281,7 +323,8 @@ class _FinancialProfileScreenState
             ),
           ),
           data: (_) => widget.isStepped
-              ? _buildSteppedWizard(l10n)
+              ? _buildSteppedWizard(l10n,
+                  isGuest: isGuest, currentUser: currentUser)
               : _buildSinglePageForm(l10n, theme, scheme),
         ),
       ),
@@ -290,12 +333,16 @@ class _FinancialProfileScreenState
 
   // ── Multi-Step Wizard View (Steps 1 to 4) ──────────────────────────────
 
-  Widget _buildSteppedWizard(AppLocalizations l10n) {
+  Widget _buildSteppedWizard(
+    AppLocalizations l10n, {
+    required bool isGuest,
+    required AppUser? currentUser,
+  }) {
     return Column(
       children: [
         // ── Top Navigation Bar & 4 Progress Segments ─────────────────
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 20, 8),
+          padding: const EdgeInsets.fromLTRB(16, 12, 20, 6),
           child: Row(
             children: [
               IconButton(
@@ -346,13 +393,65 @@ class _FinancialProfileScreenState
           ),
         ),
 
+        // ── Mode Indicator Pill (Guest vs Registered) ────────────────
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+          child: Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isGuest
+                      ? const Color(0xFF334155).withValues(alpha: 0.5)
+                      : const Color(0xFF10B981).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isGuest
+                        ? const Color(0xFF475569)
+                        : const Color(0xFF10B981).withValues(alpha: 0.35),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isGuest
+                          ? Icons.person_outline_rounded
+                          : Icons.verified_user_outlined,
+                      size: 13,
+                      color: isGuest
+                          ? const Color(0xFFCBD5E1)
+                          : const Color(0xFF10B981),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      isGuest
+                          ? 'Guest Mode · Saved locally on device · Alerts inactive'
+                          : 'Registered Account · Price alerts active',
+                      style: GoogleFonts.inter(
+                        color: isGuest
+                            ? const Color(0xFFCBD5E1)
+                            : const Color(0xFF10B981),
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
         // ── Step Content ──────────────────────────────────────────────
         Expanded(
           child: switch (_currentStep) {
             1 => _buildStep1(l10n),
             2 => _buildStep2(l10n),
             3 => _buildStep3(l10n),
-            _ => _buildStep4(l10n),
+            _ => _buildStep4(l10n, isGuest: isGuest, currentUser: currentUser),
           },
         ),
       ],
@@ -506,6 +605,12 @@ class _FinancialProfileScreenState
                 controller: _incomeController,
                 onChanged: _onAmountChanged,
               ),
+              const SizedBox(height: 8),
+              _QuickAmountPresets(
+                controller: _incomeController,
+                presets: const [50000, 100000, 200000, 350000],
+                onSelected: _onAmountChanged,
+              ),
               const SizedBox(height: 6),
               Text(
                 "Enter 0 if you don't have a regular income.",
@@ -528,6 +633,12 @@ class _FinancialProfileScreenState
                 label: 'Essential Expenses',
                 controller: _expensesController,
                 onChanged: _onAmountChanged,
+              ),
+              const SizedBox(height: 8),
+              _QuickAmountPresets(
+                controller: _expensesController,
+                presets: const [30000, 60000, 120000, 200000],
+                onSelected: _onAmountChanged,
               ),
               const SizedBox(height: 6),
               Text(
@@ -788,7 +899,11 @@ class _FinancialProfileScreenState
 
   // ── Step 4: Review & Confirm Your Information ───────────────────────────
 
-  Widget _buildStep4(AppLocalizations l10n) {
+  Widget _buildStep4(
+    AppLocalizations l10n, {
+    required bool isGuest,
+    required AppUser? currentUser,
+  }) {
     final incomeStr = _incomeController.text.trim().isEmpty
         ? 'PKR 0'
         : _formatAmount(_incomeController.text);
@@ -904,6 +1019,10 @@ class _FinancialProfileScreenState
               ),
               const SizedBox(height: 16),
 
+              // Alert Eligibility & Notification Status Card
+              _buildAlertEligibilityCard(isGuest, currentUser),
+              const SizedBox(height: 16),
+
               // Security Trust Card
               Container(
                 padding:
@@ -960,16 +1079,10 @@ class _FinancialProfileScreenState
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
-
-              const _TipBanner(
-                text:
-                    'You can update this information anytime from your profile settings.',
-              ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
-
         // Complete Profile Button
         Padding(
           padding: EdgeInsets.fromLTRB(
@@ -1002,6 +1115,120 @@ class _FinancialProfileScreenState
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildAlertEligibilityCard(bool isGuest, AppUser? currentUser) {
+    if (isGuest) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E293B).withValues(alpha: 0.65),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: const Color(0xFFEAB308).withValues(alpha: 0.35),
+            width: 1.2,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEAB308).withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.notifications_off_outlined,
+                color: Color(0xFFEAB308),
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Alerts Disabled in Guest Mode',
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFFFDE047),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Your persona is saved locally on this device. Real-time SMS and Push price alerts are reserved for registered accounts. You can create an account anytime to activate alerts.',
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFFCBD5E1),
+                      fontSize: 12.5,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF10B981).withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFF10B981).withValues(alpha: 0.3),
+          width: 1.2,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: const Color(0xFF10B981).withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.notifications_active_outlined,
+              color: Color(0xFF10B981),
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Real-Time Alerts Enabled',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Your account is registered for timely alerts when fuel, gold, exchange rates, or essential commodity prices change.',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF94A3B8),
+                    fontSize: 12.5,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1481,6 +1708,65 @@ class _AmountInputCard extends StatelessWidget {
             },
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Step 2 Quick Amount Presets ──────────────────────────────────────────────
+
+class _QuickAmountPresets extends StatelessWidget {
+  const _QuickAmountPresets({
+    required this.controller,
+    required this.presets,
+    required this.onSelected,
+  });
+
+  final TextEditingController controller;
+  final List<int> presets;
+  final VoidCallback onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: presets.map((amount) {
+          final label = amount >= 1000000
+              ? '${(amount / 1000000).toStringAsFixed(1)}M'
+              : '${(amount / 1000).toStringAsFixed(0)}k';
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () {
+                HapticFeedback.selectionClick();
+                controller.text = amount.toString();
+                onSelected();
+              },
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E293B).withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  'PKR $label',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF94A3B8),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

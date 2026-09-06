@@ -462,5 +462,14 @@
         "type": "int"
       }
     }
-  }
+  },
+  "googleSignInTitle": "Google ke sath Sign In karein",
+  "googleSignInSubtitle": "Tadbeer AI par jaari rakhne ke liye aik account muntakhib karein",
+  "googleChooseAccount": "Account muntakhib karein",
+  "googleUseAnotherAccount": "Doosra account istemal karein",
+  "googleEnterEmailHint": "Google email address darj karein",
+  "googleContinueButton": "Jaari Rakhein",
+  "googlePrivacyNotice": "Jaari rakhne ke liye, Google aap ka naam, email address, zaban ki tarjeeh, aur profile tasveer Tadbeer AI ke sath share karega.",
+  "googleSigningIn": "Google se rabta ho raha hai...",
+  "googleCancel": "Mansookh karein"
 }

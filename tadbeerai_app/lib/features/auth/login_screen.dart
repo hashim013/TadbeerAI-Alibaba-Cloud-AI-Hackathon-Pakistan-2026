@@ -12,6 +12,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/utils/l10n_context.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_text_field.dart';
+import '../../providers/repository_providers.dart';
 import 'auth_controller.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -47,7 +48,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
-      context.go('/home');
+      await _navigatePostAuth();
     } else {
       setState(() => _guestLoading = false);
       final errorMsg =
@@ -89,7 +90,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
-      context.go('/home');
+      await _navigatePostAuth();
     } else {
       setState(() => _loading = false);
       final errorMsg =
@@ -103,6 +104,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  Future<void> _navigatePostAuth() async {
+    final profile =
+        await ref.read(financialProfileRepositoryProvider).loadProfile();
+    if (!mounted) return;
+    if (profile == null || !profile.profileCompleted) {
+      context.go('/profile/financial');
+    } else {
+      context.go('/home');
+    }
+  }
+
   void _forgotPassword() {
     final currentEmail = _emailController.text.trim();
     if (currentEmail.isNotEmpty) {
@@ -113,6 +125,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _socialAuth(String provider) {
+    if (provider == 'Google') {
+      context.push('/auth/google');
+      return;
+    }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('$provider sign-in selected for demo mode.'),

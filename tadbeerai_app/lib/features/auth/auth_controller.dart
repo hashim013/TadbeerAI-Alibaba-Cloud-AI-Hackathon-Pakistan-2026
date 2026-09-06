@@ -69,6 +69,25 @@ class AuthController extends Notifier<AppUser?> {
     }
   }
 
+  Future<bool> signInWithGoogle({String? email, String? name}) async {
+    _lastErrorMessage = null;
+    try {
+      final user = await ref.read(authRepositoryProvider).signInWithGoogle(
+            email: email,
+            name: name,
+          );
+      if (user == null) {
+        // User cancelled - return false without setting error message
+        return false;
+      }
+      state = user;
+      return true;
+    } catch (e) {
+      _lastErrorMessage = e.toString();
+      return false;
+    }
+  }
+
   Future<bool> sendPasswordResetCode(String email) async {
     _lastErrorMessage = null;
     try {

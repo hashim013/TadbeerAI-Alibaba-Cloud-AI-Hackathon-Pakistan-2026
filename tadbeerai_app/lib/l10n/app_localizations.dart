@@ -2664,6 +2664,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Resend code in {seconds}s'**
   String codeResendIn(int seconds);
+
+  /// No description provided for @googleSignInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get googleSignInTitle;
+
+  /// No description provided for @googleSignInSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an account to continue to Tadbeer AI'**
+  String get googleSignInSubtitle;
+
+  /// No description provided for @googleChooseAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an account'**
+  String get googleChooseAccount;
+
+  /// No description provided for @googleUseAnotherAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Use another account'**
+  String get googleUseAnotherAccount;
+
+  /// No description provided for @googleEnterEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Google email address'**
+  String get googleEnterEmailHint;
+
+  /// No description provided for @googleContinueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get googleContinueButton;
+
+  /// No description provided for @googlePrivacyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'To continue, Google will share your name, email address, language preference, and profile picture with Tadbeer AI.'**
+  String get googlePrivacyNotice;
+
+  /// No description provided for @googleSigningIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting to Google...'**
+  String get googleSigningIn;
+
+  /// No description provided for @googleCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get googleCancel;
 }
 
 class _AppLocalizationsDelegate

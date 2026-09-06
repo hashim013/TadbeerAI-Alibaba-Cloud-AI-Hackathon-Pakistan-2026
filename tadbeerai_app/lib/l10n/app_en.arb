@@ -610,5 +610,14 @@
         "type": "int"
       }
     }
-  }
+  },
+  "googleSignInTitle": "Sign in with Google",
+  "googleSignInSubtitle": "Choose an account to continue to Tadbeer AI",
+  "googleChooseAccount": "Choose an account",
+  "googleUseAnotherAccount": "Use another account",
+  "googleEnterEmailHint": "Enter Google email address",
+  "googleContinueButton": "Continue",
+  "googlePrivacyNotice": "To continue, Google will share your name, email address, language preference, and profile picture with Tadbeer AI.",
+  "googleSigningIn": "Connecting to Google...",
+  "googleCancel": "Cancel"
 }

@@ -1472,6 +1472,35 @@ class AppLocalizationsUr extends AppLocalizations {
   String codeResendIn(int seconds) {
     return '$seconds سیکنڈ میں دوبارہ بھیجیں';
   }
+
+  @override
+  String get googleSignInTitle => 'گوگل کے ساتھ سائن ان کریں';
+
+  @override
+  String get googleSignInSubtitle =>
+      'تدبیر اے آئی پر جاری رکھنے کے لیے ایک اکاؤنٹ منتخب کریں';
+
+  @override
+  String get googleChooseAccount => 'اکاؤنٹ منتخب کریں';
+
+  @override
+  String get googleUseAnotherAccount => 'دوسرا اکاؤنٹ استعمال کریں';
+
+  @override
+  String get googleEnterEmailHint => 'گوگل ای میل ایڈریس درج کریں';
+
+  @override
+  String get googleContinueButton => 'جاری رکھیں';
+
+  @override
+  String get googlePrivacyNotice =>
+      'جاری رکھنے کے لیے، گوگل آپ کا نام، ای میل ایڈریس، زبان کی ترجیح، اور پروفائل تصویر تدبیر اے آئی کے ساتھ شیئر کرے گا۔';
+
+  @override
+  String get googleSigningIn => 'گوگل سے منسلک ہو رہا ہے...';
+
+  @override
+  String get googleCancel => 'منسوخ کریں';
 }
 
 /// The translations for Urdu, using the Latin script (`ur_Latn`).
@@ -2957,4 +2986,33 @@ class AppLocalizationsUrLatn extends AppLocalizationsUr {
   String codeResendIn(int seconds) {
     return '${seconds}s mein dobara bheinjein';
   }
+
+  @override
+  String get googleSignInTitle => 'Google ke sath Sign In karein';
+
+  @override
+  String get googleSignInSubtitle =>
+      'Tadbeer AI par jaari rakhne ke liye aik account muntakhib karein';
+
+  @override
+  String get googleChooseAccount => 'Account muntakhib karein';
+
+  @override
+  String get googleUseAnotherAccount => 'Doosra account istemal karein';
+
+  @override
+  String get googleEnterEmailHint => 'Google email address darj karein';
+
+  @override
+  String get googleContinueButton => 'Jaari Rakhein';
+
+  @override
+  String get googlePrivacyNotice =>
+      'Jaari rakhne ke liye, Google aap ka naam, email address, zaban ki tarjeeh, aur profile tasveer Tadbeer AI ke sath share karega.';
+
+  @override
+  String get googleSigningIn => 'Google se rabta ho raha hai...';
+
+  @override
+  String get googleCancel => 'Mansookh karein';
 }

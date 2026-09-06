@@ -1474,4 +1474,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String codeResendIn(int seconds) {
     return 'Resend code in ${seconds}s';
   }
+
+  @override
+  String get googleSignInTitle => 'Sign in with Google';
+
+  @override
+  String get googleSignInSubtitle =>
+      'Choose an account to continue to Tadbeer AI';
+
+  @override
+  String get googleChooseAccount => 'Choose an account';
+
+  @override
+  String get googleUseAnotherAccount => 'Use another account';
+
+  @override
+  String get googleEnterEmailHint => 'Enter Google email address';
+
+  @override
+  String get googleContinueButton => 'Continue';
+
+  @override
+  String get googlePrivacyNotice =>
+      'To continue, Google will share your name, email address, language preference, and profile picture with Tadbeer AI.';
+
+  @override
+  String get googleSigningIn => 'Connecting to Google...';
+
+  @override
+  String get googleCancel => 'Cancel';
 }
