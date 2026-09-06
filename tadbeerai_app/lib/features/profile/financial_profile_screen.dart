@@ -58,6 +58,8 @@ class _FinancialProfileScreenState
   bool _showExpenseWarning = false;
   bool _prefilled = false;
 
+  bool get isDark => Theme.of(context).brightness == Brightness.dark;
+
   @override
   void initState() {
     super.initState();
@@ -332,22 +334,30 @@ class _FinancialProfileScreenState
     final isGuest = currentUser?.isGuest ?? false;
 
     return Scaffold(
-      backgroundColor: AppColors.navyBg,
-      body: SafeArea(
-        child: profileAsync.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.teal),
-          ),
-          error: (error, _) => Center(
-            child: Text(
-              l10n.errorTitle,
-              style: GoogleFonts.inter(color: Colors.white),
+      backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.navyBg : null,
+          gradient: isDark ? null : AppColors.lightThemeGradient,
+        ),
+        child: SafeArea(
+          child: profileAsync.when(
+            loading: () => const Center(
+              child: CircularProgressIndicator(color: AppColors.teal),
             ),
+            error: (error, _) => Center(
+              child: Text(
+                l10n.errorTitle,
+                style: GoogleFonts.inter(
+                  color: isDark ? Colors.white : AppColors.textOnLight,
+                ),
+              ),
+            ),
+            data: (_) => widget.isStepped
+                ? _buildSteppedWizard(l10n,
+                    isGuest: isGuest, currentUser: currentUser)
+                : _buildSinglePageForm(l10n, theme, scheme),
           ),
-          data: (_) => widget.isStepped
-              ? _buildSteppedWizard(l10n,
-                  isGuest: isGuest, currentUser: currentUser)
-              : _buildSinglePageForm(l10n, theme, scheme),
         ),
       ),
     );
@@ -368,7 +378,8 @@ class _FinancialProfileScreenState
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                icon: Icon(Icons.arrow_back_rounded,
+                    color: isDark ? Colors.white : AppColors.textOnLight),
                 onPressed: () {
                   if (_currentStep > 1) {
                     setState(() => _currentStep--);
@@ -493,7 +504,7 @@ class _FinancialProfileScreenState
                 TextSpan(
                   text: 'Tell us about\n',
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textOnLight,
                     fontSize: 32,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.5,
@@ -513,7 +524,9 @@ class _FinancialProfileScreenState
               Text(
                 'This helps Tadbeer AI personalize your financial insights.',
                 style: GoogleFonts.inter(
-                  color: AppColors.textOnDarkSecondary,
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary
+                      : AppColors.textOnLightSecondary,
                   fontSize: 15,
                   height: 1.4,
                 ),
@@ -524,7 +537,7 @@ class _FinancialProfileScreenState
               Text(
                 'What should Tadbeer call you?',
                 style: GoogleFonts.inter(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : AppColors.textOnLight,
                   fontSize: 16.5,
                   fontWeight: FontWeight.w700,
                 ),
@@ -545,7 +558,7 @@ class _FinancialProfileScreenState
               Text(
                 'What best describes you?',
                 style: GoogleFonts.inter(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : AppColors.textOnLight,
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
                 ),
@@ -619,7 +632,7 @@ class _FinancialProfileScreenState
                 TextSpan(
                   text: 'Tell us about\n',
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textOnLight,
                     fontSize: 32,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.5,
@@ -639,7 +652,7 @@ class _FinancialProfileScreenState
               Text(
                 "What's your typical monthly income?",
                 style: GoogleFonts.inter(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : AppColors.textOnLight,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -660,7 +673,9 @@ class _FinancialProfileScreenState
               Text(
                 "Enter 0 if you don't have a regular income.",
                 style: GoogleFonts.inter(
-                  color: AppColors.textOnDarkSecondary,
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary
+                      : AppColors.textOnLightSecondary,
                   fontSize: 13,
                 ),
               ),
@@ -668,7 +683,7 @@ class _FinancialProfileScreenState
               Text(
                 "What's your typical monthly essential spending?",
                 style: GoogleFonts.inter(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : AppColors.textOnLight,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -689,7 +704,9 @@ class _FinancialProfileScreenState
               Text(
                 'This includes rent, bills, groceries, transport, etc.',
                 style: GoogleFonts.inter(
-                  color: AppColors.textOnDarkSecondary,
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary
+                      : AppColors.textOnLightSecondary,
                   fontSize: 13,
                 ),
               ),
@@ -731,7 +748,7 @@ class _FinancialProfileScreenState
               Text(
                 "What's your current total savings? (Optional)",
                 style: GoogleFonts.inter(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : AppColors.textOnLight,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -746,7 +763,9 @@ class _FinancialProfileScreenState
               Text(
                 'Used to estimate your emergency fund runway in months.',
                 style: GoogleFonts.inter(
-                  color: AppColors.textOnDarkSecondary,
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary
+                      : AppColors.textOnLightSecondary,
                   fontSize: 13,
                 ),
               ),
@@ -800,7 +819,7 @@ class _FinancialProfileScreenState
               Text(
                 'Almost there!',
                 style: GoogleFonts.inter(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : AppColors.textOnLight,
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.5,
@@ -821,7 +840,9 @@ class _FinancialProfileScreenState
               Text(
                 'Select what matters most to you right now.',
                 style: GoogleFonts.inter(
-                  color: AppColors.textOnDarkSecondary,
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary
+                      : AppColors.textOnLightSecondary,
                   fontSize: 14,
                   height: 1.4,
                 ),
@@ -968,7 +989,7 @@ class _FinancialProfileScreenState
               Text(
                 'Review & confirm',
                 style: GoogleFonts.inter(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : AppColors.textOnLight,
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.5,
@@ -988,7 +1009,9 @@ class _FinancialProfileScreenState
               Text(
                 'Please review your information before completing your profile.',
                 style: GoogleFonts.inter(
-                  color: AppColors.textOnDarkSecondary,
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary
+                      : AppColors.textOnLightSecondary,
                   fontSize: 14,
                   height: 1.4,
                 ),
@@ -1009,10 +1032,12 @@ class _FinancialProfileScreenState
               // Summary Card with Rows
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.navyCard,
+                  color: isDark ? AppColors.navyCard : AppColors.lightCard,
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.08),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : AppColors.borderLight,
                     width: 1.2,
                   ),
                 ),
@@ -1025,7 +1050,9 @@ class _FinancialProfileScreenState
                         value: _nameController.text.trim(),
                       ),
                       Divider(
-                        color: Colors.white.withValues(alpha: 0.06),
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.06)
+                            : AppColors.borderLight,
                         height: 1,
                       ),
                     ],
@@ -1035,7 +1062,9 @@ class _FinancialProfileScreenState
                       value: _personaLabel(_persona ?? Persona.student),
                     ),
                     Divider(
-                      color: Colors.white.withValues(alpha: 0.06),
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.06)
+                          : AppColors.borderLight,
                       height: 1,
                     ),
                     _SummaryRow(
@@ -1044,7 +1073,9 @@ class _FinancialProfileScreenState
                       value: incomeStr,
                     ),
                     Divider(
-                      color: Colors.white.withValues(alpha: 0.06),
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.06)
+                          : AppColors.borderLight,
                       height: 1,
                     ),
                     _SummaryRow(
@@ -1053,7 +1084,9 @@ class _FinancialProfileScreenState
                       value: expensesStr,
                     ),
                     Divider(
-                      color: Colors.white.withValues(alpha: 0.06),
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.06)
+                          : AppColors.borderLight,
                       height: 1,
                     ),
                     _SummaryRow(
@@ -1062,7 +1095,9 @@ class _FinancialProfileScreenState
                       value: savingsStr,
                     ),
                     Divider(
-                      color: Colors.white.withValues(alpha: 0.06),
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.06)
+                          : AppColors.borderLight,
                       height: 1,
                     ),
                     _SummaryRow(
@@ -1084,10 +1119,12 @@ class _FinancialProfileScreenState
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
-                  color: AppColors.navyCard,
+                  color: isDark ? AppColors.navyCard : AppColors.lightCard,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.08),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : AppColors.borderLight,
                     width: 1.2,
                   ),
                 ),
@@ -1115,7 +1152,8 @@ class _FinancialProfileScreenState
                           Text(
                             'Your information is secure',
                             style: GoogleFonts.inter(
-                              color: Colors.white,
+                              color:
+                                  isDark ? Colors.white : AppColors.textOnLight,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -1124,7 +1162,9 @@ class _FinancialProfileScreenState
                           Text(
                             'Your data is encrypted and will only be used to personalize your experience.',
                             style: GoogleFonts.inter(
-                              color: AppColors.textOnDarkSecondary,
+                              color: isDark
+                                  ? AppColors.textOnDarkSecondary
+                                  : AppColors.textOnLightSecondary,
                               fontSize: 12.5,
                               height: 1.35,
                             ),
@@ -1219,7 +1259,9 @@ class _FinancialProfileScreenState
                   Text(
                     'Your persona is saved locally on this device. Real-time SMS and Push price alerts are reserved for registered accounts. You can create an account anytime to activate alerts.',
                     style: GoogleFonts.inter(
-                      color: const Color(0xFFCBD5E1),
+                      color: isDark
+                          ? const Color(0xFFCBD5E1)
+                          : AppColors.textOnLightSecondary,
                       fontSize: 12.5,
                       height: 1.4,
                     ),
@@ -1266,7 +1308,7 @@ class _FinancialProfileScreenState
                 Text(
                   'Real-Time Alerts Enabled',
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textOnLight,
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                   ),
@@ -1275,7 +1317,9 @@ class _FinancialProfileScreenState
                 Text(
                   'Your account is registered for timely alerts when fuel, gold, exchange rates, or essential commodity prices change.',
                   style: GoogleFonts.inter(
-                    color: const Color(0xFF94A3B8),
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : AppColors.textOnLightSecondary,
                     fontSize: 12.5,
                     height: 1.4,
                   ),
@@ -1305,7 +1349,8 @@ class _FinancialProfileScreenState
             children: [
               if (!_saving)
                 IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  icon: Icon(Icons.arrow_back,
+                      color: isDark ? Colors.white : AppColors.textOnLight),
                   onPressed: () => Navigator.of(context).maybePop(),
                 ),
               const SizedBox(width: 8),
@@ -1313,7 +1358,7 @@ class _FinancialProfileScreenState
                 child: Text(
                   l10n.profileTitle,
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textOnLight,
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                   ),
@@ -1570,17 +1615,20 @@ class _SteppedPersonaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: isSelected
             ? const Color(0xFF10B981).withValues(alpha: 0.10)
-            : AppColors.navyCard,
+            : (isDark ? AppColors.navyCard : AppColors.lightCard),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isSelected
               ? const Color(0xFF10B981)
-              : Colors.white.withValues(alpha: 0.08),
+              : (isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : AppColors.borderLight),
           width: isSelected ? 1.5 : 1.2,
         ),
       ),
@@ -1610,7 +1658,7 @@ class _SteppedPersonaCard extends StatelessWidget {
                       Text(
                         title,
                         style: GoogleFonts.inter(
-                          color: Colors.white,
+                          color: isDark ? Colors.white : AppColors.textOnLight,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1619,7 +1667,9 @@ class _SteppedPersonaCard extends StatelessWidget {
                       Text(
                         subtitle,
                         style: GoogleFonts.inter(
-                          color: AppColors.textOnDarkSecondary,
+                          color: isDark
+                              ? AppColors.textOnDarkSecondary
+                              : AppColors.textOnLightSecondary,
                           fontSize: 13,
                           height: 1.35,
                         ),
@@ -1677,13 +1727,16 @@ class _AmountInputCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.navyCard,
+        color: isDark ? AppColors.navyCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : AppColors.borderLight,
           width: 1.2,
         ),
       ),
@@ -1711,7 +1764,9 @@ class _AmountInputCard extends StatelessWidget {
                 Text(
                   label,
                   style: GoogleFonts.inter(
-                    color: AppColors.textOnDarkSecondary,
+                    color: isDark
+                        ? AppColors.textOnDarkSecondary
+                        : AppColors.textOnLightSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1722,7 +1777,7 @@ class _AmountInputCard extends StatelessWidget {
                     Text(
                       'PKR ',
                       style: GoogleFonts.inter(
-                        color: Colors.white,
+                        color: isDark ? Colors.white : AppColors.textOnLight,
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
                       ),
@@ -1733,7 +1788,7 @@ class _AmountInputCard extends StatelessWidget {
                         onChanged: (_) => onChanged(),
                         keyboardType: TextInputType.number,
                         style: GoogleFonts.inter(
-                          color: Colors.white,
+                          color: isDark ? Colors.white : AppColors.textOnLight,
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
                         ),
@@ -1763,11 +1818,12 @@ class _AmountInputCard extends StatelessWidget {
                   controller.clear();
                   onChanged();
                 },
-                child: const Padding(
-                  padding: EdgeInsets.all(4),
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
                   child: Icon(
                     Icons.close_rounded,
-                    color: Colors.white54,
+                    color:
+                        isDark ? Colors.white54 : AppColors.textOnLightTertiary,
                     size: 18,
                   ),
                 ),
@@ -1795,6 +1851,7 @@ class _QuickAmountPresets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -1815,17 +1872,23 @@ class _QuickAmountPresets extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B).withValues(alpha: 0.7),
+                  color: isDark
+                      ? const Color(0xFF1E293B).withValues(alpha: 0.7)
+                      : AppColors.lightSurfaceVariant.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.1)
+                        : AppColors.borderLight,
                     width: 1,
                   ),
                 ),
                 child: Text(
                   'PKR $label',
                   style: GoogleFonts.inter(
-                    color: const Color(0xFF94A3B8),
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : AppColors.textOnLightSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1862,16 +1925,19 @@ class _GoalDetailedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
         color: isSelected
             ? const Color(0xFF10B981).withValues(alpha: 0.12)
-            : AppColors.navyCard,
+            : (isDark ? AppColors.navyCard : AppColors.lightCard),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isSelected
               ? const Color(0xFF10B981)
-              : Colors.white.withValues(alpha: 0.08),
+              : (isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : AppColors.borderLight),
           width: isSelected ? 1.5 : 1.0,
         ),
       ),
@@ -1898,7 +1964,7 @@ class _GoalDetailedCard extends StatelessWidget {
                       title,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
-                        color: Colors.white,
+                        color: isDark ? Colors.white : AppColors.textOnLight,
                         fontSize: 12,
                         fontWeight:
                             isSelected ? FontWeight.w700 : FontWeight.w600,
@@ -1912,7 +1978,9 @@ class _GoalDetailedCard extends StatelessWidget {
                       subtitle,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
-                        color: AppColors.textOnDarkSecondary,
+                        color: isDark
+                            ? AppColors.textOnDarkSecondary
+                            : AppColors.textOnLightSecondary,
                         fontSize: 9.5,
                         height: 1.2,
                       ),
@@ -1953,16 +2021,19 @@ class _GoalOtherCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
         color: isSelected
             ? const Color(0xFF10B981).withValues(alpha: 0.12)
-            : AppColors.navyCard,
+            : (isDark ? AppColors.navyCard : AppColors.lightCard),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isSelected
               ? const Color(0xFF10B981)
-              : Colors.white.withValues(alpha: 0.08),
+              : (isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : AppColors.borderLight),
           width: isSelected ? 1.5 : 1.0,
         ),
       ),
@@ -1979,14 +2050,18 @@ class _GoalOtherCard extends StatelessWidget {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.06),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.06)
+                        : AppColors.lightSurfaceVariant.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     Icons.more_horiz_rounded,
                     color: isSelected
                         ? const Color(0xFF10B981)
-                        : AppColors.textOnDarkSecondary,
+                        : (isDark
+                            ? AppColors.textOnDarkSecondary
+                            : AppColors.textOnLightSecondary),
                     size: 22,
                   ),
                 ),
@@ -1998,7 +2073,7 @@ class _GoalOtherCard extends StatelessWidget {
                       Text(
                         'Other',
                         style: GoogleFonts.inter(
-                          color: Colors.white,
+                          color: isDark ? Colors.white : AppColors.textOnLight,
                           fontSize: 14.5,
                           fontWeight:
                               isSelected ? FontWeight.w700 : FontWeight.w600,
@@ -2008,7 +2083,9 @@ class _GoalOtherCard extends StatelessWidget {
                       Text(
                         'I have a different goal in mind.',
                         style: GoogleFonts.inter(
-                          color: AppColors.textOnDarkSecondary,
+                          color: isDark
+                              ? AppColors.textOnDarkSecondary
+                              : AppColors.textOnLightSecondary,
                           fontSize: 12,
                         ),
                       ),
@@ -2045,6 +2122,7 @@ class _SummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
       child: Row(
@@ -2063,7 +2141,7 @@ class _SummaryRow extends StatelessWidget {
             child: Text(
               label,
               style: GoogleFonts.inter(
-                color: Colors.white,
+                color: isDark ? Colors.white : AppColors.textOnLight,
                 fontSize: 14.5,
                 fontWeight: FontWeight.w500,
               ),
@@ -2072,7 +2150,7 @@ class _SummaryRow extends StatelessWidget {
           Text(
             value,
             style: GoogleFonts.inter(
-              color: Colors.white,
+              color: isDark ? Colors.white : AppColors.textOnLight,
               fontSize: 14.5,
               fontWeight: FontWeight.w700,
             ),
@@ -2090,13 +2168,16 @@ class _SecurityBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: AppColors.navyCard,
+        color: isDark ? AppColors.navyCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : AppColors.borderLight,
           width: 1.2,
         ),
       ),
@@ -2120,7 +2201,9 @@ class _SecurityBanner extends StatelessWidget {
             child: Text(
               'Your information is secure and will only be used to personalize your experience.',
               style: GoogleFonts.inter(
-                color: AppColors.textOnDarkSecondary,
+                color: isDark
+                    ? AppColors.textOnDarkSecondary
+                    : AppColors.textOnLightSecondary,
                 fontSize: 13,
                 height: 1.35,
               ),
@@ -2141,13 +2224,16 @@ class _TipBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: AppColors.navyCard,
+        color: isDark ? AppColors.navyCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : AppColors.borderLight,
           width: 1.2,
         ),
       ),
@@ -2171,7 +2257,9 @@ class _TipBanner extends StatelessWidget {
             child: Text(
               text,
               style: GoogleFonts.inter(
-                color: AppColors.textOnDarkSecondary,
+                color: isDark
+                    ? AppColors.textOnDarkSecondary
+                    : AppColors.textOnLightSecondary,
                 fontSize: 13,
                 height: 1.35,
               ),
@@ -2194,18 +2282,23 @@ class _ContinueButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       height: 54,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2DD4BF), Color(0xFF10B981)],
+        gradient: LinearGradient(
+          colors: isDark
+              ? const [Color(0xFF2DD4BF), Color(0xFF10B981)]
+              : const [Color(0xFF010717), Color(0xFF0D1C34)],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
         borderRadius: BorderRadius.circular(27),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF10B981).withValues(alpha: 0.35),
+            color: isDark
+                ? const Color(0xFF10B981).withValues(alpha: 0.35)
+                : AppColors.navyBg.withValues(alpha: 0.35),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -2257,18 +2350,23 @@ class _CompleteProfileButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       height: 54,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2DD4BF), Color(0xFF10B981)],
+        gradient: LinearGradient(
+          colors: isDark
+              ? const [Color(0xFF2DD4BF), Color(0xFF10B981)]
+              : const [Color(0xFF010717), Color(0xFF0D1C34)],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
         borderRadius: BorderRadius.circular(27),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF10B981).withValues(alpha: 0.35),
+            color: isDark
+                ? const Color(0xFF10B981).withValues(alpha: 0.35)
+                : AppColors.navyBg.withValues(alpha: 0.35),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),

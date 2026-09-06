@@ -7,9 +7,12 @@ import '../data/repositories/firebase_auth_repository.dart';
 import '../data/repositories/mock_auth_repository.dart';
 import '../data/repositories/prefs_financial_profile_repository.dart';
 import '../data/repositories/prefs_settings_repository.dart';
+import '../data/repositories/sync_financial_profile_repository.dart';
 import '../domain/repositories/auth_repository.dart';
 import '../domain/repositories/financial_profile_repository.dart';
 import '../domain/repositories/settings_repository.dart';
+import '../features/auth/auth_controller.dart';
+import 'assistant_providers.dart';
 
 /// Overridden in `main()` with the real [SharedPreferences] instance
 /// (or a mock in tests) — the composition root of the dependency graph.
@@ -41,6 +44,12 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(
   (ref) => PrefsSettingsRepository(ref.watch(sharedPrefsProvider)),
 );
 
+/// Financial profile: local prefs cache as the source of truth, with a
+/// best-effort cloud mirror to `POST /users/persona` for signed-in users.
 final financialProfileRepositoryProvider = Provider<FinancialProfileRepository>(
-  (ref) => PrefsFinancialProfileRepository(ref.watch(sharedPrefsProvider)),
+  (ref) => SyncFinancialProfileRepository(
+    local: PrefsFinancialProfileRepository(ref.watch(sharedPrefsProvider)),
+    dio: ref.watch(apiDioProvider),
+    uidProvider: () => ref.read(authControllerProvider)?.id,
+  ),
 );

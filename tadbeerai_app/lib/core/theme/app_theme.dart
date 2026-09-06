@@ -5,8 +5,9 @@ import 'app_typography.dart';
 
 /// Material themes for Tadbeer AI 2.0.
 ///
-/// Dark is the primary direction (deep navy canvas, teal accents); a light
-/// variant is provided so a settings toggle can land later without rework.
+/// Dark is the primary direction (deep navy canvas, teal accents); the light
+/// variant uses a luminous teal-to-blue gradient canvas with carefully tuned
+/// contrast so every text element stays readable.
 abstract final class AppTheme {
   static ThemeData dark() => _build(Brightness.dark);
 
@@ -19,19 +20,19 @@ abstract final class AppTheme {
     final scheme = ColorScheme.fromSeed(
       seedColor: AppColors.teal,
       brightness: brightness,
-      primary: isDark ? AppColors.teal : AppColors.tealDeep,
+      primary: isDark ? AppColors.teal : AppColors.navyBg,
       onPrimary: isDark ? AppColors.navyBg : Colors.white,
-      secondary: AppColors.mint,
-      onSecondary: AppColors.navyBg,
+      secondary: isDark ? AppColors.mint : AppColors.blue,
+      onSecondary: Colors.white,
       surface: isDark ? AppColors.navySurface : AppColors.lightSurface,
       onSurface: isDark ? AppColors.textOnDark : AppColors.textOnLight,
       surfaceContainerHighest:
-          isDark ? AppColors.navyElevated : AppColors.lightCard,
+          isDark ? AppColors.navyElevated : AppColors.lightSurfaceVariant,
       onSurfaceVariant: isDark
           ? AppColors.textOnDarkSecondary
           : AppColors.textOnLightSecondary,
       error: AppColors.danger,
-      onError: AppColors.navyBg,
+      onError: isDark ? AppColors.navyBg : Colors.white,
       outline: isDark ? AppColors.borderDark : AppColors.borderLight,
     );
 
@@ -45,9 +46,10 @@ abstract final class AppTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: isDark ? AppColors.navyBg : AppColors.lightBg,
       textTheme: textTheme,
+      canvasColor: isDark ? AppColors.navyBg : AppColors.lightBg,
       splashFactory: InkSparkle.splashFactory,
       appBarTheme: AppBarTheme(
-        backgroundColor: isDark ? AppColors.navyBg : AppColors.lightBg,
+        backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
         foregroundColor: scheme.onSurface,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -64,6 +66,8 @@ abstract final class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: buttonShape,
           textStyle: textTheme.labelLarge?.copyWith(fontSize: 16),
+          elevation: isDark ? 0 : 2,
+          shadowColor: isDark ? null : AppColors.navyBg.withValues(alpha: 0.25),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -83,7 +87,7 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isDark ? AppColors.navyCard : AppColors.lightSurface,
+        fillColor: isDark ? AppColors.navyCard : AppColors.lightCard,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         border: _inputBorder(
@@ -104,7 +108,7 @@ abstract final class AppTheme {
         hintStyle: textTheme.bodyMedium?.copyWith(
           color: isDark
               ? AppColors.textOnDarkTertiary
-              : AppColors.textOnLightSecondary,
+              : AppColors.textOnLightTertiary,
           fontSize: 15,
           fontWeight: FontWeight.w400,
         ),
@@ -126,12 +130,13 @@ abstract final class AppTheme {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor:
-            isDark ? AppColors.navySurface : AppColors.lightSurface,
+        backgroundColor: isDark ? AppColors.navySurface : AppColors.lightCard,
         indicatorColor: Colors.transparent,
-        elevation: 0,
+        elevation: isDark ? 0 : 1,
+        shadowColor: isDark ? null : AppColors.lightCardShadow,
         height: 64,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        surfaceTintColor: Colors.transparent,
         iconTheme: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected)
               ? IconThemeData(size: 25, color: scheme.primary)
@@ -139,7 +144,7 @@ abstract final class AppTheme {
                   size: 25,
                   color: isDark
                       ? const Color(0xFF64748B)
-                      : AppColors.textOnLightSecondary,
+                      : AppColors.textOnLightTertiary,
                 ),
         ),
         labelTextStyle: WidgetStateProperty.resolveWith(
@@ -148,17 +153,25 @@ abstract final class AppTheme {
                 ? scheme.primary
                 : (isDark
                     ? const Color(0xFF64748B)
-                    : AppColors.textOnLightSecondary),
+                    : AppColors.textOnLightTertiary),
             fontWeight: states.contains(WidgetState.selected)
                 ? FontWeight.w700
                 : FontWeight.w500,
           ),
         ),
       ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: isDark ? AppColors.navyElevated : AppColors.lightCard,
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+      ),
       cardTheme: CardThemeData(
         color: isDark ? AppColors.navyCard : AppColors.lightCard,
         elevation: 0,
         margin: EdgeInsets.zero,
+        shadowColor: isDark ? null : AppColors.lightCardShadow,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
@@ -172,7 +185,7 @@ abstract final class AppTheme {
         space: 1,
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: isDark ? AppColors.navyElevated : Colors.white,
+        backgroundColor: isDark ? AppColors.navyElevated : AppColors.lightCard,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
       snackBarTheme: SnackBarThemeData(
@@ -186,6 +199,31 @@ abstract final class AppTheme {
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: scheme.primary,
+      ),
+      listTileTheme: ListTileThemeData(
+        iconColor: isDark
+            ? AppColors.textOnDarkSecondary
+            : AppColors.textOnLightSecondary,
+        textColor: scheme.onSurface,
+      ),
+      iconTheme: IconThemeData(
+        color: isDark
+            ? AppColors.textOnDarkSecondary
+            : AppColors.textOnLightSecondary,
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor:
+            isDark ? AppColors.navyCard : AppColors.lightSurfaceVariant,
+        labelStyle: textTheme.labelMedium?.copyWith(color: scheme.onSurface),
+      ),
+      tooltipTheme: TooltipThemeData(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.navyElevated : AppColors.textOnLight,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        textStyle: textTheme.bodySmall?.copyWith(
+          color: isDark ? AppColors.textOnDark : Colors.white,
+        ),
       ),
     );
   }

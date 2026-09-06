@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/config/api_config.dart';
+import '../data/repositories/api_finance_repository.dart';
 import '../data/repositories/mock_finance_repository.dart';
 import '../domain/entities/budget.dart';
 import '../domain/entities/finance_category.dart';
@@ -10,11 +12,26 @@ import '../domain/repositories/finance_repository.dart';
 import '../domain/services/finance_calculations.dart';
 import '../domain/services/financial_health_calculator.dart';
 import '../domain/services/insight_generator.dart';
+import '../features/auth/auth_controller.dart';
+import 'assistant_providers.dart';
 import 'repository_providers.dart';
 
-final financeRepositoryProvider = Provider<FinanceRepository>(
-  (ref) => MockFinanceRepository(ref.watch(sharedPrefsProvider)),
-);
+/// Finance ledger source: `live` (default) syncs the per-user ledger with the
+/// backend (Firestore) through an offline-first local cache;
+/// `--dart-define=FINANCE_MODE=demo` keeps the on-device mock ledger for UI
+/// development and headless tests.
+final financeRepositoryProvider = Provider<FinanceRepository>((ref) {
+  if (ApiConfig.useMockFinance) {
+    return MockFinanceRepository(ref.watch(sharedPrefsProvider));
+  }
+  final repo = ApiFinanceRepository(
+    dio: ref.watch(apiDioProvider),
+    prefs: ref.watch(sharedPrefsProvider),
+    uidProvider: () => ref.read(authControllerProvider)?.id,
+  );
+  ref.onDispose(repo.dispose);
+  return repo;
+});
 
 /// Owns the finance ledger: transactions, budgets and goals.
 ///

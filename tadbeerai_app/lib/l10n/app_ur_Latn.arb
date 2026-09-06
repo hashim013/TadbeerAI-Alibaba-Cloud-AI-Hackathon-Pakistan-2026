@@ -107,8 +107,8 @@
   "availableBalance": "Dastya balance",
   "totalIncome": "Kul aamdani",
   "totalExpenses": "Kul kharchay",
-  "resetDemoData": "Demo data reset karein",
-  "resetDemoDataDone": "Demo data wapas aa gaya.",
+  "resetDemoData": "Tamam data saaf karein",
+  "resetDemoDataDone": "Tamam data saaf ho gaya.",
   "incomeVsExpenses": "Aamdani vs kharchay",
 
   "searchTransactions": "Len-den talash karein",

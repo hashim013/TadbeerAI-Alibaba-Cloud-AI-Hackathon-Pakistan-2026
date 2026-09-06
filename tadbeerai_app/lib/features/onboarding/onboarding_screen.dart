@@ -61,7 +61,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const bgBase = AppColors.navyBg;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgBase = isDark ? AppColors.navyBg : AppColors.lightBg;
     const emeraldAccent = AppColors.emerald;
     const mintAccent = AppColors.teal;
 
@@ -106,11 +107,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     return Scaffold(
       backgroundColor: bgBase,
       body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.light.copyWith(
+        value: (isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)
+            .copyWith(
           statusBarColor: Colors.transparent,
           systemNavigationBarColor: Colors.transparent,
           systemNavigationBarDividerColor: Colors.transparent,
-          systemNavigationBarIconBrightness: Brightness.light,
+          systemNavigationBarIconBrightness:
+              isDark ? Brightness.light : Brightness.dark,
         ),
         child: Stack(
           fit: StackFit.expand,
@@ -119,14 +122,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: const Alignment(0, -0.35),
-                    radius: 1.15,
-                    colors: [
-                      const Color(0xFF061A2E).withValues(alpha: 0.35),
-                      bgBase,
-                    ],
-                  ),
+                  gradient: isDark
+                      ? RadialGradient(
+                          center: const Alignment(0, -0.35),
+                          radius: 1.15,
+                          colors: [
+                            const Color(0xFF061A2E).withValues(alpha: 0.35),
+                            bgBase,
+                          ],
+                        )
+                      : AppColors.lightThemeGradient,
                 ),
               ),
             ),
@@ -158,16 +163,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                   width: 38,
                                   height: 38,
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.06),
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.06)
+                                        : AppColors.lightCard
+                                            .withValues(alpha: 0.7),
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color:
-                                          Colors.white.withValues(alpha: 0.10),
+                                      color: isDark
+                                          ? Colors.white.withValues(alpha: 0.10)
+                                          : AppColors.borderLight,
                                     ),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.arrow_back_ios_new_rounded,
-                                    color: Colors.white,
+                                    color: isDark
+                                        ? Colors.white
+                                        : AppColors.textOnLight,
                                     size: 16,
                                   ),
                                 ),
@@ -193,17 +204,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.06),
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.06)
+                                        : AppColors.lightCard
+                                            .withValues(alpha: 0.7),
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
-                                      color:
-                                          Colors.white.withValues(alpha: 0.10),
+                                      color: isDark
+                                          ? Colors.white.withValues(alpha: 0.10)
+                                          : AppColors.borderLight,
                                     ),
                                   ),
                                   child: Text(
                                     l10n.onboardingSkip,
                                     style: GoogleFonts.inter(
-                                      color: const Color(0xFF94A3B8),
+                                      color: isDark
+                                          ? const Color(0xFF94A3B8)
+                                          : AppColors.textOnLightSecondary,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -290,20 +307,29 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               height: 52,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                gradient: const RadialGradient(
-                                  colors: [
-                                    Color(0xFF0D1C34),
-                                    Color(0xFF010717),
-                                  ],
+                                gradient: RadialGradient(
+                                  colors: isDark
+                                      ? const [
+                                          Color(0xFF0D1C34),
+                                          Color(0xFF010717),
+                                        ]
+                                      : [
+                                          AppColors.lightCard,
+                                          AppColors.lightSurface,
+                                        ],
                                 ),
                                 border: Border.all(
-                                  color: mintAccent.withValues(alpha: 0.55),
+                                  color: isDark
+                                      ? mintAccent.withValues(alpha: 0.55)
+                                      : AppColors.navyBg.withValues(alpha: 0.4),
                                   width: 1.5,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color:
-                                        emeraldAccent.withValues(alpha: 0.16),
+                                    color: isDark
+                                        ? emeraldAccent.withValues(alpha: 0.16)
+                                        : AppColors.navyBg
+                                            .withValues(alpha: 0.12),
                                     blurRadius: 12,
                                     spreadRadius: 1,
                                   ),
@@ -311,7 +337,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               ),
                               child: Icon(
                                 page.icon,
-                                color: mintAccent,
+                                color: isDark ? mintAccent : AppColors.navyBg,
                                 size: 26,
                               ),
                             )
@@ -326,16 +352,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
                             // Headline: Understand / Manage / Plan
                             ShaderMask(
-                              shaderCallback: (bounds) => const LinearGradient(
-                                colors: [
-                                  Color(0xFF34D399),
-                                  Color(0xFF2DD4BF),
-                                ],
+                              shaderCallback: (bounds) => LinearGradient(
+                                colors: isDark
+                                    ? const [
+                                        Color(0xFF34D399),
+                                        Color(0xFF2DD4BF),
+                                      ]
+                                    : const [
+                                        Color(0xFF0D9488),
+                                        Color(0xFF0F766E),
+                                      ],
                               ).createShader(bounds),
                               child: Text(
                                 page.title,
                                 style: GoogleFonts.inter(
-                                  color: Colors.white,
+                                  color: isDark
+                                      ? Colors.white
+                                      : AppColors.textOnLight,
                                   fontSize: 32,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 0.4,
@@ -360,7 +393,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               child: Text(
                                 page.description,
                                 style: GoogleFonts.inter(
-                                  color: const Color(0xFFCBD5E1),
+                                  color: isDark
+                                      ? const Color(0xFFCBD5E1)
+                                      : AppColors.textOnLightSecondary,
                                   fontSize: 15.5,
                                   fontWeight: FontWeight.w400,
                                   height: 1.48,
@@ -398,14 +433,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               height: 6,
                               decoration: BoxDecoration(
                                 color: active
-                                    ? emeraldAccent
-                                    : const Color(0xFF142746),
+                                    ? (isDark
+                                        ? emeraldAccent
+                                        : AppColors.navyBg)
+                                    : (isDark
+                                        ? const Color(0xFF142746)
+                                        : AppColors.navyBg
+                                            .withValues(alpha: 0.3)),
                                 borderRadius: BorderRadius.circular(3),
                                 boxShadow: active
                                     ? [
                                         BoxShadow(
-                                          color: emeraldAccent.withValues(
-                                              alpha: 0.5),
+                                          color: isDark
+                                              ? emeraldAccent.withValues(
+                                                  alpha: 0.5)
+                                              : AppColors.navyBg
+                                                  .withValues(alpha: 0.35),
                                           blurRadius: 8,
                                           offset: const Offset(0, 1),
                                         ),
@@ -429,16 +472,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               width: double.infinity,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(18),
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFF2DD4BF),
-                                    Color(0xFF10B981),
-                                  ],
-                                ),
+                                gradient: isDark
+                                    ? const LinearGradient(
+                                        colors: [
+                                          Color(0xFF2DD4BF),
+                                          Color(0xFF10B981),
+                                        ],
+                                      )
+                                    : const LinearGradient(
+                                        colors: [
+                                          Color(0xFF010717),
+                                          Color(0xFF0D1C34),
+                                        ],
+                                      ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF10B981)
-                                        .withValues(alpha: 0.4),
+                                    color: isDark
+                                        ? const Color(0xFF10B981)
+                                            .withValues(alpha: 0.4)
+                                        : AppColors.navyBg
+                                            .withValues(alpha: 0.35),
                                     blurRadius: 20,
                                     offset: const Offset(0, 4),
                                   ),
@@ -452,7 +505,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                         ? l10n.onboardingGetStarted
                                         : l10n.onboardingNext,
                                     style: GoogleFonts.inter(
-                                      color: const Color(0xFF010717),
+                                      color: isDark
+                                          ? const Color(0xFF010717)
+                                          : Colors.white,
                                       fontSize: 16.5,
                                       fontWeight: FontWeight.w700,
                                       letterSpacing: 0.3,
@@ -463,7 +518,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                     isLast
                                         ? Icons.rocket_launch_rounded
                                         : Icons.arrow_forward_rounded,
-                                    color: const Color(0xFF010717),
+                                    color: isDark
+                                        ? const Color(0xFF010717)
+                                        : Colors.white,
                                     size: 20,
                                   ),
                                 ],

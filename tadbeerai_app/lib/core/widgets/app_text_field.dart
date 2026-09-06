@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../theme/app_colors.dart';
 
 /// Labeled text field consistent with the Tadbeer design system.
 ///
@@ -42,7 +41,7 @@ class _AppTextFieldState extends State<AppTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
 
     return TextFormField(
       controller: widget.controller,
@@ -52,9 +51,9 @@ class _AppTextFieldState extends State<AppTextField> {
       textInputAction: widget.textInputAction,
       autofillHints: widget.autofillHints,
       autofocus: widget.autofocus,
-      cursorColor: AppColors.teal,
+      cursorColor: theme.colorScheme.primary,
       style: GoogleFonts.inter(
-        color: isDark ? const Color(0xFFF8FAFC) : AppColors.textOnLight,
+        color: theme.colorScheme.onSurface,
         fontSize: 15.5,
         fontWeight: FontWeight.w500,
       ),
@@ -69,8 +68,7 @@ class _AppTextFieldState extends State<AppTextField> {
                   _obscured
                       ? Icons.visibility_outlined
                       : Icons.visibility_off_outlined,
-                  color:
-                      isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  color: theme.colorScheme.onSurfaceVariant,
                   size: 20,
                 ),
               )

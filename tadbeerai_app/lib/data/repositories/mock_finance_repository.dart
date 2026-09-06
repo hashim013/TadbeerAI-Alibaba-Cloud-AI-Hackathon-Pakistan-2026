@@ -8,19 +8,16 @@ import '../../domain/entities/finance_data.dart';
 import '../../domain/entities/goal.dart';
 import '../../domain/entities/transaction.dart';
 import '../../domain/repositories/finance_repository.dart';
-import '../mock/mock_finance_data.dart';
 
-/// Local, offline finance repository used during the mock phase.
+/// Local, offline finance repository used in demo mode (`FINANCE_MODE=demo`).
 ///
-/// Seeds the bundled demo dataset on first launch, then persists every CRUD
-/// mutation on-device so the demo survives restarts. A remote repository
-/// replaces this in a later phase without touching UI code.
+/// Starts from an EMPTY ledger (no bundled demo data) and persists every CRUD
+/// mutation on-device so it survives restarts. The live `ApiFinanceRepository`
+/// replaces this by default without touching UI code.
 class MockFinanceRepository implements FinanceRepository {
-  MockFinanceRepository(this._prefs, {DateTime Function()? now})
-      : _now = now ?? DateTime.now;
+  MockFinanceRepository(this._prefs);
 
   final SharedPreferences _prefs;
-  final DateTime Function() _now;
 
   FinanceData? _cache;
 
@@ -121,8 +118,16 @@ class MockFinanceRepository implements FinanceRepository {
 
   Future<FinanceData> _current() async => _cache ?? await getFinanceData();
 
+  /// Seeds an EMPTY ledger — the bundled demo dataset is no longer written to
+  /// storage. `MockFinanceData` is retained purely as a unit-test fixture (see
+  /// financial_health_test.dart); both mock and live finance start empty.
   Future<FinanceData> _seedAndPersist() async {
-    final seeded = MockFinanceData.seed(_now());
+    const seeded = FinanceData(
+      transactions: [],
+      budgets: [],
+      goals: [],
+      openingSavingsBalance: 0,
+    );
     await _persist(seeded);
     return seeded;
   }

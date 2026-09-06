@@ -128,8 +128,8 @@
   "availableBalance": "Available balance",
   "totalIncome": "Total income",
   "totalExpenses": "Total expenses",
-  "resetDemoData": "Reset demo data",
-  "resetDemoDataDone": "Demo data restored.",
+  "resetDemoData": "Clear all data",
+  "resetDemoDataDone": "All data cleared.",
   "incomeVsExpenses": "Income vs expenses",
 
   "searchTransactions": "Search transactions",

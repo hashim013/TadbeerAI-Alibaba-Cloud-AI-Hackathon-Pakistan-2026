@@ -123,6 +123,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return PopScope(
       canPop: false,
@@ -131,13 +132,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         _onBack();
       },
       child: Scaffold(
-        backgroundColor: AppColors.navyBg,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle.light.copyWith(
+          value:
+              (isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)
+                  .copyWith(
             statusBarColor: Colors.transparent,
             systemNavigationBarColor: Colors.transparent,
             systemNavigationBarDividerColor: Colors.transparent,
-            systemNavigationBarIconBrightness: Brightness.light,
+            systemNavigationBarIconBrightness:
+                isDark ? Brightness.light : Brightness.dark,
           ),
           child: Stack(
             fit: StackFit.expand,
@@ -146,14 +150,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: const Alignment(0, -0.45),
-                      radius: 1.1,
-                      colors: [
-                        const Color(0xFF061A2E).withValues(alpha: 0.35),
-                        AppColors.navyBg,
-                      ],
-                    ),
+                    gradient: isDark
+                        ? RadialGradient(
+                            center: const Alignment(0, -0.45),
+                            radius: 1.1,
+                            colors: [
+                              const Color(0xFF061A2E).withValues(alpha: 0.35),
+                              Theme.of(context).scaffoldBackgroundColor,
+                            ],
+                          )
+                        : AppColors.lightThemeGradient,
                   ),
                 ),
               ),
@@ -181,15 +187,31 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.06),
+                                  color: isDark
+                                      ? Colors.white.withValues(alpha: 0.06)
+                                      : AppColors.lightCard
+                                          .withValues(alpha: 0.85),
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.10),
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.10)
+                                        : AppColors.borderLight,
                                   ),
+                                  boxShadow: isDark
+                                      ? null
+                                      : [
+                                          const BoxShadow(
+                                            color: AppColors.lightCardShadow,
+                                            blurRadius: 4,
+                                            offset: Offset(0, 1),
+                                          ),
+                                        ],
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.arrow_back_ios_new_rounded,
-                                  color: Colors.white,
+                                  color: isDark
+                                      ? Colors.white
+                                      : AppColors.textOnLight,
                                   size: 16,
                                 ),
                               ),
@@ -215,7 +237,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         Text(
                           l10n.signupTitle,
                           style: GoogleFonts.inter(
-                            color: Colors.white,
+                            color:
+                                isDark ? Colors.white : AppColors.textOnLight,
                             fontSize: 30,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.2,
@@ -226,7 +249,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         Text(
                           l10n.signupSubtitle,
                           style: GoogleFonts.inter(
-                            color: AppColors.textOnDarkSecondary,
+                            color: isDark
+                                ? AppColors.textOnDarkSecondary
+                                : AppColors.textOnLightSecondary,
                             fontSize: 15,
                             fontWeight: FontWeight.w400,
                             letterSpacing: 0.1,
@@ -246,7 +271,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           autofillHints: const [AutofillHints.name],
                           prefixIcon: const Icon(
                             Icons.person_outline_rounded,
-                            color: AppColors.textOnDarkSecondary,
                             size: 20,
                           ),
                         ),
@@ -263,7 +287,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           autofillHints: const [AutofillHints.email],
                           prefixIcon: const Icon(
                             Icons.mail_outline_rounded,
-                            color: AppColors.textOnDarkSecondary,
                             size: 20,
                           ),
                         ),
@@ -280,7 +303,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           autofillHints: const [AutofillHints.newPassword],
                           prefixIcon: const Icon(
                             Icons.lock_outline_rounded,
-                            color: AppColors.textOnDarkSecondary,
                             size: 20,
                           ),
                         ),
@@ -297,7 +319,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           autofillHints: const [AutofillHints.newPassword],
                           prefixIcon: const Icon(
                             Icons.shield_outlined,
-                            color: AppColors.textOnDarkSecondary,
                             size: 20,
                           ),
                         ),
@@ -322,7 +343,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           children: [
                             Expanded(
                               child: Divider(
-                                color: Colors.white.withValues(alpha: 0.10),
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.10)
+                                    : AppColors.borderLight,
                                 thickness: 1,
                               ),
                             ),
@@ -332,7 +355,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                               child: Text(
                                 'or continue with',
                                 style: GoogleFonts.inter(
-                                  color: AppColors.textOnDarkSecondary,
+                                  color: isDark
+                                      ? AppColors.textOnDarkSecondary
+                                      : AppColors.textOnLightSecondary,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w400,
                                 ),
@@ -340,7 +365,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             ),
                             Expanded(
                               child: Divider(
-                                color: Colors.white.withValues(alpha: 0.12),
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.12)
+                                    : AppColors.borderLight,
                                 thickness: 1,
                               ),
                             ),
@@ -367,7 +394,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             Text(
                               l10n.loginHaveAccount,
                               style: GoogleFonts.inter(
-                                color: AppColors.textOnDarkSecondary,
+                                color: isDark
+                                    ? AppColors.textOnDarkSecondary
+                                    : AppColors.textOnLightSecondary,
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w400,
                               ),
@@ -377,7 +406,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                               child: Text(
                                 l10n.actionSignIn,
                                 style: GoogleFonts.inter(
-                                  color: AppColors.teal,
+                                  color: isDark
+                                      ? AppColors.teal
+                                      : AppColors.navyBg,
                                   fontSize: 14.5,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -414,6 +445,7 @@ class _SocialAuthCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -422,12 +454,23 @@ class _SocialAuthCard extends StatelessWidget {
         child: Container(
           height: 52,
           decoration: BoxDecoration(
-            color: AppColors.navyCard,
+            color: isDark ? AppColors.navyCard : AppColors.lightCard,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : AppColors.borderLight,
               width: 1.2,
             ),
+            boxShadow: isDark
+                ? null
+                : [
+                    const BoxShadow(
+                      color: AppColors.lightCardShadow,
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -441,7 +484,7 @@ class _SocialAuthCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textOnLight,
                     fontSize: 14.5,
                     fontWeight: FontWeight.w600,
                   ),

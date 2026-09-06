@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/config/api_config.dart';
 import '../core/constants/app_constants.dart';
+import '../core/network/auth_interceptor.dart';
 import '../data/repositories/api_assistant_repository.dart';
 import '../data/repositories/mock_assistant_repository.dart';
 import '../domain/entities/assistant_api_models.dart';
@@ -15,6 +16,7 @@ import '../domain/entities/finance_category.dart';
 import '../domain/entities/goal.dart';
 import '../domain/repositories/assistant_repository.dart';
 import '../domain/services/finance_calculations.dart';
+import '../features/auth/auth_controller.dart';
 import 'economic_providers.dart';
 import 'finance_providers.dart';
 import 'profile_providers.dart';
@@ -23,7 +25,7 @@ import 'repository_providers.dart';
 /// Single shared Dio instance for the backend connection — never a new
 /// client per request.
 final apiDioProvider = Provider<Dio>((ref) {
-  return Dio(
+  final dio = Dio(
     BaseOptions(
       baseUrl: ApiConfig.baseUrl,
       // The multi-agent pipeline (with LLM fallbacks) can take a while;
@@ -32,6 +34,11 @@ final apiDioProvider = Provider<Dio>((ref) {
       receiveTimeout: const Duration(seconds: 90),
     ),
   );
+  // Attach the signed-in user's Firebase ID token to every request
+  // (assistant, economy, finance). Signed-out / Firebase-unavailable calls
+  // proceed without the header.
+  dio.interceptors.add(AuthInterceptor());
+  return dio;
 });
 
 /// Answers through the real backend by default; `--dart-define=ASSISTANT_MODE=demo`
@@ -186,11 +193,27 @@ class AssistantChatController extends Notifier<AssistantChatState> {
   /// Language used for the most recent ask — retries reuse it.
   String _lastLanguage = 'en';
 
+  /// Per-user chat storage key — mirrors the finance ledger's per-user cache
+  /// scoping so switching accounts never shows another user's conversation.
+  /// Signed-out and pure-local guests share a single `guest` bucket.
+  String get _chatKey {
+    final uid = ref.read(authControllerProvider)?.id.trim() ?? '';
+    final bucket = (uid.isEmpty || uid.startsWith('guest')) ? 'guest' : uid;
+    return '${AppConstants.prefChatHistory}_$bucket';
+  }
+
   @override
   AssistantChatState build() {
+    // Rebuild — and reload the per-user conversation — only when the signed-in
+    // uid changes (not on unrelated profile edits).
+    ref.watch(authControllerProvider.select((user) => user?.id));
+    return _loadFromPrefs();
+  }
+
+  AssistantChatState _loadFromPrefs() {
     final prefs = _prefs;
     if (prefs == null) return const AssistantChatState();
-    final jsonStr = prefs.getString(AppConstants.prefChatHistory);
+    final jsonStr = prefs.getString(_chatKey);
     if (jsonStr == null || jsonStr.trim().isEmpty) {
       return const AssistantChatState();
     }
@@ -214,7 +237,7 @@ class AssistantChatController extends Notifier<AssistantChatState> {
     if (prefs == null) return;
     try {
       final list = state.messages.map((m) => m.toJson()).toList();
-      await prefs.setString(AppConstants.prefChatHistory, jsonEncode(list));
+      await prefs.setString(_chatKey, jsonEncode(list));
     } catch (_) {}
   }
 
@@ -263,7 +286,7 @@ class AssistantChatController extends Notifier<AssistantChatState> {
   /// Clears the conversation.
   void clear() {
     state = const AssistantChatState();
-    _prefs?.remove(AppConstants.prefChatHistory);
+    _prefs?.remove(_chatKey);
   }
 
   Future<void> _ask(String question, String language) async {

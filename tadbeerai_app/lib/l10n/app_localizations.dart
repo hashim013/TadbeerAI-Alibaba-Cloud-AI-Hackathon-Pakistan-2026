@@ -726,13 +726,13 @@ abstract class AppLocalizations {
   /// No description provided for @resetDemoData.
   ///
   /// In en, this message translates to:
-  /// **'Reset demo data'**
+  /// **'Clear all data'**
   String get resetDemoData;
 
   /// No description provided for @resetDemoDataDone.
   ///
   /// In en, this message translates to:
-  /// **'Demo data restored.'**
+  /// **'All data cleared.'**
   String get resetDemoDataDone;
 
   /// No description provided for @incomeVsExpenses.

@@ -52,6 +52,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   int _resendSeconds = 30;
   Timer? _resendTimer;
 
+  /// Convenience accessor for brightness checks across all builder methods.
+  bool get isDark => Theme.of(context).brightness == Brightness.dark;
+
   @override
   void initState() {
     super.initState();
@@ -163,9 +166,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         SnackBar(
           content: Text(
             '${context.l10n.codeSentTo} $email',
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(
+              color: isDark ? Colors.white : AppColors.lightCard,
+            ),
           ),
-          backgroundColor: AppColors.navyCard,
+          backgroundColor: isDark ? AppColors.navyCard : AppColors.textOnLight,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -215,6 +220,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -222,13 +229,16 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         _handleBack();
       },
       child: Scaffold(
-        backgroundColor: AppColors.navyBg,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle.light.copyWith(
+          value:
+              (isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)
+                  .copyWith(
             statusBarColor: Colors.transparent,
             systemNavigationBarColor: Colors.transparent,
             systemNavigationBarDividerColor: Colors.transparent,
-            systemNavigationBarIconBrightness: Brightness.light,
+            systemNavigationBarIconBrightness:
+                isDark ? Brightness.light : Brightness.dark,
           ),
           child: Stack(
             fit: StackFit.expand,
@@ -237,14 +247,16 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: const Alignment(0, -0.45),
-                      radius: 1.1,
-                      colors: [
-                        const Color(0xFF061A2E).withValues(alpha: 0.35),
-                        AppColors.navyBg,
-                      ],
-                    ),
+                    gradient: isDark
+                        ? RadialGradient(
+                            center: const Alignment(0, -0.45),
+                            radius: 1.1,
+                            colors: [
+                              const Color(0xFF061A2E).withValues(alpha: 0.35),
+                              Theme.of(context).scaffoldBackgroundColor,
+                            ],
+                          )
+                        : AppColors.lightThemeGradient,
                   ),
                 ),
               ),
@@ -298,7 +310,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           Text(
             l10n.forgotPasswordTitle,
             style: GoogleFonts.inter(
-              color: Colors.white,
+              color: isDark ? Colors.white : AppColors.textOnLight,
               fontSize: 28,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.2,
@@ -309,7 +321,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           Text(
             l10n.forgotPasswordSubtitle,
             style: GoogleFonts.inter(
-              color: AppColors.textOnDarkSecondary,
+              color: isDark
+                  ? AppColors.textOnDarkSecondary
+                  : AppColors.textOnLightSecondary,
               fontSize: 14.5,
               fontWeight: FontWeight.w400,
               height: 1.4,
@@ -335,7 +349,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             autofillHints: const [AutofillHints.email],
             prefixIcon: const Icon(
               Icons.mail_outline_rounded,
-              color: AppColors.textOnDarkSecondary,
               size: 20,
             ),
           ),
@@ -357,7 +370,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: Text(
                 l10n.backToSignIn,
                 style: GoogleFonts.inter(
-                  color: AppColors.teal,
+                  color: isDark ? AppColors.teal : AppColors.navyBg,
                   fontSize: 14.5,
                   fontWeight: FontWeight.w600,
                 ),
@@ -388,7 +401,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           Text(
             l10n.verifyCodeTitle,
             style: GoogleFonts.inter(
-              color: Colors.white,
+              color: isDark ? Colors.white : AppColors.textOnLight,
               fontSize: 28,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.2,
@@ -406,7 +419,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               Text(
                 '${l10n.codeSentTo} $email',
                 style: GoogleFonts.inter(
-                  color: AppColors.textOnDarkSecondary,
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary
+                      : AppColors.textOnLightSecondary,
                   fontSize: 13.5,
                 ),
               ),
@@ -424,7 +439,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   child: Text(
                     'Change',
                     style: GoogleFonts.inter(
-                      color: AppColors.teal,
+                      color: isDark ? AppColors.teal : AppColors.navyBg,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -442,7 +457,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               Text(
                 l10n.fieldVerificationCode,
                 style: GoogleFonts.inter(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : AppColors.textOnLight,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -497,7 +512,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 ? Text(
                     l10n.codeResendIn(_resendSeconds),
                     style: GoogleFonts.inter(
-                      color: AppColors.textOnDarkSecondary,
+                      color: isDark
+                          ? AppColors.textOnDarkSecondary
+                          : AppColors.textOnLightSecondary,
                       fontSize: 13,
                     ),
                   )
@@ -506,7 +523,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     child: Text(
                       l10n.actionResendCode,
                       style: GoogleFonts.inter(
-                        color: AppColors.teal,
+                        color: isDark ? AppColors.teal : AppColors.navyBg,
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
                       ),
@@ -531,7 +548,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             autofillHints: const [AutofillHints.newPassword],
             prefixIcon: const Icon(
               Icons.lock_outline_rounded,
-              color: AppColors.textOnDarkSecondary,
               size: 20,
             ),
           ),
@@ -552,7 +568,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             textInputAction: TextInputAction.done,
             prefixIcon: const Icon(
               Icons.lock_reset_rounded,
-              color: AppColors.textOnDarkSecondary,
               size: 20,
             ),
           ),
@@ -574,6 +589,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   // ── Stage 3: Success View ─────────────────────────────────────────────────
   Widget _buildSuccessStage(BuildContext context) {
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       key: const ValueKey('stage_success'),
@@ -610,7 +626,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         Text(
           l10n.passwordResetSuccessTitle,
           style: GoogleFonts.inter(
-            color: Colors.white,
+            color: isDark ? Colors.white : AppColors.textOnLight,
             fontSize: 26,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.2,
@@ -623,7 +639,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           child: Text(
             l10n.passwordResetSuccessSubtitle,
             style: GoogleFonts.inter(
-              color: AppColors.textOnDarkSecondary,
+              color: isDark
+                  ? AppColors.textOnDarkSecondary
+                  : AppColors.textOnLightSecondary,
               fontSize: 15,
               fontWeight: FontWeight.w400,
               height: 1.45,
@@ -650,6 +668,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   Widget _buildPinBoxesRow() {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         final boxWidth = ((constraints.maxWidth - 40) / 6).clamp(38.0, 52.0);
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -663,14 +682,18 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               width: boxWidth,
               height: 54,
               decoration: BoxDecoration(
-                color: AppColors.navyCard,
+                color: isDark ? AppColors.navyCard : AppColors.lightCard,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: hasFocus
                       ? AppColors.teal
                       : (hasText
-                          ? Colors.white.withValues(alpha: 0.35)
-                          : Colors.white.withValues(alpha: 0.10)),
+                          ? (isDark
+                              ? Colors.white.withValues(alpha: 0.35)
+                              : AppColors.tealDeep)
+                          : (isDark
+                              ? Colors.white.withValues(alpha: 0.10)
+                              : AppColors.borderLight)),
                   width: hasFocus ? 1.8 : 1.2,
                 ),
                 boxShadow: hasFocus
@@ -681,7 +704,15 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           spreadRadius: 0.5,
                         ),
                       ]
-                    : null,
+                    : (isDark
+                        ? null
+                        : [
+                            const BoxShadow(
+                              color: AppColors.lightCardShadow,
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
+                          ]),
               ),
               child: Center(
                 child: KeyboardListener(
@@ -700,7 +731,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.number,
                     style: GoogleFonts.inter(
-                      color: Colors.white,
+                      color: isDark ? Colors.white : AppColors.textOnLight,
                       fontSize: 21,
                       fontWeight: FontWeight.w700,
                     ),
@@ -743,6 +774,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   // ── Top Bar & Branding ────────────────────────────────────────────────────
   Widget _buildTopBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Align(
       alignment: AlignmentDirectional.centerStart,
       child: Material(
@@ -754,15 +786,28 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.06),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.06)
+                  : AppColors.lightCard.withValues(alpha: 0.85),
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.10),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.10)
+                    : AppColors.borderLight,
               ),
+              boxShadow: isDark
+                  ? null
+                  : [
+                      const BoxShadow(
+                        color: AppColors.lightCardShadow,
+                        blurRadius: 4,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.arrow_back_ios_new_rounded,
-              color: Colors.white,
+              color: isDark ? Colors.white : AppColors.textOnLight,
               size: 16,
             ),
           ),

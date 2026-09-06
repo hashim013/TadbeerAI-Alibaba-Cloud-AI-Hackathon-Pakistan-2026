@@ -107,8 +107,8 @@
   "availableBalance": "دستیاب بیلنس",
   "totalIncome": "کل آمدنی",
   "totalExpenses": "کل اخراجات",
-  "resetDemoData": "ڈیمو ڈیٹا ری سیٹ کریں",
-  "resetDemoDataDone": "ڈیمو ڈیٹا بحال ہو گیا۔",
+  "resetDemoData": "تمام ڈیٹا صاف کریں",
+  "resetDemoDataDone": "تمام ڈیٹا صاف ہو گیا۔",
   "incomeVsExpenses": "آمدنی بمقابلہ اخراجات",
 
   "searchTransactions": "لین دین تلاش کریں",

@@ -2,9 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tadbeerai/core/constants/app_constants.dart';
+import 'package:tadbeerai/domain/entities/app_user.dart';
 import 'package:tadbeerai/domain/entities/assistant_api_models.dart';
 import 'package:tadbeerai/domain/entities/assistant_message.dart';
 import 'package:tadbeerai/domain/repositories/assistant_repository.dart';
+import 'package:tadbeerai/features/auth/auth_controller.dart';
 import 'package:tadbeerai/providers/assistant_providers.dart';
 import 'package:tadbeerai/providers/repository_providers.dart';
 
@@ -58,6 +60,18 @@ class _FakeAssistantRepo implements AssistantRepository {
   }
 }
 
+/// A signed-in user makes the per-user chat storage key deterministic. Chat
+/// history is scoped to `{prefChatHistory}_{uid}` so switching accounts never
+/// shows another user's conversation.
+const _uid = 'user-1';
+const _chatKey = '${AppConstants.prefChatHistory}_$_uid';
+
+class _FakeAuthController extends AuthController {
+  @override
+  AppUser? build() =>
+      const AppUser(id: _uid, name: 'Test User', email: 'test@tadbeer.ai');
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -73,6 +87,7 @@ void main() {
         sharedPrefsProvider.overrideWithValue(prefs),
         assistantContextProvider.overrideWithValue(_context),
         assistantRepositoryProvider.overrideWithValue(repo),
+        authControllerProvider.overrideWith(() => _FakeAuthController()),
       ],
     );
     addTearDown(container1.dispose);
@@ -89,11 +104,12 @@ void main() {
     expect(state1.messages.last.reply?.api?.answer,
         'Here is financial advice based on your numbers.');
 
-    // Verify written to SharedPreferences
-    final storedJson = prefs.getString(AppConstants.prefChatHistory);
+    // Verify written to the per-user SharedPreferences key.
+    final storedJson = prefs.getString(_chatKey);
     expect(storedJson, isNotNull);
     expect(storedJson, contains('What is my current runway?'));
-    expect(storedJson, contains('Here is financial advice based on your numbers.'));
+    expect(storedJson,
+        contains('Here is financial advice based on your numbers.'));
 
     // Container 2 (simulating app restart with same SharedPreferences)
     final container2 = ProviderContainer(
@@ -101,6 +117,7 @@ void main() {
         sharedPrefsProvider.overrideWithValue(prefs),
         assistantContextProvider.overrideWithValue(_context),
         assistantRepositoryProvider.overrideWithValue(repo),
+        authControllerProvider.overrideWith(() => _FakeAuthController()),
       ],
     );
     addTearDown(container2.dispose);
@@ -125,19 +142,18 @@ void main() {
         sharedPrefsProvider.overrideWithValue(prefs),
         assistantContextProvider.overrideWithValue(_context),
         assistantRepositoryProvider.overrideWithValue(repo),
+        authControllerProvider.overrideWith(() => _FakeAuthController()),
       ],
     );
     addTearDown(container.dispose);
 
-    await container
-        .read(assistantChatProvider.notifier)
-        .send('Hello Tadbeer');
+    await container.read(assistantChatProvider.notifier).send('Hello Tadbeer');
 
-    expect(prefs.getString(AppConstants.prefChatHistory), isNotNull);
+    expect(prefs.getString(_chatKey), isNotNull);
 
     container.read(assistantChatProvider.notifier).clear();
 
     expect(container.read(assistantChatProvider).messages, isEmpty);
-    expect(prefs.getString(AppConstants.prefChatHistory), isNull);
+    expect(prefs.getString(_chatKey), isNull);
   });
 }

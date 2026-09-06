@@ -355,10 +355,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get totalExpenses => 'Total expenses';
 
   @override
-  String get resetDemoData => 'Reset demo data';
+  String get resetDemoData => 'Clear all data';
 
   @override
-  String get resetDemoDataDone => 'Demo data restored.';
+  String get resetDemoDataDone => 'All data cleared.';
 
   @override
   String get incomeVsExpenses => 'Income vs expenses';

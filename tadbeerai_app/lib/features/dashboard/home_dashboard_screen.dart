@@ -39,21 +39,30 @@ class HomeDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(financeControllerProvider);
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: AppColors.navyBg,
-      body: SafeArea(
-        child: asyncData.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.teal),
-          ),
-          error: (error, _) => Center(
-            child: Text(
-              l10n.errorTitle,
-              style: GoogleFonts.inter(color: Colors.white),
+      backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.navyBg : null,
+          gradient: isDark ? null : AppColors.lightThemeGradient,
+        ),
+        child: SafeArea(
+          child: asyncData.when(
+            loading: () => const Center(
+              child: CircularProgressIndicator(color: AppColors.teal),
             ),
+            error: (error, _) => Center(
+              child: Text(
+                l10n.errorTitle,
+                style: GoogleFonts.inter(
+                  color: isDark ? Colors.white : AppColors.textOnLight,
+                ),
+              ),
+            ),
+            data: (data) => _DashboardContent(data: data),
           ),
-          data: (data) => _DashboardContent(data: data),
         ),
       ),
     );
@@ -73,6 +82,7 @@ class _DashboardContent extends ConsumerWidget {
     final insight = ref.watch(financeInsightProvider);
     final user = ref.watch(authControllerProvider);
     final profileAsync = ref.watch(financialProfileControllerProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final income = FinanceCalculations.monthlyIncome(data.transactions, now);
     final expenses =
@@ -94,7 +104,7 @@ class _DashboardContent extends ConsumerWidget {
                   Text(
                     _greeting(l10n, user?.name, now.hour),
                     style: GoogleFonts.inter(
-                      color: Colors.white,
+                      color: isDark ? Colors.white : AppColors.textOnLight,
                       fontSize: 25,
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.3,
@@ -104,7 +114,9 @@ class _DashboardContent extends ConsumerWidget {
                   Text(
                     "Here's your financial overview",
                     style: GoogleFonts.inter(
-                      color: AppColors.textOnDarkSecondary,
+                      color: isDark
+                          ? AppColors.textOnDarkSecondary
+                          : AppColors.textOnLightSecondary,
                       fontSize: 14.5,
                       fontWeight: FontWeight.w400,
                     ),
@@ -131,15 +143,26 @@ class _DashboardContent extends ConsumerWidget {
                   width: 42,
                   height: 42,
                   decoration: BoxDecoration(
-                    color: AppColors.navyCard,
+                    color: isDark ? AppColors.navyCard : AppColors.lightCard,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.08),
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : AppColors.borderLight,
                     ),
+                    boxShadow: isDark
+                        ? null
+                        : [
+                            const BoxShadow(
+                              color: AppColors.lightCardShadow,
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.notifications_none_rounded,
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textOnLight,
                     size: 22,
                   ),
                 ),
@@ -156,12 +179,21 @@ class _DashboardContent extends ConsumerWidget {
                   width: 42,
                   height: 42,
                   decoration: BoxDecoration(
-                    color: AppColors.navyCard,
+                    color: isDark ? AppColors.navyCard : AppColors.lightCard,
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: AppColors.teal.withValues(alpha: 0.4),
                       width: 1.5,
                     ),
+                    boxShadow: isDark
+                        ? null
+                        : [
+                            const BoxShadow(
+                              color: AppColors.lightCardShadow,
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                   ),
                   child: Center(
                     child: Text(
@@ -169,7 +201,7 @@ class _DashboardContent extends ConsumerWidget {
                           ? user!.name.trim()[0].toUpperCase()
                           : 'U',
                       style: GoogleFonts.inter(
-                        color: AppColors.teal,
+                        color: isDark ? AppColors.teal : AppColors.tealDeep,
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -307,6 +339,7 @@ class _HealthCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final score = health?.score ?? 72;
     final rating = health?.rating ?? HealthRating.good;
     final ratingLabel = switch (rating) {
@@ -325,7 +358,7 @@ class _HealthCard extends StatelessWidget {
           Text(
             l10n.financialHealthTitle,
             style: GoogleFonts.inter(
-              color: Colors.white,
+              color: isDark ? Colors.white : AppColors.textOnLight,
               fontSize: 15,
               fontWeight: FontWeight.w600,
             ),
@@ -341,7 +374,7 @@ class _HealthCard extends StatelessWidget {
                     text: TextSpan(
                       text: '$score',
                       style: GoogleFonts.inter(
-                        color: Colors.white,
+                        color: isDark ? Colors.white : AppColors.textOnLight,
                         fontSize: 38,
                         fontWeight: FontWeight.w800,
                       ),
@@ -349,7 +382,9 @@ class _HealthCard extends StatelessWidget {
                         TextSpan(
                           text: ' /100',
                           style: GoogleFonts.inter(
-                            color: AppColors.textOnDarkSecondary,
+                            color: isDark
+                                ? AppColors.textOnDarkSecondary
+                                : AppColors.textOnLightSecondary,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
@@ -372,7 +407,9 @@ class _HealthCard extends StatelessWidget {
                     child: Text(
                       ratingLabel,
                       style: GoogleFonts.inter(
-                        color: const Color(0xFF34D399),
+                        color: isDark
+                            ? const Color(0xFF34D399)
+                            : AppColors.tealDeep,
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                       ),
@@ -402,19 +439,21 @@ class ScoreCircularGauge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       width: size,
       height: size,
       child: CustomPaint(
         painter: _ScoreGaugePainter(
           score: score.clamp(0, 100),
-          trackColor: const Color(0xFF162B4D),
+          trackColor:
+              isDark ? const Color(0xFF162B4D) : const Color(0xFFE2E8F0),
         ),
         child: Center(
           child: Text(
             '$score',
             style: GoogleFonts.inter(
-              color: Colors.white,
+              color: isDark ? Colors.white : AppColors.textOnLight,
               fontSize: 20,
               fontWeight: FontWeight.w700,
             ),
@@ -483,6 +522,7 @@ class _EconomicPulseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     const usdPkr = 277.75;
     const policyRate = 11.50;
 
@@ -501,7 +541,7 @@ class _EconomicPulseCard extends StatelessWidget {
                   Text(
                     'Pakistan Economic Pulse',
                     style: GoogleFonts.inter(
-                      color: Colors.white,
+                      color: isDark ? Colors.white : AppColors.textOnLight,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
@@ -510,7 +550,9 @@ class _EconomicPulseCard extends StatelessWidget {
                   Text(
                     'Updated: Today, 10:30 AM',
                     style: GoogleFonts.inter(
-                      color: AppColors.textOnDarkSecondary,
+                      color: isDark
+                          ? AppColors.textOnDarkSecondary
+                          : AppColors.textOnLightSecondary,
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
                     ),
@@ -581,13 +623,16 @@ class _IndicatorRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
         Expanded(
           child: Text(
             label,
             style: GoogleFonts.inter(
-              color: AppColors.textOnDarkSecondary,
+              color: isDark
+                  ? AppColors.textOnDarkSecondary
+                  : AppColors.textOnLightSecondary,
               fontSize: 14.5,
               fontWeight: FontWeight.w500,
             ),
@@ -596,7 +641,7 @@ class _IndicatorRow extends StatelessWidget {
         Text(
           value,
           style: GoogleFonts.inter(
-            color: Colors.white,
+            color: isDark ? Colors.white : AppColors.textOnLight,
             fontSize: 15,
             fontWeight: FontWeight.w700,
           ),
@@ -622,6 +667,7 @@ class _TodayInsightCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final text = insight != null
         ? switch (insight!.type) {
             InsightType.positive =>
@@ -644,7 +690,7 @@ class _TodayInsightCard extends StatelessWidget {
           Text(
             "Today's Insight",
             style: GoogleFonts.inter(
-              color: Colors.white,
+              color: isDark ? Colors.white : AppColors.textOnLight,
               fontSize: 15,
               fontWeight: FontWeight.w600,
             ),
@@ -657,7 +703,9 @@ class _TodayInsightCard extends StatelessWidget {
                 child: Text(
                   text,
                   style: GoogleFonts.inter(
-                    color: AppColors.textOnDarkSecondary,
+                    color: isDark
+                        ? AppColors.textOnDarkSecondary
+                        : AppColors.textOnLightSecondary,
                     fontSize: 14.5,
                     height: 1.45,
                     fontWeight: FontWeight.w400,

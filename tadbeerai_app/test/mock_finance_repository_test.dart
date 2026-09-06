@@ -1,18 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tadbeerai/core/constants/app_constants.dart';
-import 'package:tadbeerai/data/mock/mock_finance_data.dart';
 import 'package:tadbeerai/data/repositories/mock_finance_repository.dart';
 import 'package:tadbeerai/domain/entities/budget.dart';
 import 'package:tadbeerai/domain/entities/goal.dart';
 import 'package:tadbeerai/domain/entities/transaction.dart';
-import 'package:tadbeerai/domain/services/finance_calculations.dart';
 
-/// Behavioural tests for the mock finance repository: seeding, CRUD and
-/// on-device persistence (every mutation must survive a fresh instance,
-/// which proves the SharedPreferences round-trip through JSON).
+/// Behavioural tests for the demo-mode finance repository.
+///
+/// Since the bundled demo seed was dropped (see the Real Finance Backend
+/// Migration plan), a fresh repository now starts from an EMPTY ledger rather
+/// than the 88-transaction demo dataset. Every CRUD mutation must still
+/// survive a fresh instance, which proves the SharedPreferences JSON
+/// round-trip; `resetDemoData` now CLEARS instead of re-seeding.
 void main() {
-  // A fixed "today" keeps the relative demo dataset deterministic.
   final now = DateTime(2026, 3, 15);
 
   late SharedPreferences prefs;
@@ -21,61 +22,26 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
-    repository = MockFinanceRepository(prefs, now: () => now);
+    repository = MockFinanceRepository(prefs);
   });
 
   /// A brand-new repository over the same storage — simulates an app restart.
-  MockFinanceRepository freshRepository() =>
-      MockFinanceRepository(prefs, now: () => now);
+  MockFinanceRepository freshRepository() => MockFinanceRepository(prefs);
 
-  group('seeding', () {
-    test('first launch seeds the full demo dataset', () async {
+  group('empty start', () {
+    test('first launch starts from an empty ledger (no demo seed)', () async {
       final data = await repository.getFinanceData();
 
-      expect(data.transactions, hasLength(88)); // 4 months x 22 entries
-      expect(data.budgets, hasLength(9));
-      expect(data.goals, hasLength(4));
-      expect(data.openingSavingsBalance, MockFinanceData.openingSavingsBalance);
+      expect(data.transactions, isEmpty);
+      expect(data.budgets, isEmpty);
+      expect(data.goals, isEmpty);
+      expect(data.openingSavingsBalance, 0);
     });
 
-    test('current-month totals are exactly 80k income / 65k expenses',
-        () async {
-      final data = await repository.getFinanceData();
+    test('the empty ledger is persisted to storage', () async {
+      await repository.getFinanceData();
 
-      expect(
-        FinanceCalculations.monthlyIncome(data.transactions, now),
-        80000,
-      );
-      expect(
-        FinanceCalculations.monthlyExpenses(data.transactions, now),
-        65000,
-      );
-      expect(
-        FinanceCalculations.monthlyIncome(data.transactions, now) -
-            FinanceCalculations.monthlyExpenses(data.transactions, now),
-        15000,
-      );
-    });
-
-    test('exactly two seeded categories are over budget', () async {
-      final data = await repository.getFinanceData();
-      final spent = FinanceCalculations.spentByCategory(data.transactions, now);
-
-      final over = data.budgets
-          .where((b) => (spent[b.category] ?? 0) > b.monthlyLimit)
-          .map((b) => b.category)
-          .toSet();
-
-      expect(over, {'transport', 'shopping'});
-    });
-
-    test('the seed never contains future transactions', () async {
-      final data = await repository.getFinanceData();
-
-      for (final t in data.transactions) {
-        expect(t.date.isAfter(now), isFalse,
-            reason: '"${t.title}" is dated ${t.date}');
-      }
+      expect(prefs.getString(AppConstants.prefFinanceData), isNotNull);
     });
   });
 
@@ -94,27 +60,21 @@ void main() {
 
       final reloaded = await freshRepository().getFinanceData();
 
-      expect(reloaded.transactions, hasLength(89));
-      expect(reloaded.transactions.any((t) => t.id == 'tx-extra'), isTrue);
-      expect(
-        FinanceCalculations.monthlyExpenses(reloaded.transactions, now),
-        65550,
-      );
+      expect(reloaded.transactions, hasLength(1));
+      expect(reloaded.transactions.single.id, 'tx-extra');
+      expect(reloaded.transactions.single.amount, 550);
     });
 
     test('an updated transaction replaces the stored version', () async {
       await repository.addTransaction(coffee(550));
-      await repository.updateTransaction(coffee(1050).copyWith(
-        title: 'Coffee & cake',
-      ));
+      await repository
+          .updateTransaction(coffee(1050).copyWith(title: 'Coffee & cake'));
 
       final reloaded = await freshRepository().getFinanceData();
-      final updated =
-          reloaded.transactions.firstWhere((t) => t.id == 'tx-extra');
 
-      expect(reloaded.transactions, hasLength(89));
-      expect(updated.amount, 1050);
-      expect(updated.title, 'Coffee & cake');
+      expect(reloaded.transactions, hasLength(1));
+      expect(reloaded.transactions.single.amount, 1050);
+      expect(reloaded.transactions.single.title, 'Coffee & cake');
     });
 
     test('a deleted transaction disappears from storage', () async {
@@ -123,8 +83,7 @@ void main() {
 
       final reloaded = await freshRepository().getFinanceData();
 
-      expect(reloaded.transactions, hasLength(88));
-      expect(reloaded.transactions.any((t) => t.id == 'tx-extra'), isFalse);
+      expect(reloaded.transactions, isEmpty);
     });
   });
 
@@ -133,36 +92,32 @@ void main() {
       await repository.upsertBudget(const Budget(
         id: 'budget-shopping',
         category: 'shopping',
+        monthlyLimit: 3000,
+      ));
+      await repository.upsertBudget(const Budget(
+        id: 'budget-shopping-v2',
+        category: 'shopping',
         monthlyLimit: 4000,
       ));
 
       final reloaded = await freshRepository().getFinanceData();
 
-      expect(reloaded.budgets, hasLength(9));
-      final shopping =
-          reloaded.budgets.firstWhere((b) => b.category == 'shopping');
-      expect(shopping.monthlyLimit, 4000);
-
-      // Raising the limit leaves only transport over budget.
-      final spent =
-          FinanceCalculations.spentByCategory(reloaded.transactions, now);
-      final over = reloaded.budgets
-          .where((b) => (spent[b.category] ?? 0) > b.monthlyLimit)
-          .map((b) => b.category)
-          .toSet();
-      expect(over, {'transport'});
+      expect(reloaded.budgets, hasLength(1));
+      expect(reloaded.budgets.single.category, 'shopping');
+      expect(reloaded.budgets.single.monthlyLimit, 4000);
     });
 
     test('a budget can be deleted', () async {
-      await repository.deleteBudget('budget-education');
+      await repository.upsertBudget(const Budget(
+        id: 'budget-food',
+        category: 'food',
+        monthlyLimit: 5000,
+      ));
+      await repository.deleteBudget('budget-food');
 
       final reloaded = await freshRepository().getFinanceData();
 
-      expect(reloaded.budgets, hasLength(8));
-      expect(
-        reloaded.budgets.any((b) => b.id == 'budget-education'),
-        isFalse,
-      );
+      expect(reloaded.budgets, isEmpty);
     });
   });
 
@@ -177,7 +132,7 @@ void main() {
       ));
 
       var reloaded = await freshRepository().getFinanceData();
-      expect(reloaded.goals, hasLength(5));
+      expect(reloaded.goals, hasLength(1));
 
       await repository.updateGoal(Goal(
         id: 'goal-test',
@@ -188,20 +143,17 @@ void main() {
       ));
 
       reloaded = await freshRepository().getFinanceData();
-      expect(
-        reloaded.goals.firstWhere((g) => g.id == 'goal-test').savedAmount,
-        10000,
-      );
+      expect(reloaded.goals.single.savedAmount, 10000);
 
       await repository.deleteGoal('goal-test');
 
       reloaded = await freshRepository().getFinanceData();
-      expect(reloaded.goals, hasLength(4));
+      expect(reloaded.goals, isEmpty);
     });
   });
 
   group('reset and recovery', () {
-    test('resetDemoData restores the pristine seed after mutations', () async {
+    test('resetDemoData clears the ledger to empty after mutations', () async {
       await repository.addTransaction(Transaction(
         id: 'tx-extra',
         title: 'Coffee',
@@ -210,25 +162,37 @@ void main() {
         category: 'dining',
         date: now,
       ));
-      await repository.deleteBudget('budget-education');
-      await repository.deleteGoal('goal-travel');
+      await repository.upsertBudget(const Budget(
+        id: 'budget-food',
+        category: 'food',
+        monthlyLimit: 5000,
+      ));
+      await repository.addGoal(Goal(
+        id: 'goal-test',
+        title: 'Bicycle',
+        targetAmount: 50000,
+        savedAmount: 0,
+        targetDate: DateTime(2026, 12, 31),
+      ));
 
       await repository.resetDemoData();
 
       final reloaded = await freshRepository().getFinanceData();
-      expect(reloaded.transactions, hasLength(88));
-      expect(reloaded.budgets, hasLength(9));
-      expect(reloaded.goals, hasLength(4));
+      expect(reloaded.transactions, isEmpty);
+      expect(reloaded.budgets, isEmpty);
+      expect(reloaded.goals, isEmpty);
+      expect(reloaded.openingSavingsBalance, 0);
     });
 
-    test('corrupt persisted JSON falls back to reseeding', () async {
+    test('corrupt persisted JSON falls back to an empty ledger', () async {
       await repository.getFinanceData(); // seed and persist
       await prefs.setString(AppConstants.prefFinanceData, '{ not json');
 
       final reloaded = await freshRepository().getFinanceData();
 
-      expect(reloaded.transactions, hasLength(88));
-      expect(reloaded.budgets, hasLength(9));
+      expect(reloaded.transactions, isEmpty);
+      expect(reloaded.budgets, isEmpty);
+      expect(reloaded.goals, isEmpty);
     });
   });
 }

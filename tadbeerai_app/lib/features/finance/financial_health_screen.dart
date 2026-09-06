@@ -27,159 +27,190 @@ class FinancialHealthScreen extends ConsumerWidget {
     final health = ref.watch(financialHealthProvider);
     final l10n = context.l10n;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.navyBg,
+      backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
       appBar: AppBar(
-        backgroundColor: AppColors.navyBg,
+        backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back_rounded,
+            color: isDark ? Colors.white : AppColors.textOnLight,
+          ),
           onPressed: () => context.pop(),
         ),
         title: Text(
           l10n.financialHealthTitle,
           style: GoogleFonts.inter(
-            color: Colors.white,
+            color: isDark ? Colors.white : AppColors.textOnLight,
             fontSize: 19,
             fontWeight: FontWeight.w700,
           ),
         ),
       ),
-      body: asyncData.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.teal),
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.navyBg : null,
+          gradient: isDark ? null : AppColors.lightThemeGradient,
         ),
-        error: (error, _) => Center(
-          child: Text(
-            l10n.errorTitle,
-            style: GoogleFonts.inter(color: Colors.white),
+        child: asyncData.when(
+          loading: () => const Center(
+            child: CircularProgressIndicator(color: AppColors.teal),
           ),
-        ),
-        data: (data) {
-          if (health == null) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.teal),
-            );
-          }
-
-          // Order components consistently matching the reference mockup:
-          // 1. Savings, 2. Spending, 3. Emergency Fund, 4. Budget/Awareness, 5. Goals
-          const order = ['savings', 'spending', 'emergency', 'budget', 'goals'];
-          final sortedComponents = [...health.components]..sort((a, b) {
-              final indexA = order.indexOf(a.key);
-              final indexB = order.indexOf(b.key);
-              return (indexA == -1 ? 99 : indexA)
-                  .compareTo(indexB == -1 ? 99 : indexB);
-            });
-
-          return Column(
-            children: [
-              Expanded(
-                child: ListView(
-                  physics: const ClampingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
-                  children: [
-                    // ── 1. Hero Score Gauge ────────────────────────────────
-                    Center(
-                      child: HealthScoreGauge(
-                        score: health.score,
-                        ratingLabel: _ratingLabel(l10n, health.score),
-                        size: 196,
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-
-                    // ── 2. Component Breakdown Cards ───────────────────────
-                    ...sortedComponents.map(
-                      (component) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _ComponentCard(component: component),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // ── 3. How It Works Transparency Card ──────────────────
-                    _HowItWorks(
-                      title: l10n.howScoreWorks,
-                      body: l10n.howScoreWorksBody,
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                ),
+          error: (error, _) => Center(
+            child: Text(
+              l10n.errorTitle,
+              style: GoogleFonts.inter(
+                color: isDark ? Colors.white : AppColors.textOnLight,
               ),
+            ),
+          ),
+          data: (data) {
+            if (health == null) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.teal),
+              );
+            }
 
-              // ── 4. Pinned Bottom Action Button ───────────────────────────
-              Container(
-                padding: EdgeInsets.fromLTRB(
-                  20,
-                  12,
-                  20,
-                  math.max(MediaQuery.of(context).padding.bottom, 16),
+            // Order components consistently matching the reference mockup:
+            // 1. Savings, 2. Spending, 3. Emergency Fund, 4. Budget/Awareness, 5. Goals
+            const order = [
+              'savings',
+              'spending',
+              'emergency',
+              'budget',
+              'goals'
+            ];
+            final sortedComponents = [...health.components]..sort((a, b) {
+                final indexA = order.indexOf(a.key);
+                final indexB = order.indexOf(b.key);
+                return (indexA == -1 ? 99 : indexA)
+                    .compareTo(indexB == -1 ? 99 : indexB);
+              });
+
+            return Column(
+              children: [
+                Expanded(
+                  child: ListView(
+                    physics: const ClampingScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+                    children: [
+                      // ── 1. Hero Score Gauge ────────────────────────────────
+                      Center(
+                        child: HealthScoreGauge(
+                          score: health.score,
+                          ratingLabel: _ratingLabel(l10n, health.score),
+                          size: 196,
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+
+                      // ── 2. Component Breakdown Cards ───────────────────────
+                      ...sortedComponents.map(
+                        (component) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _ComponentCard(component: component),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // ── 3. How It Works Transparency Card ──────────────────
+                      _HowItWorks(
+                        title: l10n.howScoreWorks,
+                        body: l10n.howScoreWorksBody,
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  color: AppColors.navyBg,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.navyBg.withValues(alpha: 0.9),
-                      blurRadius: 16,
-                      offset: const Offset(0, -6),
-                    ),
-                  ],
-                ),
-                child: Container(
-                  height: 54,
+
+                // ── 4. Pinned Bottom Action Button ───────────────────────────
+                Container(
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    12,
+                    20,
+                    math.max(MediaQuery.of(context).padding.bottom, 16),
+                  ),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF2DD4BF), Color(0xFF10B981)],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    borderRadius: BorderRadius.circular(27),
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.35),
+                        color: Theme.of(context)
+                            .scaffoldBackgroundColor
+                            .withValues(alpha: 0.9),
                         blurRadius: 16,
-                        offset: const Offset(0, 4),
+                        offset: const Offset(0, -6),
                       ),
                     ],
                   ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
+                  child: Container(
+                    height: 54,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: isDark
+                            ? const [
+                                Color(0xFF2DD4BF),
+                                Color(0xFF10B981),
+                              ]
+                            : const [
+                                Color(0xFF010717),
+                                Color(0xFF0D1C34),
+                              ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
                       borderRadius: BorderRadius.circular(27),
-                      onTap: () {
-                        context.push('/ask');
-                      },
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Improve My Score',
-                              style: GoogleFonts.inter(
-                                color: Colors.white,
-                                fontSize: 16.5,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.2,
+                      boxShadow: [
+                        BoxShadow(
+                          color: isDark
+                              ? const Color(0xFF10B981).withValues(alpha: 0.35)
+                              : AppColors.navyBg.withValues(alpha: 0.35),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(27),
+                        onTap: () {
+                          context.push('/ask');
+                        },
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Improve My Score',
+                                style: GoogleFonts.inter(
+                                  color: Colors.white,
+                                  fontSize: 16.5,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.2,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(
-                              Icons.arrow_forward_rounded,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ],
+                              const SizedBox(width: 8),
+                              const Icon(
+                                Icons.arrow_forward_rounded,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -208,13 +239,15 @@ class HealthScoreGauge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       width: size,
       height: size,
       child: CustomPaint(
         painter: _HealthGaugePainter(
           score: score.clamp(0, 100),
-          trackColor: const Color(0xFF0F263B),
+          trackColor:
+              isDark ? const Color(0xFF0F263B) : const Color(0xFFE2E8F0),
         ),
         child: Center(
           child: Column(
@@ -224,7 +257,7 @@ class HealthScoreGauge extends StatelessWidget {
                 text: TextSpan(
                   text: '$score',
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textOnLight,
                     fontSize: 48,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -1,
@@ -233,7 +266,9 @@ class HealthScoreGauge extends StatelessWidget {
                     TextSpan(
                       text: ' /100',
                       style: GoogleFonts.inter(
-                        color: AppColors.textOnDarkSecondary,
+                        color: isDark
+                            ? AppColors.textOnDarkSecondary
+                            : AppColors.textOnLightSecondary,
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
                       ),
@@ -245,7 +280,7 @@ class HealthScoreGauge extends StatelessWidget {
               Text(
                 ratingLabel,
                 style: GoogleFonts.inter(
-                  color: const Color(0xFF34D399),
+                  color: isDark ? const Color(0xFF34D399) : AppColors.tealDeep,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
@@ -325,18 +360,30 @@ class _ComponentCardState extends State<_ComponentCard> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final component = widget.component;
     final config = _getConfig(component.key, component.score);
     final (ratingText, ratingColor) = _ratingInfo(component.score);
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.navyCard,
+        color: isDark ? AppColors.navyCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : AppColors.borderLight,
           width: 1.2,
         ),
+        boxShadow: isDark
+            ? null
+            : [
+                const BoxShadow(
+                  color: AppColors.lightCardShadow,
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
+                ),
+              ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -374,7 +421,8 @@ class _ComponentCardState extends State<_ComponentCard> {
                           Text(
                             config.title,
                             style: GoogleFonts.inter(
-                              color: Colors.white,
+                              color:
+                                  isDark ? Colors.white : AppColors.textOnLight,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -383,7 +431,9 @@ class _ComponentCardState extends State<_ComponentCard> {
                           Text(
                             config.subtitle,
                             style: GoogleFonts.inter(
-                              color: AppColors.textOnDarkSecondary,
+                              color: isDark
+                                  ? AppColors.textOnDarkSecondary
+                                  : AppColors.textOnLightSecondary,
                               fontSize: 13,
                               fontWeight: FontWeight.w400,
                             ),
@@ -407,7 +457,7 @@ class _ComponentCardState extends State<_ComponentCard> {
                     Text(
                       '${component.score}/100',
                       style: GoogleFonts.inter(
-                        color: Colors.white,
+                        color: isDark ? Colors.white : AppColors.textOnLight,
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                       ),
@@ -431,7 +481,9 @@ class _ComponentCardState extends State<_ComponentCard> {
                         child: Text(
                           _componentDetail(l10n, component),
                           style: GoogleFonts.inter(
-                            color: AppColors.textOnDarkSecondary,
+                            color: isDark
+                                ? AppColors.textOnDarkSecondary
+                                : AppColors.textOnLightSecondary,
                             fontSize: 13,
                             height: 1.35,
                           ),
@@ -442,7 +494,10 @@ class _ComponentCardState extends State<_ComponentCard> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.08),
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : AppColors.lightSurfaceVariant
+                                  .withValues(alpha: 0.45),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -450,7 +505,8 @@ class _ComponentCardState extends State<_ComponentCard> {
                             ((component.weight * 100).round()).toString(),
                           ),
                           style: GoogleFonts.inter(
-                            color: Colors.white,
+                            color:
+                                isDark ? Colors.white : AppColors.textOnLight,
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                           ),
@@ -543,13 +599,16 @@ class _HowItWorks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.navyCard,
+        color: isDark ? AppColors.navyCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : AppColors.borderLight,
           width: 1.2,
         ),
       ),
@@ -561,14 +620,14 @@ class _HowItWorks extends StatelessWidget {
               const Icon(
                 Icons.info_outline_rounded,
                 size: 18,
-                color: AppColors.teal,
+                color: AppColors.tealDeep,
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   title,
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textOnLight,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
@@ -580,7 +639,9 @@ class _HowItWorks extends StatelessWidget {
           Text(
             body,
             style: GoogleFonts.inter(
-              color: AppColors.textOnDarkSecondary,
+              color: isDark
+                  ? AppColors.textOnDarkSecondary
+                  : AppColors.textOnLightSecondary,
               fontSize: 13,
               height: 1.45,
             ),

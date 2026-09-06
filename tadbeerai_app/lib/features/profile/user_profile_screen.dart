@@ -67,389 +67,416 @@ class UserProfileScreen extends ConsumerWidget {
 
     final personaTitle = _formatPersonaTitle(profile?.persona);
     final isGuest = user?.isGuest ?? true;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: AppColors.navyBg,
-      body: SafeArea(
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            // ── Top Navigation Bar ─────────────────────────────────────────
-            SliverToBoxAdapter(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                child: Row(
-                  children: [
-                    _NavBackButton(
-                      onTap: () {
-                        if (context.canPop()) {
-                          context.pop();
-                        } else {
-                          context.go('/home');
-                        }
-                      },
-                    ),
-                    const SizedBox(width: 14),
-                    Text(
-                      'My Profile',
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
+      backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.navyBg : null,
+          gradient: isDark ? null : AppColors.lightThemeGradient,
+        ),
+        child: SafeArea(
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              // ── Top Navigation Bar ─────────────────────────────────────────
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Row(
+                    children: [
+                      _NavBackButton(
+                        onTap: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go('/home');
+                          }
+                        },
                       ),
-                    ),
-                    const Spacer(),
-                    // Quick edit shortcut
-                    IconButton(
-                      icon: const Icon(
-                        Icons.mode_edit_outline_rounded,
-                        color: AppColors.teal,
-                        size: 20,
+                      const SizedBox(width: 14),
+                      Text(
+                        'My Profile',
+                        style: GoogleFonts.inter(
+                          color: isDark ? Colors.white : AppColors.textOnLight,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                        ),
                       ),
-                      tooltip: 'Edit Personal Details',
-                      onPressed: () {
-                        HapticFeedback.lightImpact();
-                        _showPersonalInfoSheet(context, ref, user, profile);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // ── Hero Identity Card ────────────────────────────────────────
-            SliverToBoxAdapter(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.navyCard,
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.08),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.28),
-                        blurRadius: 18,
-                        offset: const Offset(0, 6),
+                      const Spacer(),
+                      // Quick edit shortcut
+                      IconButton(
+                        icon: const Icon(
+                          Icons.mode_edit_outline_rounded,
+                          color: AppColors.teal,
+                          size: 20,
+                        ),
+                        tooltip: 'Edit Personal Details',
+                        onPressed: () {
+                          HapticFeedback.lightImpact();
+                          _showPersonalInfoSheet(context, ref, user, profile);
+                        },
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.all(18),
-                  child: Row(
-                    children: [
-                      // Avatar with gradient border
-                      Container(
-                        width: 68,
-                        height: 68,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            colors: [AppColors.teal, AppColors.emerald],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.teal.withValues(alpha: 0.25),
-                              blurRadius: 10,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.all(2.5),
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.navyElevated,
-                          ),
-                          child: Center(
-                            child: Text(
-                              displayName.isNotEmpty
-                                  ? displayName[0].toUpperCase()
-                                  : 'U',
-                              style: GoogleFonts.inter(
-                                color: Colors.white,
-                                fontSize: 26,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
+                ),
+              ),
 
-                      // User name, persona, and account badge
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              displayName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.inter(
-                                color: Colors.white,
-                                fontSize: 19,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.2,
-                              ),
+              // ── Hero Identity Card ────────────────────────────────────────
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.navyCard : AppColors.lightCard,
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : AppColors.borderLight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: isDark
+                              ? Colors.black.withValues(alpha: 0.28)
+                              : AppColors.lightCardShadow
+                                  .withValues(alpha: 0.8),
+                          blurRadius: 18,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(18),
+                    child: Row(
+                      children: [
+                        // Avatar with gradient border
+                        Container(
+                          width: 68,
+                          height: 68,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const LinearGradient(
+                              colors: [AppColors.teal, AppColors.emerald],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                            const SizedBox(height: 3),
-                            Text(
-                              personaTitle,
-                              style: GoogleFonts.inter(
-                                color: AppColors.textOnDarkSecondary,
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w500,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.teal.withValues(alpha: 0.25),
+                                blurRadius: 10,
+                                offset: const Offset(0, 3),
                               ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(2.5),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isDark
+                                  ? AppColors.navyElevated
+                                  : AppColors.lightSurface,
                             ),
-                            const SizedBox(height: 8),
-                            // Status Pill
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isGuest
-                                    ? const Color(0xFFF59E0B)
-                                        .withValues(alpha: 0.12)
-                                    : AppColors.teal.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: isGuest
-                                      ? const Color(0xFFF59E0B)
-                                          .withValues(alpha: 0.35)
-                                      : AppColors.teal.withValues(alpha: 0.35),
-                                  width: 1,
+                            child: Center(
+                              child: Text(
+                                displayName.isNotEmpty
+                                    ? displayName[0].toUpperCase()
+                                    : 'U',
+                                style: GoogleFonts.inter(
+                                  color: isDark
+                                      ? Colors.white
+                                      : AppColors.textOnLight,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isGuest
-                                        ? Icons.lock_clock_rounded
-                                        : Icons.verified_rounded,
-                                    size: 13,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+
+                        // User name, persona, and account badge
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                displayName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.inter(
+                                  color: isDark
+                                      ? Colors.white
+                                      : AppColors.textOnLight,
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                personaTitle,
+                                style: GoogleFonts.inter(
+                                  color: isDark
+                                      ? AppColors.textOnDarkSecondary
+                                      : AppColors.textOnLightSecondary,
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              // Status Pill
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isGuest
+                                      ? const Color(0xFFF59E0B)
+                                          .withValues(alpha: 0.12)
+                                      : AppColors.teal.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
                                     color: isGuest
                                         ? const Color(0xFFF59E0B)
-                                        : AppColors.teal,
+                                            .withValues(alpha: 0.35)
+                                        : AppColors.teal
+                                            .withValues(alpha: 0.35),
+                                    width: 1,
                                   ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    isGuest
-                                        ? 'Guest Session • Local'
-                                        : 'Verified • Alerts Active',
-                                    style: GoogleFonts.inter(
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      isGuest
+                                          ? Icons.lock_clock_rounded
+                                          : Icons.verified_rounded,
+                                      size: 13,
                                       color: isGuest
                                           ? const Color(0xFFF59E0B)
                                           : AppColors.teal,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.2,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      isGuest
+                                          ? 'Guest Session • Local'
+                                          : 'Verified • Alerts Active',
+                                      style: GoogleFonts.inter(
+                                        color: isGuest
+                                            ? const Color(0xFFF59E0B)
+                                            : AppColors.teal,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              // ── Group 1: Account & Finances ───────────────────────────────
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
+                  child: Text(
+                    'ACCOUNT & FINANCES',
+                    style: GoogleFonts.inter(
+                      color: isDark
+                          ? AppColors.textOnDarkTertiary
+                          : AppColors.textOnLightSecondary,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _MenuGroupCard(
+                    items: [
+                      _ProfileMenuItem(
+                        icon: Icons.person_outline_rounded,
+                        iconBgColor: AppColors.emerald,
+                        title: 'Personal Information',
+                        subtitle: displayEmail,
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          _showPersonalInfoSheet(context, ref, user, profile);
+                        },
+                      ),
+                      _ProfileMenuItem(
+                        icon: Icons.account_balance_wallet_outlined,
+                        iconBgColor: AppColors.teal,
+                        title: 'Financial Information',
+                        subtitle:
+                            '$personaTitle • ${_formatCurrency(profile?.monthlyIncome)}/mo',
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          _showFinancialInfoSheet(context, profile);
+                        },
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
 
-            // ── Group 1: Account & Finances ───────────────────────────────
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
-                child: Text(
-                  'ACCOUNT & FINANCES',
-                  style: GoogleFonts.inter(
-                    color: AppColors.textOnDarkTertiary,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.0,
+              // ── Group 2: Preferences & Settings ───────────────────────────
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
+                  child: Text(
+                    'PREFERENCES & SYSTEM',
+                    style: GoogleFonts.inter(
+                      color: isDark
+                          ? AppColors.textOnDarkTertiary
+                          : AppColors.textOnLightSecondary,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.0,
+                    ),
                   ),
                 ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _MenuGroupCard(
-                  items: [
-                    _ProfileMenuItem(
-                      icon: Icons.person_outline_rounded,
-                      iconBgColor: AppColors.emerald,
-                      title: 'Personal Information',
-                      subtitle: displayEmail,
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        _showPersonalInfoSheet(context, ref, user, profile);
-                      },
-                    ),
-                    _ProfileMenuItem(
-                      icon: Icons.account_balance_wallet_outlined,
-                      iconBgColor: AppColors.teal,
-                      title: 'Financial Information',
-                      subtitle:
-                          '$personaTitle • ${_formatCurrency(profile?.monthlyIncome)}/mo',
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        _showFinancialInfoSheet(context, profile);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // ── Group 2: Preferences & Settings ───────────────────────────
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
-                child: Text(
-                  'PREFERENCES & SYSTEM',
-                  style: GoogleFonts.inter(
-                    color: AppColors.textOnDarkTertiary,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.0,
-                  ),
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _MenuGroupCard(
-                  items: [
-                    _ProfileMenuItem(
-                      icon: Icons.tune_rounded,
-                      iconBgColor: const Color(0xFF06B6D4),
-                      title: 'App Settings',
-                      subtitle: 'Notifications, Alerts & Theme',
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        _showAppSettingsSheet(context, ref);
-                      },
-                    ),
-                    _ProfileMenuItem(
-                      icon: Icons.language_rounded,
-                      iconBgColor: const Color(0xFF3B82F6),
-                      title: 'Language',
-                      subtitle: currentLanguage.displayName,
-                      trailingWidget: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color:
-                              const Color(0xFF3B82F6).withValues(alpha: 0.14),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _MenuGroupCard(
+                    items: [
+                      _ProfileMenuItem(
+                        icon: Icons.tune_rounded,
+                        iconBgColor: const Color(0xFF06B6D4),
+                        title: 'App Settings',
+                        subtitle: 'Notifications, Alerts & Theme',
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          _showAppSettingsSheet(context, ref);
+                        },
+                      ),
+                      _ProfileMenuItem(
+                        icon: Icons.language_rounded,
+                        iconBgColor: const Color(0xFF3B82F6),
+                        title: 'Language',
+                        subtitle: currentLanguage.displayName,
+                        trailingWidget: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
                             color:
-                                const Color(0xFF3B82F6).withValues(alpha: 0.35),
+                                const Color(0xFF3B82F6).withValues(alpha: 0.14),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(0xFF3B82F6)
+                                  .withValues(alpha: 0.35),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.public_rounded,
+                                size: 13,
+                                color: Color(0xFF60A5FA),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                currentLanguage.displayName,
+                                style: GoogleFonts.inter(
+                                  color: const Color(0xFF93C5FD),
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.public_rounded,
-                              size: 13,
-                              color: Color(0xFF60A5FA),
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              currentLanguage.displayName,
-                              style: GoogleFonts.inter(
-                                color: const Color(0xFF93C5FD),
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          _showLanguageSelectorSheet(context, ref);
+                        },
                       ),
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        _showLanguageSelectorSheet(context, ref);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // ── Group 3: Support & Information ────────────────────────────
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
-                child: Text(
-                  'SUPPORT & INFORMATION',
-                  style: GoogleFonts.inter(
-                    color: AppColors.textOnDarkTertiary,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.0,
+                    ],
                   ),
                 ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _MenuGroupCard(
-                  items: [
-                    _ProfileMenuItem(
-                      icon: Icons.help_outline_rounded,
-                      iconBgColor: const Color(0xFFF59E0B),
-                      title: 'Help & Support',
-                      subtitle: 'FAQs, Guidelines & Contact',
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        _showHelpSupportSheet(context);
-                      },
-                    ),
-                    _ProfileMenuItem(
-                      icon: Icons.info_outline_rounded,
-                      iconBgColor: const Color(0xFF6366F1),
-                      title: 'About Tadbeer AI',
-                      subtitle: 'v2.0.0 • Alibaba Cloud AI 2026',
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        _showAboutSheet(context);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
 
-            // ── Sign Out Action ───────────────────────────────────────────
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 28, 20, 36),
-                child: _SignOutButton(
-                  onPressed: () {
-                    HapticFeedback.mediumImpact();
-                    _showSignOutDialog(context, ref);
-                  },
+              // ── Group 3: Support & Information ────────────────────────────
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
+                  child: Text(
+                    'SUPPORT & INFORMATION',
+                    style: GoogleFonts.inter(
+                      color: isDark
+                          ? AppColors.textOnDarkTertiary
+                          : AppColors.textOnLightSecondary,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ],
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _MenuGroupCard(
+                    items: [
+                      _ProfileMenuItem(
+                        icon: Icons.help_outline_rounded,
+                        iconBgColor: const Color(0xFFF59E0B),
+                        title: 'Help & Support',
+                        subtitle: 'FAQs, Guidelines & Contact',
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          _showHelpSupportSheet(context);
+                        },
+                      ),
+                      _ProfileMenuItem(
+                        icon: Icons.info_outline_rounded,
+                        iconBgColor: const Color(0xFF6366F1),
+                        title: 'About Tadbeer AI',
+                        subtitle: 'v2.0.0 • Alibaba Cloud AI 2026',
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          _showAboutSheet(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // ── Sign Out Action ───────────────────────────────────────────
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 28, 20, 36),
+                  child: _SignOutButton(
+                    onPressed: () {
+                      HapticFeedback.mediumImpact();
+                      _showSignOutDialog(context, ref);
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -477,173 +504,202 @@ class UserProfileScreen extends ConsumerWidget {
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => _ModalContainer(
-        title: 'Personal Information',
-        icon: Icons.person_rounded,
-        iconColor: AppColors.emerald,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _InfoTile(
-              label: 'User ID',
-              value: user?.id ?? 'guest_session',
-              icon: Icons.fingerprint_rounded,
-            ),
-            const SizedBox(height: 12),
-            _InfoTile(
-              label: 'Email Address',
-              value: user?.email.isNotEmpty == true
-                  ? user!.email
-                  : 'guest@tadbeer.ai',
-              icon: Icons.email_outlined,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Full Name',
-              style: GoogleFonts.inter(
-                color: AppColors.textOnDarkSecondary,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return _ModalContainer(
+          title: 'Personal Information',
+          icon: Icons.person_rounded,
+          iconColor: AppColors.emerald,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _InfoTile(
+                label: 'User ID',
+                value: user?.id ?? 'guest_session',
+                icon: Icons.fingerprint_rounded,
               ),
-            ),
-            const SizedBox(height: 6),
-            TextField(
-              controller: nameController,
-              style: GoogleFonts.inter(color: Colors.white, fontSize: 15),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: AppColors.navyElevated,
-                hintText: 'Enter your name',
-                hintStyle: GoogleFonts.inter(
-                  color: AppColors.textOnDarkTertiary,
+              const SizedBox(height: 12),
+              _InfoTile(
+                label: 'Email Address',
+                value: user?.email.isNotEmpty == true
+                    ? user!.email
+                    : 'guest@tadbeer.ai',
+                icon: Icons.email_outlined,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Full Name',
+                style: GoogleFonts.inter(
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary
+                      : AppColors.textOnLightSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                 ),
-                prefixIcon: const Icon(
-                  Icons.badge_outlined,
-                  color: AppColors.teal,
-                  size: 19,
+              ),
+              const SizedBox(height: 6),
+              TextField(
+                controller: nameController,
+                style: GoogleFonts.inter(
+                  color: isDark ? Colors.white : AppColors.textOnLight,
+                  fontSize: 15,
                 ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.12),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor:
+                      isDark ? AppColors.navyElevated : AppColors.lightBg,
+                  hintText: 'Enter your name',
+                  hintStyle: GoogleFonts.inter(
+                    color: isDark
+                        ? AppColors.textOnDarkTertiary
+                        : AppColors.textOnLightTertiary,
                   ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.12),
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(
+                  prefixIcon: const Icon(
+                    Icons.badge_outlined,
                     color: AppColors.teal,
-                    width: 1.5,
+                    size: 19,
                   ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              'Phone Number',
-              style: GoogleFonts.inter(
-                color: AppColors.textOnDarkSecondary,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 6),
-            TextField(
-              controller: phoneController,
-              keyboardType: TextInputType.phone,
-              style: GoogleFonts.inter(color: Colors.white, fontSize: 15),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: AppColors.navyElevated,
-                hintText: '+92 300 1234567',
-                hintStyle: GoogleFonts.inter(
-                  color: AppColors.textOnDarkTertiary,
-                ),
-                prefixIcon: const Icon(
-                  Icons.phone_android_rounded,
-                  color: AppColors.teal,
-                  size: 19,
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.12),
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.12),
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(
-                    color: AppColors.teal,
-                    width: 1.5,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 22),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: () {
-                  HapticFeedback.lightImpact();
-                  final newName = nameController.text.trim();
-                  final newPhone = phoneController.text.trim();
-                  if (newName.isNotEmpty) {
-                    ref.read(authControllerProvider.notifier).updateUserProfile(
-                          name: newName,
-                          phone: newPhone,
-                        );
-                    if (profile != null) {
-                      ref
-                          .read(financialProfileControllerProvider.notifier)
-                          .saveProfile(profile.copyWith(name: newName));
-                    }
-                  }
-                  Navigator.of(ctx).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Profile details updated successfully.'),
-                      behavior: SnackBarBehavior.floating,
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.teal,
-                  foregroundColor: AppColors.navyBg,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.12)
+                          : AppColors.borderLight,
+                    ),
                   ),
-                ),
-                child: Text(
-                  'Save Changes',
-                  style: GoogleFonts.inter(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.12)
+                          : AppColors.borderLight,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(
+                      color: AppColors.teal,
+                      width: 1.5,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-          ],
-        ),
-      ),
+              const SizedBox(height: 14),
+              Text(
+                'Phone Number',
+                style: GoogleFonts.inter(
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary
+                      : AppColors.textOnLightSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 6),
+              TextField(
+                controller: phoneController,
+                keyboardType: TextInputType.phone,
+                style: GoogleFonts.inter(
+                  color: isDark ? Colors.white : AppColors.textOnLight,
+                  fontSize: 15,
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor:
+                      isDark ? AppColors.navyElevated : AppColors.lightBg,
+                  hintText: '+92 300 1234567',
+                  hintStyle: GoogleFonts.inter(
+                    color: isDark
+                        ? AppColors.textOnDarkTertiary
+                        : AppColors.textOnLightTertiary,
+                  ),
+                  prefixIcon: const Icon(
+                    Icons.phone_android_rounded,
+                    color: AppColors.teal,
+                    size: 19,
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.12)
+                          : AppColors.borderLight,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.12)
+                          : AppColors.borderLight,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(
+                      color: AppColors.teal,
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 22),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    final newName = nameController.text.trim();
+                    final newPhone = phoneController.text.trim();
+                    if (newName.isNotEmpty) {
+                      ref
+                          .read(authControllerProvider.notifier)
+                          .updateUserProfile(
+                            name: newName,
+                            phone: newPhone,
+                          );
+                      if (profile != null) {
+                        ref
+                            .read(financialProfileControllerProvider.notifier)
+                            .saveProfile(profile.copyWith(name: newName));
+                      }
+                    }
+                    Navigator.of(ctx).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Profile details updated successfully.'),
+                        behavior: SnackBarBehavior.floating,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: isDark ? AppColors.teal : AppColors.navyBg,
+                    foregroundColor: isDark ? AppColors.navyBg : Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Text(
+                    'Save Changes',
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -728,6 +784,7 @@ class UserProfileScreen extends ConsumerWidget {
     final marketAlerts = ref.watch(marketAlertsProvider);
     final haptics = ref.watch(hapticsEnabledProvider);
     final themeMode = ref.watch(appThemeModeProvider);
+    final user = ref.watch(authControllerProvider);
 
     showModalBottomSheet<void>(
       context: context,
@@ -736,12 +793,14 @@ class UserProfileScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (ctx) => Consumer(
         builder: (context, ref, _) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
           return _ModalContainer(
             title: 'App Settings',
             icon: Icons.tune_rounded,
             iconColor: const Color(0xFF06B6D4),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _SettingsToggleRow(
                   title: 'Push Notifications',
@@ -751,7 +810,12 @@ class UserProfileScreen extends ConsumerWidget {
                     ref.read(pushNotificationsProvider.notifier).set(val);
                   },
                 ),
-                const Divider(color: Colors.white10, height: 16),
+                Divider(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : AppColors.borderLight,
+                  height: 16,
+                ),
                 _SettingsToggleRow(
                   title: 'Market & Commodity Alerts',
                   subtitle:
@@ -761,7 +825,12 @@ class UserProfileScreen extends ConsumerWidget {
                     ref.read(marketAlertsProvider.notifier).set(val);
                   },
                 ),
-                const Divider(color: Colors.white10, height: 16),
+                Divider(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : AppColors.borderLight,
+                  height: 16,
+                ),
                 _SettingsToggleRow(
                   title: 'Haptic Feedback',
                   subtitle: 'Tactile vibrations on key app interactions',
@@ -770,42 +839,69 @@ class UserProfileScreen extends ConsumerWidget {
                     ref.read(hapticsEnabledProvider.notifier).set(val);
                   },
                 ),
-                const Divider(color: Colors.white10, height: 16),
+                Divider(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : AppColors.borderLight,
+                  height: 20,
+                ),
+                Text(
+                  'Theme Appearance',
+                  style: GoogleFonts.inter(
+                    color: isDark ? Colors.white : AppColors.textOnLight,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  'Choose how Tadbeer AI looks on your device',
+                  style: GoogleFonts.inter(
+                    color: isDark
+                        ? AppColors.textOnDarkSecondary
+                        : AppColors.textOnLightSecondary,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 12),
                 Row(
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Theme Appearance',
-                            style: GoogleFonts.inter(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            themeMode == ThemeMode.dark
-                                ? 'Dark Mode (Tadbeer Official)'
-                                : 'Light Mode',
-                            style: GoogleFonts.inter(
-                              color: AppColors.textOnDarkSecondary,
-                              fontSize: 12.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Switch(
-                      value: themeMode == ThemeMode.dark,
-                      activeThumbColor: AppColors.teal,
-                      onChanged: (isDark) {
+                    _ThemeOptionCard(
+                      title: 'Dark',
+                      subtitle: 'Navy & Teal',
+                      icon: Icons.dark_mode_rounded,
+                      isSelected: themeMode == ThemeMode.dark,
+                      onTap: () {
                         HapticFeedback.selectionClick();
-                        ref.read(appThemeModeProvider.notifier).setThemeMode(
-                              isDark ? ThemeMode.dark : ThemeMode.light,
-                            );
+                        ref
+                            .read(appThemeModeProvider.notifier)
+                            .setThemeMode(ThemeMode.dark, userId: user?.id);
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _ThemeOptionCard(
+                      title: 'Light',
+                      subtitle: 'Clean & Navy',
+                      icon: Icons.light_mode_rounded,
+                      isSelected: themeMode == ThemeMode.light,
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        ref
+                            .read(appThemeModeProvider.notifier)
+                            .setThemeMode(ThemeMode.light, userId: user?.id);
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _ThemeOptionCard(
+                      title: 'System',
+                      subtitle: 'Auto Match',
+                      icon: Icons.brightness_auto_rounded,
+                      isSelected: themeMode == ThemeMode.system,
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        ref
+                            .read(appThemeModeProvider.notifier)
+                            .setThemeMode(ThemeMode.system, userId: user?.id);
                       },
                     ),
                   ],
@@ -828,87 +924,102 @@ class UserProfileScreen extends ConsumerWidget {
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => _ModalContainer(
-        title: 'Select Language',
-        icon: Icons.language_rounded,
-        iconColor: const Color(0xFF3B82F6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: AppLanguage.values.map((lang) {
-            final isSelected = lang == activeLanguage;
-            return Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.teal.withValues(alpha: 0.12)
-                    : AppColors.navyElevated,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return _ModalContainer(
+          title: 'Select Language',
+          icon: Icons.language_rounded,
+          iconColor: const Color(0xFF3B82F6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: AppLanguage.values.map((lang) {
+              final isSelected = lang == activeLanguage;
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
                   color: isSelected
-                      ? AppColors.teal
-                      : Colors.white.withValues(alpha: 0.08),
-                  width: isSelected ? 1.5 : 1,
-                ),
-              ),
-              child: ListTile(
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  ref.read(appLocaleProvider.notifier).setLanguage(lang);
-                  Navigator.of(ctx).pop();
-                },
-                leading: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
+                      ? AppColors.teal.withValues(alpha: isDark ? 0.12 : 0.10)
+                      : (isDark ? AppColors.navyElevated : AppColors.lightBg),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
                     color: isSelected
-                        ? AppColors.teal.withValues(alpha: 0.2)
-                        : Colors.white.withValues(alpha: 0.05),
+                        ? AppColors.teal
+                        : (isDark
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : AppColors.borderLight),
+                    width: isSelected ? 1.5 : 1,
                   ),
-                  child: Center(
-                    child: Text(
-                      lang == AppLanguage.english
-                          ? 'EN'
-                          : (lang == AppLanguage.urdu ? 'UR' : 'RU'),
-                      style: GoogleFonts.inter(
-                        color: isSelected ? AppColors.teal : Colors.white70,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
+                ),
+                child: ListTile(
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    ref.read(appLocaleProvider.notifier).setLanguage(lang);
+                    Navigator.of(ctx).pop();
+                  },
+                  leading: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isSelected
+                          ? AppColors.teal.withValues(alpha: 0.2)
+                          : (isDark
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : AppColors.teal.withValues(alpha: 0.08)),
+                    ),
+                    child: Center(
+                      child: Text(
+                        lang == AppLanguage.english
+                            ? 'EN'
+                            : (lang == AppLanguage.urdu ? 'UR' : 'RU'),
+                        style: GoogleFonts.inter(
+                          color: isSelected
+                              ? AppColors.teal
+                              : (isDark
+                                  ? Colors.white70
+                                  : AppColors.textOnLightSecondary),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                title: Text(
-                  lang.displayName,
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  title: Text(
+                    lang.displayName,
+                    style: GoogleFonts.inter(
+                      color: isDark ? Colors.white : AppColors.textOnLight,
+                      fontSize: 15,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                    ),
                   ),
-                ),
-                subtitle: Text(
-                  lang.nativeSubtitle,
-                  style: GoogleFonts.inter(
-                    color: AppColors.textOnDarkSecondary,
-                    fontSize: 12.5,
+                  subtitle: Text(
+                    lang.nativeSubtitle,
+                    style: GoogleFonts.inter(
+                      color: isDark
+                          ? AppColors.textOnDarkSecondary
+                          : AppColors.textOnLightSecondary,
+                      fontSize: 12.5,
+                    ),
                   ),
+                  trailing: isSelected
+                      ? const Icon(
+                          Icons.check_circle_rounded,
+                          color: AppColors.teal,
+                          size: 20,
+                        )
+                      : null,
                 ),
-                trailing: isSelected
-                    ? const Icon(
-                        Icons.check_circle_rounded,
-                        color: AppColors.teal,
-                        size: 20,
-                      )
-                    : null,
-              ),
-            );
-          }).toList(),
-        ),
-      ),
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 
   void _showHelpSupportSheet(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -943,10 +1054,12 @@ class UserProfileScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppColors.navyElevated,
+                color: isDark ? AppColors.navyElevated : AppColors.lightSurface,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.08),
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : AppColors.borderLight,
                 ),
               ),
               child: Row(
@@ -964,7 +1077,8 @@ class UserProfileScreen extends ConsumerWidget {
                         Text(
                           'Need technical assistance?',
                           style: GoogleFonts.inter(
-                            color: Colors.white,
+                            color:
+                                isDark ? Colors.white : AppColors.textOnLight,
                             fontSize: 13.5,
                             fontWeight: FontWeight.w600,
                           ),
@@ -973,7 +1087,7 @@ class UserProfileScreen extends ConsumerWidget {
                         Text(
                           'support@tadbeer.ai',
                           style: GoogleFonts.inter(
-                            color: AppColors.teal,
+                            color: isDark ? AppColors.teal : AppColors.tealDeep,
                             fontSize: 12.5,
                             fontWeight: FontWeight.w500,
                           ),
@@ -992,6 +1106,7 @@ class UserProfileScreen extends ConsumerWidget {
   }
 
   void _showAboutSheet(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -1011,7 +1126,8 @@ class UserProfileScreen extends ConsumerWidget {
                 height: 60,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.navyElevated,
+                  color:
+                      isDark ? AppColors.navyElevated : AppColors.lightSurface,
                   border: Border.all(
                     color: AppColors.teal.withValues(alpha: 0.3),
                     width: 2,
@@ -1031,7 +1147,7 @@ class UserProfileScreen extends ConsumerWidget {
               child: Text(
                 'Tadbeer AI 2.0',
                 style: GoogleFonts.inter(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : AppColors.textOnLight,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
@@ -1041,7 +1157,9 @@ class UserProfileScreen extends ConsumerWidget {
               child: Text(
                 'Alibaba Cloud AI Hackathon Pakistan 2026',
                 style: GoogleFonts.inter(
-                  color: AppColors.textOnDarkSecondary,
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary
+                      : AppColors.textOnLightSecondary,
                   fontSize: 12.5,
                   fontWeight: FontWeight.w500,
                 ),
@@ -1051,7 +1169,9 @@ class UserProfileScreen extends ConsumerWidget {
             Text(
               'Tadbeer AI is Pakistan’s premier personalized financial intelligence co-pilot. Built with on-device resilience, multi-agent LLM reasoning, and official Pakistan Bureau of Statistics economic telemetry.',
               style: GoogleFonts.inter(
-                color: AppColors.textOnDarkSecondary,
+                color: isDark
+                    ? AppColors.textOnDarkSecondary
+                    : AppColors.textOnLightSecondary,
                 fontSize: 13,
                 height: 1.45,
               ),
@@ -1076,6 +1196,7 @@ class UserProfileScreen extends ConsumerWidget {
   }
 
   void _showSignOutDialog(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -1091,7 +1212,9 @@ class UserProfileScreen extends ConsumerWidget {
             Text(
               'Are you sure you want to sign out? Your financial records on this device will remain secure.',
               style: GoogleFonts.inter(
-                color: AppColors.textOnDarkSecondary,
+                color: isDark
+                    ? AppColors.textOnDarkSecondary
+                    : AppColors.textOnLightSecondary,
                 fontSize: 14,
                 height: 1.4,
               ),
@@ -1105,7 +1228,9 @@ class UserProfileScreen extends ConsumerWidget {
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 13),
                       side: BorderSide(
-                        color: Colors.white.withValues(alpha: 0.16),
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.16)
+                            : AppColors.borderLight,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(13),
@@ -1114,7 +1239,7 @@ class UserProfileScreen extends ConsumerWidget {
                     child: Text(
                       'Cancel',
                       style: GoogleFonts.inter(
-                        color: Colors.white,
+                        color: isDark ? Colors.white : AppColors.textOnLight,
                         fontSize: 14.5,
                         fontWeight: FontWeight.w600,
                       ),
@@ -1160,6 +1285,90 @@ class UserProfileScreen extends ConsumerWidget {
 
 // ── Supporting Widgets ───────────────────────────────────────────────────────
 
+class _ThemeOptionCard extends StatelessWidget {
+  const _ThemeOptionCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? AppColors.teal.withValues(alpha: isDark ? 0.16 : 0.12)
+                  : (isDark ? AppColors.navyElevated : AppColors.lightBg),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: isSelected
+                    ? AppColors.teal
+                    : (isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : AppColors.borderLight),
+                width: isSelected ? 1.5 : 1,
+              ),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  icon,
+                  size: 22,
+                  color: isSelected
+                      ? (isDark ? AppColors.teal : AppColors.tealDeep)
+                      : (isDark
+                          ? AppColors.textOnDarkSecondary
+                          : AppColors.textOnLightSecondary),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    color: isSelected
+                        ? (isDark ? AppColors.teal : AppColors.tealDeep)
+                        : (isDark ? Colors.white : AppColors.textOnLight),
+                    fontSize: 13,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.inter(
+                    color: isDark
+                        ? AppColors.textOnDarkTertiary
+                        : AppColors.textOnLightSecondary,
+                    fontSize: 10.5,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _NavBackButton extends StatelessWidget {
   const _NavBackButton({required this.onTap});
 
@@ -1167,6 +1376,7 @@ class _NavBackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -1176,15 +1386,19 @@ class _NavBackButton extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: AppColors.navyCard,
+            color: isDark
+                ? AppColors.navyCard
+                : AppColors.lightCard.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : AppColors.borderLight,
             ),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Colors.white,
+            color: isDark ? Colors.white : AppColors.textOnLight,
             size: 17,
           ),
         ),
@@ -1200,13 +1414,25 @@ class _MenuGroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.navyCard,
+        color: isDark ? AppColors.navyCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : AppColors.borderLight,
         ),
+        boxShadow: isDark
+            ? null
+            : [
+                const BoxShadow(
+                  color: AppColors.lightCardShadow,
+                  blurRadius: 10,
+                  offset: Offset(0, 2),
+                ),
+              ],
       ),
       child: Column(
         children: [
@@ -1214,7 +1440,9 @@ class _MenuGroupCard extends StatelessWidget {
             items[i],
             if (i < items.length - 1)
               Divider(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : AppColors.borderLight,
                 height: 1,
                 indent: 58,
                 endIndent: 16,
@@ -1245,6 +1473,7 @@ class _ProfileMenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -1276,7 +1505,7 @@ class _ProfileMenuItem extends StatelessWidget {
                     Text(
                       title,
                       style: GoogleFonts.inter(
-                        color: Colors.white,
+                        color: isDark ? Colors.white : AppColors.textOnLight,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
@@ -1287,7 +1516,9 @@ class _ProfileMenuItem extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                        color: AppColors.textOnDarkSecondary,
+                        color: isDark
+                            ? AppColors.textOnDarkSecondary
+                            : AppColors.textOnLightSecondary,
                         fontSize: 12.5,
                       ),
                     ),
@@ -1299,9 +1530,11 @@ class _ProfileMenuItem extends StatelessWidget {
               if (trailingWidget != null) trailingWidget!,
               const SizedBox(width: 4),
 
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
-                color: AppColors.textOnDarkTertiary,
+                color: isDark
+                    ? AppColors.textOnDarkTertiary
+                    : AppColors.textOnLightTertiary,
                 size: 20,
               ),
             ],
@@ -1376,6 +1609,7 @@ class _ModalContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final mediaQuery = MediaQuery.of(context);
     final bottomInset = mediaQuery.viewInsets.bottom;
     final maxSheetHeight = mediaQuery.size.height * 0.88;
@@ -1383,11 +1617,22 @@ class _ModalContainer extends StatelessWidget {
     return Container(
       constraints: BoxConstraints(maxHeight: maxSheetHeight),
       decoration: BoxDecoration(
-        color: AppColors.navyCard,
+        color: isDark ? AppColors.navyCard : AppColors.lightCard,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.12),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.12)
+              : AppColors.borderLight,
         ),
+        boxShadow: isDark
+            ? null
+            : [
+                const BoxShadow(
+                  color: AppColors.lightCardShadow,
+                  blurRadius: 20,
+                  offset: Offset(0, -4),
+                ),
+              ],
       ),
       padding: EdgeInsets.fromLTRB(20, 12, 20, 24 + bottomInset),
       child: Column(
@@ -1399,7 +1644,9 @@ class _ModalContainer extends StatelessWidget {
               width: 38,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.2)
+                    : Colors.black.withValues(alpha: 0.16),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -1422,16 +1669,17 @@ class _ModalContainer extends StatelessWidget {
               Text(
                 title,
                 style: GoogleFonts.inter(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : AppColors.textOnLight,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const Spacer(),
               IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.close_rounded,
-                  color: Colors.white54,
+                  color:
+                      isDark ? Colors.white54 : AppColors.textOnLightTertiary,
                   size: 20,
                 ),
                 onPressed: () => Navigator.of(context).pop(),
@@ -1464,18 +1712,22 @@ class _InfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.navyElevated,
+        color: isDark ? AppColors.navyElevated : AppColors.lightBg,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.06),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.06)
+              : AppColors.borderLight,
         ),
       ),
       child: Row(
         children: [
-          Icon(icon, color: AppColors.teal, size: 18),
+          Icon(icon,
+              color: isDark ? AppColors.teal : AppColors.tealDeep, size: 18),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -1484,7 +1736,9 @@ class _InfoTile extends StatelessWidget {
                 Text(
                   label,
                   style: GoogleFonts.inter(
-                    color: AppColors.textOnDarkTertiary,
+                    color: isDark
+                        ? AppColors.textOnDarkTertiary
+                        : AppColors.textOnLightSecondary,
                     fontSize: 11.5,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1493,7 +1747,7 @@ class _InfoTile extends StatelessWidget {
                 Text(
                   value,
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textOnLight,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1522,6 +1776,7 @@ class _SettingsToggleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
         Expanded(
@@ -1531,7 +1786,7 @@ class _SettingsToggleRow extends StatelessWidget {
               Text(
                 title,
                 style: GoogleFonts.inter(
-                  color: Colors.white,
+                  color: isDark ? Colors.white : AppColors.textOnLight,
                   fontSize: 14.5,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1540,7 +1795,9 @@ class _SettingsToggleRow extends StatelessWidget {
               Text(
                 subtitle,
                 style: GoogleFonts.inter(
-                  color: AppColors.textOnDarkSecondary,
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary
+                      : AppColors.textOnLightSecondary,
                   fontSize: 12,
                 ),
               ),
@@ -1571,13 +1828,16 @@ class _HelpFaqTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.navyElevated,
+        color: isDark ? AppColors.navyElevated : AppColors.lightBg,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.06),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.06)
+              : AppColors.borderLight,
         ),
       ),
       child: Column(
@@ -1586,7 +1846,7 @@ class _HelpFaqTile extends StatelessWidget {
           Text(
             question,
             style: GoogleFonts.inter(
-              color: Colors.white,
+              color: isDark ? Colors.white : AppColors.textOnLight,
               fontSize: 13.5,
               fontWeight: FontWeight.w600,
             ),
@@ -1595,7 +1855,9 @@ class _HelpFaqTile extends StatelessWidget {
           Text(
             answer,
             style: GoogleFonts.inter(
-              color: AppColors.textOnDarkSecondary,
+              color: isDark
+                  ? AppColors.textOnDarkSecondary
+                  : AppColors.textOnLightSecondary,
               fontSize: 12.5,
               height: 1.35,
             ),

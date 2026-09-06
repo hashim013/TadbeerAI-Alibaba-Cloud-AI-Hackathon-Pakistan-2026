@@ -90,13 +90,21 @@ class _MainShellState extends State<MainShell>
       ),
     ];
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.navyBg,
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: widget.navigationShell,
+      backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.navyBg : null,
+          gradient: isDark ? null : AppColors.lightThemeGradient,
+        ),
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: widget.navigationShell,
+          ),
         ),
       ),
       bottomNavigationBar: _ModernBottomNavBar(
@@ -136,18 +144,27 @@ class _ModernBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.navyCard,
+        color: theme.brightness == Brightness.dark
+            ? AppColors.navyCard
+            : AppColors.lightCard,
         border: Border(
           top: BorderSide(
-            color: Colors.white.withValues(alpha: 0.08),
+            color: isDark
+                ? scheme.outline.withValues(alpha: 0.65)
+                : AppColors.borderLight,
             width: 1.0,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.35)
+                : AppColors.lightCardShadow,
             blurRadius: 18,
             offset: const Offset(0, -4),
           ),
@@ -188,6 +205,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -204,14 +222,12 @@ class _NavItem extends StatelessWidget {
               width: isSelected ? 22 : 0,
               height: 3,
               decoration: BoxDecoration(
-                color:
-                    isSelected ? const Color(0xFF2DD4BF) : Colors.transparent,
+                color: isSelected ? scheme.primary : Colors.transparent,
                 borderRadius: BorderRadius.circular(1.5),
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color:
-                              const Color(0xFF2DD4BF).withValues(alpha: 0.55),
+                          color: scheme.primary.withValues(alpha: 0.45),
                           blurRadius: 6,
                           spreadRadius: 0.5,
                         ),
@@ -233,10 +249,10 @@ class _NavItem extends StatelessWidget {
                       duration: const Duration(milliseconds: 200),
                       curve: Curves.easeOutCubic,
                       tween: ColorTween(
-                        begin: const Color(0xFF64748B),
+                        begin: scheme.onSurfaceVariant,
                         end: isSelected
-                            ? const Color(0xFF2DD4BF)
-                            : const Color(0xFF64748B),
+                            ? scheme.primary
+                            : scheme.onSurfaceVariant,
                       ),
                       builder: (context, color, _) {
                         return Icon(
@@ -260,8 +276,8 @@ class _NavItem extends StatelessWidget {
                         fontWeight:
                             isSelected ? FontWeight.w700 : FontWeight.w500,
                         color: isSelected
-                            ? const Color(0xFF2DD4BF)
-                            : const Color(0xFF94A3B8),
+                            ? scheme.primary
+                            : scheme.onSurfaceVariant,
                         letterSpacing: 0.1,
                         height: 1.15,
                       ),

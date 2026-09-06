@@ -37,7 +37,8 @@ class _FakeAuthRepo implements AuthRepository {
   Future<AppUser?> currentUser() async => currentUserVal;
 
   @override
-  Future<AppUser> signIn({required String email, required String password}) async =>
+  Future<AppUser> signIn(
+          {required String email, required String password}) async =>
       currentUserVal!;
 
   @override
@@ -80,6 +81,8 @@ class _TestAuthController extends AuthController {
   AppUser? build() => _initialUser;
 }
 
+late SharedPreferences testPrefs;
+
 Widget _buildTestApp({
   required AppUser? user,
   required FinancialProfile? profile,
@@ -89,6 +92,7 @@ Widget _buildTestApp({
 
   return ProviderScope(
     overrides: [
+      sharedPrefsProvider.overrideWithValue(testPrefs),
       financialProfileRepositoryProvider.overrideWithValue(profileRepo),
       authRepositoryProvider.overrideWithValue(authRepo),
       authControllerProvider.overrideWith(() => _TestAuthController(user)),
@@ -102,8 +106,9 @@ Widget _buildTestApp({
 }
 
 void main() {
-  setUp(() {
+  setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    testPrefs = await SharedPreferences.getInstance();
   });
 
   group('UserProfileScreen Tests', () {
@@ -129,7 +134,8 @@ void main() {
         profileCompleted: true,
       );
 
-      await tester.pumpWidget(_buildTestApp(user: testUser, profile: testProfile));
+      await tester
+          .pumpWidget(_buildTestApp(user: testUser, profile: testProfile));
       await tester.pumpAndSettle();
 
       // Verify Header
@@ -248,7 +254,8 @@ void main() {
       expect(find.text('Theme Appearance'), findsOneWidget);
     });
 
-    testWidgets('tapping Language opens language selection sheet and switches locale',
+    testWidgets(
+        'tapping Language opens language selection sheet and switches locale',
         (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 2.0;
@@ -273,7 +280,8 @@ void main() {
       expect(find.text('Select Language'), findsNothing);
     });
 
-    testWidgets('tapping Sign Out shows confirmation bottom sheet with Cancel action',
+    testWidgets(
+        'tapping Sign Out shows confirmation bottom sheet with Cancel action',
         (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 2.0;

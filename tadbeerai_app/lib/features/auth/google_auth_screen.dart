@@ -125,9 +125,10 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
   }
 
   void _showInfoSheet(String title, String content) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.navyCard,
+      backgroundColor: isDark ? AppColors.navyCard : AppColors.lightCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -142,7 +143,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                 width: 32,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : Colors.black.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -156,7 +159,7 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                 Text(
                   title,
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textOnLight,
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
                   ),
@@ -167,7 +170,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
             Text(
               content,
               style: GoogleFonts.inter(
-                color: AppColors.textOnDarkSecondary,
+                color: isDark
+                    ? AppColors.textOnDarkSecondary
+                    : AppColors.textOnLightSecondary,
                 fontSize: 13.5,
                 height: 1.5,
               ),
@@ -178,8 +183,8 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
               child: FilledButton(
                 onPressed: () => Navigator.of(ctx).pop(),
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.teal,
-                  foregroundColor: AppColors.navyBg,
+                  backgroundColor: isDark ? AppColors.teal : AppColors.navyBg,
+                  foregroundColor: isDark ? AppColors.navyBg : Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -206,7 +211,7 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.navyBg,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: SafeArea(
           child: Column(
             children: [
@@ -247,12 +252,15 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
   }
 
   Widget _buildTopBar(BuildContext context, dynamic l10n, bool isBusy) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : AppColors.borderLight,
             width: 1,
           ),
         ),
@@ -264,7 +272,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
           TextButton(
             onPressed: isBusy ? null : _onCancel,
             style: TextButton.styleFrom(
-              foregroundColor: AppColors.textOnDarkSecondary,
+              foregroundColor: isDark
+                  ? AppColors.textOnDarkSecondary
+                  : AppColors.textOnLightSecondary,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               minimumSize: const Size(48, 36),
             ),
@@ -281,10 +291,14 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.04),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.04)
+                  : AppColors.lightSurfaceVariant,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.07),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.07)
+                    : AppColors.borderLight,
                 width: 1,
               ),
             ),
@@ -300,7 +314,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                 Text(
                   'accounts.google.com',
                   style: GoogleFonts.inter(
-                    color: AppColors.textOnDarkTertiary,
+                    color: isDark
+                        ? AppColors.textOnDarkTertiary
+                        : AppColors.textOnLightTertiary,
                     fontSize: 11.5,
                     fontWeight: FontWeight.w500,
                   ),
@@ -314,17 +330,22 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
   }
 
   Widget _buildGoogleIdentityCard(dynamic l10n, bool isBusy) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.navyCard,
+        color: isDark ? AppColors.navyCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : AppColors.borderLight,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.25)
+                : AppColors.lightCardShadow,
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -360,7 +381,7 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                   l10n.googleSignInTitle,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textOnLight,
                     fontSize: 21,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.2,
@@ -379,7 +400,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                         l10n.googleSignInSubtitle,
                         textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
-                          color: AppColors.textOnDarkSecondary,
+                          color: isDark
+                              ? AppColors.textOnDarkSecondary
+                              : AppColors.textOnLightSecondary,
                           fontSize: 13.5,
                           height: 1.35,
                         ),
@@ -398,7 +421,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
             ),
           ),
 
-          const Divider(height: 1, color: Color(0x14FFFFFF)),
+          Divider(
+              height: 1,
+              color: isDark ? const Color(0x14FFFFFF) : AppColors.borderLight),
 
           // "Choose an account" Section Subheader
           Padding(
@@ -409,7 +434,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                   child: Text(
                     l10n.googleChooseAccount,
                     style: GoogleFonts.inter(
-                      color: AppColors.textOnDarkTertiary,
+                      color: isDark
+                          ? AppColors.textOnDarkTertiary
+                          : AppColors.textOnLightTertiary,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.3,
@@ -449,7 +476,10 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
               isBusy: isBusy,
               isSelected: _signingInEmail == _savedAccounts[i].email,
             ),
-            const Divider(height: 1, color: Color(0x10FFFFFF)),
+            Divider(
+                height: 1,
+                color:
+                    isDark ? const Color(0x10FFFFFF) : AppColors.borderLight),
           ],
 
           // "Use another account" Row
@@ -467,6 +497,7 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
     required bool isBusy,
     required bool isSelected,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final initial =
         account.name.isNotEmpty ? account.name[0].toUpperCase() : 'G';
 
@@ -515,7 +546,8 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                           child: Text(
                             account.name,
                             style: GoogleFonts.inter(
-                              color: Colors.white,
+                              color:
+                                  isDark ? Colors.white : AppColors.textOnLight,
                               fontSize: 14.5,
                               fontWeight: FontWeight.w600,
                             ),
@@ -529,13 +561,17 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.08),
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.08)
+                                  : AppColors.lightSurfaceVariant,
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               account.badge!,
                               style: GoogleFonts.inter(
-                                color: AppColors.textOnDarkTertiary,
+                                color: isDark
+                                    ? AppColors.textOnDarkTertiary
+                                    : AppColors.textOnLightTertiary,
                                 fontSize: 9.5,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -548,7 +584,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                     Text(
                       account.email,
                       style: GoogleFonts.inter(
-                        color: AppColors.textOnDarkSecondary,
+                        color: isDark
+                            ? AppColors.textOnDarkSecondary
+                            : AppColors.textOnLightSecondary,
                         fontSize: 13,
                       ),
                       maxLines: 1,
@@ -573,7 +611,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 13,
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : AppColors.textOnLightTertiary,
                 ),
             ],
           ),
@@ -583,6 +623,7 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
   }
 
   Widget _buildUseAnotherAccountRow(dynamic l10n, bool isBusy) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -600,16 +641,22 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.04),
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.04)
+                      : AppColors.lightSurfaceVariant,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.12),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.12)
+                        : AppColors.borderLight,
                     width: 1,
                   ),
                 ),
                 child: Icon(
                   Icons.person_add_alt_1_outlined,
-                  color: Colors.white.withValues(alpha: 0.8),
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.8)
+                      : AppColors.textOnLightSecondary,
                   size: 18,
                 ),
               ),
@@ -618,7 +665,7 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                 child: Text(
                   l10n.googleUseAnotherAccount,
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: isDark ? Colors.white : AppColors.textOnLight,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -628,7 +675,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                 _showCustomInput
                     ? Icons.keyboard_arrow_up_rounded
                     : Icons.keyboard_arrow_down_rounded,
-                color: Colors.white.withValues(alpha: 0.4),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.4)
+                    : AppColors.textOnLightTertiary,
                 size: 20,
               ),
             ],
@@ -639,15 +688,21 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
   }
 
   Widget _buildCustomEmailSection(dynamic l10n, bool isBusy) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 6, 20, 18),
-      color: Colors.white.withValues(alpha: 0.02),
+      color: isDark
+          ? Colors.white.withValues(alpha: 0.02)
+          : AppColors.lightSurfaceVariant.withValues(alpha: 0.3),
       child: Form(
         key: _customFormKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Divider(height: 1, color: Color(0x10FFFFFF)),
+            Divider(
+              height: 1,
+              color: isDark ? const Color(0x10FFFFFF) : AppColors.borderLight,
+            ),
             const SizedBox(height: 14),
             AppTextField(
               controller: _customEmailController,
@@ -684,6 +739,7 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
   }
 
   Widget _buildPrivacyNotice(dynamic l10n) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
@@ -694,13 +750,17 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
               Icon(
                 Icons.shield_outlined,
                 size: 14,
-                color: Colors.white.withValues(alpha: 0.5),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.5)
+                    : AppColors.textOnLightTertiary,
               ),
               const SizedBox(width: 6),
               Text(
                 'Google Privacy & Disclosure',
                 style: GoogleFonts.inter(
-                  color: AppColors.textOnDarkTertiary,
+                  color: isDark
+                      ? AppColors.textOnDarkTertiary
+                      : AppColors.textOnLightTertiary,
                   fontSize: 11.5,
                   fontWeight: FontWeight.w500,
                 ),
@@ -711,7 +771,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
           Text(
             l10n.googlePrivacyNotice,
             style: GoogleFonts.inter(
-              color: AppColors.textOnDarkTertiary,
+              color: isDark
+                  ? AppColors.textOnDarkTertiary
+                  : AppColors.textOnLightTertiary,
               fontSize: 11.5,
               height: 1.45,
             ),
@@ -727,11 +789,11 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                 child: Text(
                   'Privacy Policy',
                   style: GoogleFonts.inter(
-                    color: AppColors.teal,
+                    color: isDark ? AppColors.teal : AppColors.blue,
                     fontSize: 11.5,
                     fontWeight: FontWeight.w500,
                     decoration: TextDecoration.underline,
-                    decorationColor: AppColors.teal,
+                    decorationColor: isDark ? AppColors.teal : AppColors.blue,
                   ),
                 ),
               ),
@@ -740,7 +802,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                 child: Text(
                   '•',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.3),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.3)
+                        : AppColors.textOnLightTertiary,
                     fontSize: 11,
                   ),
                 ),
@@ -753,11 +817,11 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                 child: Text(
                   'Terms of Service',
                   style: GoogleFonts.inter(
-                    color: AppColors.teal,
+                    color: isDark ? AppColors.teal : AppColors.blue,
                     fontSize: 11.5,
                     fontWeight: FontWeight.w500,
                     decoration: TextDecoration.underline,
-                    decorationColor: AppColors.teal,
+                    decorationColor: isDark ? AppColors.teal : AppColors.blue,
                   ),
                 ),
               ),

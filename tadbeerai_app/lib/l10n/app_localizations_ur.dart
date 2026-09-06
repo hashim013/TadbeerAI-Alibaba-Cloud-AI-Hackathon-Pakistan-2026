@@ -356,10 +356,10 @@ class AppLocalizationsUr extends AppLocalizations {
   String get totalExpenses => 'کل اخراجات';
 
   @override
-  String get resetDemoData => 'ڈیمو ڈیٹا ری سیٹ کریں';
+  String get resetDemoData => 'تمام ڈیٹا صاف کریں';
 
   @override
-  String get resetDemoDataDone => 'ڈیمو ڈیٹا بحال ہو گیا۔';
+  String get resetDemoDataDone => 'تمام ڈیٹا صاف ہو گیا۔';
 
   @override
   String get incomeVsExpenses => 'آمدنی بمقابلہ اخراجات';
@@ -1856,10 +1856,10 @@ class AppLocalizationsUrLatn extends AppLocalizationsUr {
   String get totalExpenses => 'Kul kharchay';
 
   @override
-  String get resetDemoData => 'Demo data reset karein';
+  String get resetDemoData => 'Tamam data saaf karein';
 
   @override
-  String get resetDemoDataDone => 'Demo data wapas aa gaya.';
+  String get resetDemoDataDone => 'Tamam data saaf ho gaya.';
 
   @override
   String get incomeVsExpenses => 'Aamdani vs kharchay';

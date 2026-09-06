@@ -58,7 +58,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    const bgBase = AppColors.navyBg;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgBase = isDark ? AppColors.navyBg : AppColors.lightBg;
     const tealAccent = AppColors.teal;
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
@@ -74,11 +75,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         behavior: HitTestBehavior.opaque,
         onTap: _navigateToOnboarding,
         child: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle.light.copyWith(
+          value:
+              (isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)
+                  .copyWith(
             statusBarColor: Colors.transparent,
             systemNavigationBarColor: Colors.transparent,
             systemNavigationBarDividerColor: Colors.transparent,
-            systemNavigationBarIconBrightness: Brightness.light,
+            systemNavigationBarIconBrightness:
+                isDark ? Brightness.light : Brightness.dark,
           ),
           child: Stack(
             fit: StackFit.expand,
@@ -87,14 +91,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: const Alignment(0, -0.28),
-                      radius: 1.1,
-                      colors: [
-                        const Color(0xFF061A2E).withValues(alpha: 0.35),
-                        bgBase,
-                      ],
-                    ),
+                    gradient: isDark
+                        ? RadialGradient(
+                            center: const Alignment(0, -0.28),
+                            radius: 1.1,
+                            colors: [
+                              const Color(0xFF061A2E).withValues(alpha: 0.35),
+                              bgBase,
+                            ],
+                          )
+                        : AppColors.lightThemeGradient,
                   ),
                 ),
               ),
@@ -107,6 +113,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     builder: (context, _) => CustomPaint(
                       painter: _ParticleWavePainter(
                         phase: _waveController.value * 2 * math.pi,
+                        isDark: isDark,
                       ),
                     ),
                   ),
@@ -168,7 +175,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         Text(
                           'TADBEER',
                           style: GoogleFonts.inter(
-                            color: Colors.white,
+                            color:
+                                isDark ? Colors.white : AppColors.textOnLight,
                             fontSize: 34,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 2.4,
@@ -178,7 +186,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         Text(
                           'AI',
                           style: GoogleFonts.inter(
-                            color: tealAccent,
+                            color: isDark ? tealAccent : AppColors.tealDeep,
                             fontSize: 34,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 1.6,
@@ -198,9 +206,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       'Your AI Financial Intelligence Companion',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
-                        color: const Color(0xFFE2E8F0),
+                        color: isDark
+                            ? const Color(0xFFE2E8F0)
+                            : AppColors.textOnLight,
                         fontSize: 10,
-                        fontWeight: FontWeight.w300,
+                        fontWeight: FontWeight.w500,
                         height: 1.35,
                         letterSpacing: 0.35,
                       ),
@@ -226,8 +236,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 /// sweeping upward to the right across the lower portion of the screen.
 class _ParticleWavePainter extends CustomPainter {
   final double phase;
+  final bool isDark;
 
-  _ParticleWavePainter({required this.phase});
+  _ParticleWavePainter({required this.phase, this.isDark = true});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -274,7 +285,9 @@ class _ParticleWavePainter extends CustomPainter {
             py >= size.height * 0.60 &&
             py <= size.height + radius &&
             alpha > 0.02) {
-          paint.color = AppColors.teal.withValues(alpha: alpha);
+          paint.color = isDark
+              ? AppColors.teal.withValues(alpha: alpha)
+              : AppColors.navyBg.withValues(alpha: alpha * 0.7);
           canvas.drawCircle(Offset(px, py), radius, paint);
         }
       }

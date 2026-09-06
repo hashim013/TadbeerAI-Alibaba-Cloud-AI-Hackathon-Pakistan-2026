@@ -28,6 +28,9 @@ class ApiConfig {
   /// Endpoint of the PBS SPI essential commodity prices.
   static const String essentialPricesPath = '/v1/economy/essential-prices';
 
+  /// Endpoint of the per-user finance ledger (GET/PUT whole snapshot).
+  static const String financePath = '/v1/finance';
+
   /// Assistant data source: `live` (default) answers through the real
   /// backend; `demo` keeps the offline mock for UI development and tests.
   static const String assistantMode = String.fromEnvironment(
@@ -39,6 +42,16 @@ class ApiConfig {
 
   /// Economy data source: `live` (default) fetches from backend; `demo` uses offline mock.
   static bool get useMockEconomy => assistantMode == 'demo';
+
+  /// Finance data source: `live` (default) syncs the per-user ledger with the
+  /// backend (Firestore) through an offline-first local cache; `demo` keeps the
+  /// on-device mock ledger for UI development and headless tests.
+  static const String financeMode = String.fromEnvironment(
+    'FINANCE_MODE',
+    defaultValue: 'live',
+  );
+
+  static bool get useMockFinance => financeMode == 'demo';
 
   /// Authentication data source: `firebase` (default) connects to Firebase Auth;
   /// `demo` keeps offline mock for headless unit tests.

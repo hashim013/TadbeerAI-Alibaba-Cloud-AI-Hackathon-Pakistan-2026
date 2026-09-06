@@ -409,8 +409,7 @@ class _EssentialPricesSectionState
                     'Dairy & Poultry' => l10n.essentialPricesCategoryDairy,
                     'Food & Staples' => l10n.essentialPricesCategoryStaples,
                     'Pulses' => l10n.essentialPricesCategoryPulses,
-                    'Cooking & Fuel' =>
-                      l10n.essentialPricesCategoryCookingFuel,
+                    'Cooking & Fuel' => l10n.essentialPricesCategoryCookingFuel,
                     _ => category,
                   };
                   return Padding(
@@ -430,7 +429,7 @@ class _EssentialPricesSectionState
                         fontWeight:
                             isSelected ? FontWeight.bold : FontWeight.normal,
                         color: isSelected
-                            ? (isDark ? Colors.black : Colors.white)
+                            ? Colors.white
                             : (isDark
                                 ? AppColors.textOnDark
                                 : AppColors.textOnLight),
