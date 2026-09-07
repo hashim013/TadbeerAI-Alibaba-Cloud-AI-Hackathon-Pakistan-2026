@@ -1,6 +1,6 @@
-from core.domain_config import IMPACT_FORMULAS
-from core.fallbacks import fallback_impacts
-from core.llm_client import call_llm_json
+from legacy.domain_config import IMPACT_FORMULAS
+from legacy.fallbacks import fallback_impacts
+from legacy.llm_client import call_llm_json
 
 IMPACT_SYSTEM_PROMPT = """
 You are a Pakistan Business Impact Analyst for TadbeerAI.

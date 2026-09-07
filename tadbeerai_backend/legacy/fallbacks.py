@@ -5,7 +5,7 @@ to generate contextual (not generic) analysis.
 """
 
 import re
-from core.domain_config import IMPACT_FORMULAS
+from legacy.domain_config import IMPACT_FORMULAS
 
 
 # ==================== TEXT EXTRACTION ====================

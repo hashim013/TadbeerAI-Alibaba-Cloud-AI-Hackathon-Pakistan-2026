@@ -11,8 +11,8 @@
   <a href="#-flutter-mobile-application"><img src="https://img.shields.io/badge/Frontend-Flutter%203.x%20%7C%20Riverpod-02569B?style=flat-square&logo=flutter" alt="Flutter"></a>
   <a href="#-fastapi-backend"><img src="https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python%203.11-009688?style=flat-square&logo=fastapi" alt="FastAPI"></a>
   <a href="#-firebase-authentication"><img src="https://img.shields.io/badge/Auth-Firebase%20Authentication-FFCA28?style=flat-square&logo=firebase" alt="Firebase"></a>
-  <a href="#-data-sources--provenance"><img src="https://img.shields.io/badge/Economic%20Data-PBS%20SPI%20%26%20SBP-10B981?style=flat-square" alt="PBS & SBP"></a>
-  <a href="#-automated-test-suite--verification"><img src="https://img.shields.io/badge/Tests-551%20Passed%20(301%20Backend%20%2B%20250%20Flutter)-success?style=flat-square" alt="Tests"></a>
+  <a href="#-data-sources--provenance"><img src="https://img.shields.io/badge/Economic%20Data-World%20Bank%20%2B%20PBS%2FSBP-10B981?style=flat-square" alt="World Bank + PBS/SBP"></a>
+  <a href="#-automated-test-suite--verification"><img src="https://img.shields.io/badge/Tests-624%20Passed%20(320%20Backend%20%2B%20304%20Flutter)-success?style=flat-square" alt="Tests"></a>
   <a href="#-code-quality"><img src="https://img.shields.io/badge/Flutter%20Analyze-0%20Issues-brightgreen?style=flat-square" alt="Analyze"></a>
 </p>
 
@@ -47,7 +47,7 @@ In Pakistan's dynamic macroeconomic climate—marked by shifting inflation, exch
 3. **"What if petrol prices rise by 10%, or grocery expenses increase by Rs 5,000?"**
 4. **"What concrete, prioritized financial actions should I take today to safeguard my family?"**
 
-**Tadbeer AI 2.0** bridges this gap. It connects **official macroeconomic data and weekly essential commodity prices** with **user-specific financial contexts**, powering **100% deterministic What-If simulations** and a **supervised LangGraph multi-agent financial companion** fluent in English, Urdu (اردو), and Roman Urdu.
+**Tadbeer AI 2.0** bridges this gap. It connects **official macroeconomic data (World Bank annual indicators) and essential commodity price references** with **user-specific financial contexts**, powering **100% deterministic What-If simulations** and a **supervised LangGraph multi-agent financial companion** fluent in English, Urdu (اردو), and Roman Urdu.
 
 > 🛡️ **Guiding Principle: Zero Mathematical Hallucinations**  
 > Large Language Models excel at synthesis, explanation, and empathetic communication, but are prone to calculation errors. In Tadbeer AI, **all arithmetic, scenario modeling, budget ratios, and runway projections are computed by deterministic Python and Dart mathematical engines**. The AI explains and contextualizes verified numbers without inventing data.
@@ -57,10 +57,10 @@ In Pakistan's dynamic macroeconomic climate—marked by shifting inflation, exch
 ## 🚀 Core Pillars & Capabilities
 
 ### 1. Essential Prices & Economic Intelligence (PBS SPI)
-- **Sensitive Price Indicator (SPI) Monitoring**: Tracks official weekly prices for 16 key consumer commodities across 17 urban centres and 50 markets in Pakistan (Flour, Tomatoes, Onions, Potatoes, Chicken, Fresh Milk, Eggs, Pulses, Cooking Oil, LPG Cylinders, etc.).
+- **Sensitive Price Indicator (SPI) Monitoring**: Ships a clearly-labelled **demo** catalogue of 16 key consumer commodities (Flour, Tomatoes, Onions, Potatoes, Chicken, Fresh Milk, Eggs, Pulses, Cooking Oil, LPG Cylinders, etc.). The live Pakistan Bureau of Statistics (PBS) SPI gateway — whose weekly bulletin covers 51 commodities across 17 urban centres and 50 markets — is **not configured in this build**, so essential prices are returned as demo data and badged `demo`.
 - **Economic Explanation**: Every commodity includes **What Changed**, **Why It Matters**, and a **Household Budget Impact** actionable hint.
-- **Macroeconomic Dashboard**: Real-time tracking of Headline CPI Inflation, SBP Policy Rate, USD/PKR interbank rate, KIBOR (3-Month), FX Reserves, and Worker Remittances.
-- **Transparent Provenance**: Direct citation of the Pakistan Bureau of Statistics (PBS) and State Bank of Pakistan (SBP), observation periods, and explicit status badges (`live` vs `demo`).
+- **Macroeconomic Dashboard**: Headline CPI Inflation, USD/PKR exchange rate, FX Reserves, Worker Remittances and GDP growth are fetched **live** from the World Bank indicator API as the most recent **annual** figures (never real-time/intraday). SBP Policy Rate and KIBOR (3-Month) are **demo** placeholders unless a live gateway is configured.
+- **Transparent Provenance**: Every value carries a code-controlled status badge (`live`, `partial`, `demo` or `unavailable`) with its source and observation period, so annual World Bank data is never shown as real-time and demo values are never marked live.
 
 ### 2. Deterministic What-If Simulation Engine
 - **Mathematical Integrity**: Evaluates how economic shocks affect monthly income, discretionary spending, and emergency runway.
@@ -76,14 +76,16 @@ In Pakistan's dynamic macroeconomic climate—marked by shifting inflation, exch
 - **4-Step Setup Wizard**: Smooth user onboarding covering Monthly Income, Savings, Budget Category Allocations, and Financial Goals.
 - **50/30/20 Budgeting Rules**: Real-time classification of Needs, Wants, and Savings.
 - **Financial Health Score (0–100)**: Transparent score evaluated on emergency fund sufficiency, debt load, budget compliance, and savings rate.
-- **Local Device Privacy**: Financial transactions, budgets, goals, and profile data are stored 100% locally on-device via `SharedPreferences`.
+- **Offline-First Privacy & Sync**: Transactions, budgets, goals and profile data are cached on-device (`SharedPreferences`) and sync to a **per-user Firestore ledger** via `/v1/finance` for signed-in accounts — the local cache is the source of truth and reconciles when online, and the cache bucket is dropped on account switch. Guest sessions stay **local-only** and never call the network.
 
 ### 4. Ask Tadbeer — Multi-Agent AI Companion
-- **LangGraph Supervisor Graph**: A stateful multi-agent supervisor orchestrates user queries across specialized nodes:
-  - `economic_intelligence`: Retrieves verified PBS SPI commodity prices and SBP indicators.
-  - `what_if_analysis`: Runs deterministic scenario calculators.
-  - `personal_finance`: Contextualizes user budget and spending patterns.
-  - `general_financial_assistant`: Answers financial literacy, savings strategies, and halal finance questions.
+- **LangGraph Supervisor Graph**: A stateful `supervisor` node routes each query to the relevant specialist agents, a deterministic tool layer, and a final response composer:
+  - `economic_intelligence`: interprets World Bank **annual** indicators and the (demo) PBS essential-commodity prices for an ordinary household.
+  - `personal_finance`: contextualises the user's own income, expenses, savings, budget and goals.
+  - `financial_literacy`: explains financial concepts in simple, localised language.
+  - `risk_impact`: estimates what the data means for **this** user and suggests small, practical steps.
+  - `deterministic_tools`: the What-If scenario engine plus health-score and runway math — **all** arithmetic lives here, never in the LLM.
+  - `response`: composes the final, honest answer from the agents' structured output.
 - **Context-Aware Deep Linking**: Tap any essential commodity or economic indicator to ask Tadbeer directly about its impact.
 - **Chat History Persistence**: Automatic local conversation persistence across app sessions with one-tap clear.
 
@@ -106,10 +108,10 @@ In Pakistan's dynamic macroeconomic climate—marked by shifting inflation, exch
 graph TB
     %% Mobile Layer
     subgraph Client ["Flutter Mobile Client (tadbeerai_app)"]
-        UI["4-Tab Modern UI<br/>(Home | Finance | Economy | Ask Tadbeer)"]
+        UI["5-Area Shell UI<br/>(Home | Finance | Economy | Ask Tadbeer | Profile)"]
         State["Riverpod State Management"]
         Router["GoRouter Deep Linking"]
-        Storage["Local SharedPreferences<br/>(Financial Profile, Budgets, Chats)"]
+        Storage["Offline-First Local Cache<br/>(SharedPreferences: Profile, Budgets, Chats)"]
         AuthRepo["AuthRepository<br/>(Firebase Auth + Mock Fallback)"]
     end
 
@@ -119,10 +121,12 @@ graph TB
     %% Backend Layer
     subgraph Backend ["FastAPI AI Backend (tadbeerai_backend)"]
         Gateway["FastAPI API Gateway (/v1)"]
-        
+        FinStore["Firestore Finance Ledger<br/>(per-UID via /v1/finance, JSON fallback)"]
+
         subgraph DataAdapters ["Data Adapters & Gateways"]
-            PBS["PBS SPI Commodity Client<br/>(16 Essential Items)"]
-            SBP["SBP Macroeconomic Client<br/>(CPI, FX, KIBOR, USD/PKR)"]
+            WB["World Bank Client<br/>(live ANNUAL: CPI, USD/PKR, FX, Remittances, GDP)"]
+            PBS["PBS SPI Commodity Client<br/>(demo: 16 Essential Items)"]
+            SBP["SBP Macro Client<br/>(demo: Policy Rate, KIBOR)"]
             Cache["In-Memory TTL Cache"]
         end
 
@@ -132,26 +136,36 @@ graph TB
         end
 
         subgraph MultiAgent ["LangGraph Multi-Agent Pipeline"]
-            Supervisor["Routing Supervisor"]
-            NodeEcon["Economic Intelligence Node"]
-            NodeWhatIf["What-If Analysis Node"]
-            NodeFinance["Personal Finance Node"]
-            NodeGeneral["General Assistant Node"]
+            Supervisor["supervisor (routing)"]
+            NodeEcon["economic_intelligence"]
+            NodeFinance["personal_finance"]
+            NodeLit["financial_literacy"]
+            NodeRisk["risk_impact"]
+            Tools["deterministic_tools<br/>(What-If, health & runway math)"]
+            Composer["response (composer)"]
         end
     end
 
     %% External Connections
     Gateway --> DataAdapters
     Gateway --> Engine
+    Gateway --> FinStore
     Gateway --> MultiAgent
     DataAdapters --> Cache
+    Storage -.->|signed-in sync| FinStore
     MultiAgent --> Supervisor
     Supervisor --> NodeEcon
-    Supervisor --> NodeWhatIf
     Supervisor --> NodeFinance
-    Supervisor --> NodeGeneral
-    NodeWhatIf --> Engine
+    Supervisor --> NodeLit
+    Supervisor --> NodeRisk
     NodeEcon --> DataAdapters
+    NodeEcon --> Tools
+    NodeFinance --> Tools
+    NodeLit --> Tools
+    Tools --> Engine
+    Tools --> NodeRisk
+    NodeRisk --> Composer
+    Tools --> Composer
 ```
 
 ---
@@ -176,16 +190,18 @@ TadbeerAI 2.0/
 │   │   │   └── profile/             # 4-step financial profile setup wizard
 │   │   ├── l10n/                    # Localization catalogs (.arb files: en, ur, ur-Latn)
 │   │   └── providers/               # Riverpod dependency injection & state providers
-│   └── test/                        # 250 unit, repository, and widget tests
+│   └── test/                        # 304 unit, repository, and widget tests
 │
 └── tadbeerai_backend/               # Python FastAPI + LangGraph Backend
     ├── core/
     │   ├── agents/                  # LangGraph multi-agent graph, supervisor & nodes
-    │   ├── economic_data/           # PBS SPI commodity client, SBP client, service
+    │   ├── economic_data/           # World Bank annual client + PBS/SBP demo gateways
     │   ├── llm/                     # Multi-provider LLM adapters (Gemini, Groq, Mock)
     │   ├── scenarios/               # Deterministic What-If mathematical calculators
-    │   └── api_v1.py                # REST endpoints (/v1/chat, /v1/economy, etc.)
-    └── tests/                       # 301 backend pytest test suites
+    │   └── api_v1.py                # REST endpoints (/v1/assistant/chat, /v1/economy, /v1/finance)
+    ├── legacy/                      # Archived first-generation RSS pipeline (not imported by the app)
+    ├── main.py                      # FastAPI entrypoint (/v1 router + user/notification endpoints)
+    └── tests/                       # 320 backend pytest tests
 ```
 
 ---
@@ -223,14 +239,18 @@ TadbeerAI 2.0/
    ```
 
 4. **Configure environment variables**:
-   Create a `.env` file in `tadbeerai_backend/`:
+   Create a `.env` file in `tadbeerai_backend/` (see `.env.example` for the full list):
    ```env
-   TADBEER_ENV=development
-   TADBEER_LLM_PROVIDER=gemini       # Options: gemini | groq | mock
-   GEMINI_API_KEY=your_gemini_key    # Optional if using mock provider
-   GROQ_API_KEY=your_groq_key        # Optional fallback provider
-   PORT=8000
+   # LLM provider selection — read by core/llm/registry.py
+   PRIMARY_LLM=gemini                # gemini | groq (unknown/empty falls back to gemini)
+   FALLBACK_LLM=groq                 # one controlled fallback; must differ from PRIMARY_LLM
+   GEMINI_API_KEY=your_gemini_key    # needed when gemini is the primary or fallback
+   GROQ_API_KEY=your_groq_key        # needed when groq is the primary or fallback
+   API_PORT=8000
    ```
+   > World Bank **annual** indicators are fetched live and need **no** API key. The PBS SPI and
+   > SBP gateways stay disabled unless you set `PBS_BASE_URL` / `SBP_BASE_URL` (with their keys);
+   > when unset, those indicators fall back to clearly-labelled **demo** data.
 
 5. **Run the backend server**:
    ```bash
@@ -274,6 +294,8 @@ TadbeerAI 2.0/
    # Running on connected device or emulator:
    flutter run
    ```
+   > The backend base URL is injected at build time via `--dart-define=API_BASE_URL=...`
+   > (defaults to `http://10.0.2.2:8000` for the Android emulator). No secrets are compiled into the app.
 
 ---
 
@@ -283,11 +305,11 @@ The project enforces continuous verification across all domain, repository, widg
 
 | Scope | Suite | Result | Execution Time |
 | :--- | :--- | :---: | :---: |
-| **Flutter App** | `flutter test` | **250 Passed / 0 Failed** (5 skipped opt-in E2E) | ~20.2s |
-| **Flutter Linter** | `flutter analyze` | **0 Errors / 0 Warnings / 0 Issues** | ~9.9s |
-| **FastAPI Backend** | `pytest` | **301 Passed / 0 Failed** | ~1.12s |
+| **Flutter App** | `flutter test` | **304 Passed / 0 Failed** (5 skipped opt-in E2E) | ~25s |
+| **Flutter Linter** | `flutter analyze` | **0 Errors / 0 Warnings / 0 Issues** | ~4.9s |
+| **FastAPI Backend** | `pytest` | **320 Passed / 0 Failed** | ~13.2s |
 | **Python Bytecode** | `compileall` | **Code 0 (Clean compilation)** | < 1.0s |
-| **Combined** | **Total Verification** | **551 Automated Tests Passing** | — |
+| **Combined** | **Total Verification** | **624 Automated Tests Passing** | — |
 
 ---
 
@@ -295,13 +317,14 @@ The project enforces continuous verification across all domain, repository, widg
 
 Tadbeer AI 2.0 upholds complete statistical integrity:
 
-- **Pakistan Bureau of Statistics (PBS)**:
-  - Weekly Sensitive Price Indicator (SPI) bulletin tracking 51 essential commodities across 17 urban centres and 50 markets.
-  - Retail average prices for staple grains, pulses, dairy, poultry, vegetables, edible oil, and LPG cylinders.
-- **State Bank of Pakistan (SBP)**:
-  - Monetary Policy Committee policy rates, KIBOR (3-Month), weighted interbank USD/PKR exchange rates, and liquid FX reserves.
+- **World Bank (live, annual)**:
+  - Headline CPI inflation, USD/PKR exchange rate, liquid FX reserves, worker remittances and GDP growth are fetched live from the keyless World Bank indicator API as the most recent **annual** values (with a multi-year history for charts). Annual data is never presented as real-time.
+- **Pakistan Bureau of Statistics (PBS) — demo in this build**:
+  - The weekly Sensitive Price Indicator (SPI) bulletin covers 51 essential commodities across 17 urban centres and 50 markets; this build ships a clearly-labelled **demo** catalogue of 16 items (staple grains, pulses, dairy, poultry, vegetables, edible oil and LPG cylinders) because the live PBS gateway is not configured.
+- **State Bank of Pakistan (SBP) — demo in this build**:
+  - The Monetary Policy Committee policy rate and KIBOR (3-Month) are **demo** placeholders unless a live SBP gateway is configured. (In this build USD/PKR and FX reserves come from the World Bank, not SBP.)
 - **Status Transparency**:
-  - Whenever live gateway connections are unavailable, the application gracefully switches to bundled seed data, explicitly badging status as `demo` or `partial` with detailed fallback reasons. **Synthetic numbers are never falsely marked as live**.
+  - Every indicator and commodity carries a code-controlled status — `live` (World Bank annual), `partial`, `demo` (bundled seed) or `unavailable` — with its source and observation period. Whenever a live gateway is unavailable the app gracefully falls back to bundled seed data and badges it accordingly. **Synthetic numbers are never falsely marked as live, and annual data is never labelled real-time.**
 
 ---
 

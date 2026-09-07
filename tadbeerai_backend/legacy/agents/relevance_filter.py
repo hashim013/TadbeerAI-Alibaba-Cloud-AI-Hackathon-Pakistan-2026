@@ -1,5 +1,5 @@
 import re
-from core.rss_sources import DOMAIN_KEYWORDS
+from legacy.rss_sources import DOMAIN_KEYWORDS
 
 
 # Words that indicate an article is NOT business news

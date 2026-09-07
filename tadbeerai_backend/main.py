@@ -1,37 +1,19 @@
-import json
 import os
-import time
 from contextlib import asynccontextmanager
 
-from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 
-
-from agents.action_generator import generate_actions
-from agents.content_ingestor import ingest_content
-from agents.impact_analyzer import analyze_impact
-from agents.insight_extractor import extract_insight
-from agents.relevance_filter import score_and_filter
-from agents.rss_watcher import fetch_all_feeds
-from agents.simulation_agent import simulate_action
 from core.api_v1 import router as v1_router
-from core.llm_client import get_ai_provider, normalize_confidence
+from core.llm import get_llm_registry
 from core.paths import get_data_dir
 from core.schemas import (
-    AnalyseRequest,
-    SimulateRequest,
     RegisterUserRequest,
     UserPersonaRequest,
     UpdateUserRequest,
     FcmTokenRequest,
-)
-from core.trace_builder import (
-    append_simulation_trace,
-    build_analyse_trace,
-    build_feed_trace,
 )
 from core.auth import get_authenticated_user_id
 from core.firestore_client import init_firestore, get_firestore_client
@@ -41,11 +23,6 @@ from core.notification_service import get_notification_service
 load_dotenv()
 
 DATA_DIR = get_data_dir()
-FEED_CACHE = os.path.join(DATA_DIR, "feed_cache.json")
-TRACE_LOG = os.path.join(DATA_DIR, "trace_log.json")
-POLL_MINUTES = int(os.getenv("POLL_INTERVAL_MINUTES", "15"))
-
-_feed_trace: list[dict] = []
 
 
 def get_trace_log_path(user_id: Optional[str]) -> str:
@@ -56,66 +33,6 @@ def get_trace_log_path(user_id: Optional[str]) -> str:
         safe_uid = "guest"
     return os.path.join(DATA_DIR, f"trace_log_{safe_uid}.json")
 
-scheduler = BackgroundScheduler()
-
-
-def refresh_feed() -> list[dict]:
-    """Runs Agent 0 + 1 and caches filtered feed."""
-    global _feed_trace
-    print("[Scheduler] Refreshing RSS feed...")
-    os.makedirs(DATA_DIR, exist_ok=True)
-    raw = fetch_all_feeds()
-
-    # Load and merge mock news from mock_db/news_feed.json
-    try:
-        from email.utils import parsedate_to_datetime
-        from datetime import datetime
-        mock_feed_path = os.path.join(os.path.dirname(__file__), "mock_db", "news_feed.json")
-        if os.path.exists(mock_feed_path):
-            with open(mock_feed_path, "r", encoding="utf-8") as f:
-                mock_data = json.load(f)
-                mock_news = mock_data.get("news", [])
-                
-                formatted_mock_news = []
-                for item in mock_news:
-                    pub_str = item.get("published", "")
-                    try:
-                        pub_iso = parsedate_to_datetime(pub_str).isoformat()
-                    except Exception:
-                        pub_iso = datetime.now().isoformat()
-                        
-                    formatted_mock_news.append({
-                        "id": str(item.get("id")),
-                        "title": item.get("title", ""),
-                        "url": item.get("link", ""),
-                        "source": item.get("source", ""),
-                        "preview_text": item.get("summary", "")[:200],
-                        "published_at": pub_iso,
-                        "image_url": item.get("image_url"),
-                        "raw_text": item.get("summary", "") + " " + item.get("title", ""),
-                    })
-                
-                seen_urls = {item["url"] for item in raw}
-                merged_count = 0
-                for item in formatted_mock_news:
-                    if item["url"] not in seen_urls:
-                        raw.append(item)
-                        seen_urls.add(item["url"])
-                        merged_count += 1
-                print(f"[Scheduler] Merged {merged_count} articles from news_feed.json")
-    except Exception as e:
-        print(f"[Scheduler] Failed to load/merge mock news_feed.json: {e}")
-
-    filtered = score_and_filter(raw)
-    top_domain = filtered[0]["domain"] if filtered else "none"
-    _feed_trace = build_feed_trace(len(raw), len(filtered), top_domain)
-
-    with open(FEED_CACHE, "w") as f:
-        json.dump(filtered, f, default=str)
-
-    print(f"[Scheduler] Feed refreshed: {len(filtered)} items")
-    return filtered
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -125,28 +42,7 @@ async def lifespan(app: FastAPI):
         print("[Startup] [OK] Firestore initialized")
     except Exception as e:
         print(f"[Startup] [WARN] Firestore initialization warning: {e}")
-
-    # Reset MockDatabase on startup (Agent Rule 5)
-    try:
-        from core.mock_db import MockDatabase
-        MockDatabase().reset()
-        print("[Startup] [OK] MockDatabase reset to default")
-    except Exception as e:
-        print(f"[Startup] [WARN] MockDatabase reset warning: {e}")
-    
-    # Vercel (serverless) freezes/kills background threads between invocations,
-    # so the RSS scheduler and the blocking startup refresh only run off-Vercel.
-    # On Vercel the feed refreshes on-demand via the stale-cache logic in /feed.
-    if not os.getenv("VERCEL"):
-        scheduler.add_job(refresh_feed, "interval", minutes=POLL_MINUTES)
-        scheduler.start()
-        try:
-            refresh_feed()
-        except Exception as e:
-            print(f"[Startup] Feed refresh failed: {e}")
     yield
-    if not os.getenv("VERCEL"):
-        scheduler.shutdown(wait=False)
 
 
 app = FastAPI(title="TadbeerAI API", version="2.0.0", lifespan=lifespan)
@@ -173,9 +69,16 @@ def root():
         "hackathon": "AISeekho2026",
         "version": "2.0.0",
         "endpoints": [
-            "/feed", "/analyse", "/simulate", "/trace", "/health",
-            "/register", "/users", "/notifications",
-            "/v1/health", "/v1/assistant/chat", "/v1/economy/snapshot",
+            "/health",
+            "/v1/health",
+            "/v1/assistant/chat",
+            "/v1/economy/snapshot",
+            "/v1/economy/essential-prices",
+            "/v1/finance",
+            "/register",
+            "/users",
+            "/users/persona",
+            "/notifications",
         ],
     }
 
@@ -185,288 +88,15 @@ def health():
     firestore = get_firestore_client()
     registry = get_user_registry()
     user_count = len(registry.get_all_users())
+    llm_registry = get_llm_registry()
     return {
         "status": "ok",
         "team": "TADBEERAI",
         "challenge": "1",
-        "ai_provider": get_ai_provider(),
+        "ai_provider": llm_registry.primary_name,
         "firestore": "✅ Connected" if firestore.available else "⚠️ Fallback (Mock)",
         "registered_users": user_count,
     }
-
-
-@app.get("/feed")
-def get_feed(refresh: bool = False, category: Optional[str] = None):
-    """GET /feed — Pakistan business news for Flutter FeedScreen (filtered by user category if provided)."""
-    cache_exists = os.path.exists(FEED_CACHE)
-    should_refresh = refresh or not cache_exists
-    items = []
-
-    if cache_exists and not should_refresh:
-        # Check file age to auto-expire cache after 10 minutes (600 seconds)
-        mtime = os.path.getmtime(FEED_CACHE)
-        age_seconds = time.time() - mtime
-        if age_seconds > 600:
-            should_refresh = True
-            print(f"[Feed] Cache is {int(age_seconds)}s old (>600s). Triggering auto-refresh.")
-
-    if not should_refresh:
-        try:
-            with open(FEED_CACHE) as f:
-                items = json.load(f)
-            if items:
-                print(f"[Feed] Returning {len(items)} cached items")
-        except Exception as e:
-            print(f"[Feed] Cache read error, will refresh: {e}")
-            should_refresh = True
-
-    if should_refresh:
-        print("[Feed] Refreshing and scoring feed...")
-        items = refresh_feed()
-
-    if category:
-        category_lower = category.lower().strip()
-        
-        KEYWORDS_BY_CATEGORY = {
-            "student": [
-                "student", "university", "education", "stipend", "school", "college", "scholarship", 
-                "youth", "career", "degree", "internship", "tuition", "hnd", "graduat"
-            ],
-            "business": [
-                "business", "company", "corporate", "turnover", "employee", "industry", "export", 
-                "import", "tax", "imf", "sbp", "policy", "startup", "finance", "funding", "audit", 
-                "securities", "trade"
-            ],
-            "shop": [
-                "shop", "retail", "store", "revenue", "inventory", "sales", "consumer", "price", 
-                "delivery", "tax", "importer", "grocer", "supermarket", "pos", "shopkeeper"
-            ],
-            "employee": [
-                "salary", "employee", "job", "wage", "income", "pay", "tax slab", "hiring", 
-                "workforce", "allowance", "pension", "bonus", "recruiting", "unemployment"
-            ]
-        }
-        
-        CATEGORY_MAP = {
-            "shop": "shop",
-            "shopkeeper": "shop",
-            "shop keeper": "shop",
-            "business": "business",
-            "business owner": "business",
-            "employee": "employee",
-            "student": "student"
-        }
-        
-        mapped_cat = CATEGORY_MAP.get(category_lower)
-        if mapped_cat:
-            kws = KEYWORDS_BY_CATEGORY[mapped_cat]
-            filtered = []
-            for item in items:
-                title_desc = (item.get("title", "") + " " + item.get("preview_text", "")).lower()
-                if any(kw in title_desc for kw in kws):
-                    filtered.append(item)
-            print(f"[Feed] Filtered feed for category '{category}' (mapped: '{mapped_cat}'): {len(filtered)}/{len(items)} items")
-            items = filtered
-
-    return items
-
-
-def _run_analyse(request: AnalyseRequest, user_id: Optional[str] = None) -> dict:
-    global _feed_trace
-    timings: dict[str, float] = {}
-
-    t0 = time.time()
-    ingested = ingest_content(
-        text=request.text,
-        source_url=request.source_url,
-        language=request.language,
-    )
-    timings["ingest"] = time.time() - t0
-
-    detect_text = request.text or ingested["normalized_text"]
-    temp_articles = score_and_filter([{
-        "title": detect_text[:100],
-        "raw_text": ingested["normalized_text"],
-        "id": "temp",
-        "url": request.source_url or "",
-        "source": "",
-        "published_at": "",
-        "preview_text": "",
-    }])
-    domain = temp_articles[0]["domain"] if temp_articles else "Finance"
-
-    t0 = time.time()
-    insight = extract_insight(ingested, domain, user_profile=request.user_profile, language=request.language)
-    timings["insight"] = time.time() - t0
-
-    t0 = time.time()
-    impacts = analyze_impact(insight, domain, ingested["entities"], request.user_profile, language=request.language)
-    timings["impact"] = time.time() - t0
-
-    t0 = time.time()
-    actions = generate_actions(insight, impacts, domain, user_profile=request.user_profile, language=request.language)
-    timings["actions"] = time.time() - t0
-
-    agent_trace = build_analyse_trace(
-        ingested, domain, insight, impacts, actions, timings, feed_trace=_feed_trace
-    )
-
-    trace_payload = {
-        "insight": insight,
-        "impacts": impacts,
-        "actions": actions,
-        "domain": domain,
-        "agent_trace": agent_trace,
-    }
-    os.makedirs(DATA_DIR, exist_ok=True)
-    trace_path = get_trace_log_path(user_id)
-    with open(trace_path, "w") as f:
-        json.dump(trace_payload, f, default=str)
-
-    return {
-        "insight": insight.get("insight_title", ""),
-        "insight_detail": insight.get("insight_detail", ""),
-        "confidence": normalize_confidence(insight.get("confidence", 0.75)),
-        "confidence_reason": insight.get("confidence_reason", ""),
-        "tags": insight.get("tags", [domain]),
-        "impacts": impacts,
-        "actions": actions,
-        "agent_trace": agent_trace,
-        "domain": domain,
-    }
-
-
-@app.post("/analyse")
-@app.post("/analyze")
-def analyse(request: AnalyseRequest, authorization: Optional[str] = Header(None)):
-    """POST /analyse — Agents 2→5 pipeline for Flutter InsightScreen."""
-    if not request.text and not request.source_url:
-        raise HTTPException(status_code=400, detail="No text or source_url provided")
-    try:
-        user_id = get_authenticated_user_id(authorization)
-        if not user_id and request.user_profile:
-            user_id = request.user_profile.get("user_id") or request.user_profile.get("uid")
-        return _run_analyse(request, user_id)
-    except ValueError as e:
-        # User-facing errors from URL scraping (bad URL, empty content, etc.)
-        print(f"[Analyse] URL error: {e}")
-        raise HTTPException(status_code=422, detail=str(e))
-    except Exception as e:
-        print(f"[Analyse] Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/simulate")
-@app.post("/execute")
-def simulate(request: SimulateRequest, authorization: Optional[str] = Header(None)):
-    """POST /simulate — Agent 6 real execution for Flutter BeforeAfterScreen."""
-    user_id = get_authenticated_user_id(authorization)
-    if not user_id:
-        user_id = request.user_id
-    if not user_id and request.user_profile:
-        user_id = request.user_profile.get("user_id") or request.user_profile.get("uid")
-        
-    trace_path = get_trace_log_path(user_id)
-    try:
-        with open(trace_path) as f:
-            trace_data = json.load(f)
-    except Exception:
-        trace_data = {
-            "insight": {
-                "insight_title": "Business development detected",
-                "insight_detail": "",
-            },
-            "actions": [{
-                "rank": 1,
-                "title": "Review situation",
-                "detail": "Monitor development",
-                "business_math": "",
-                "churn_risk": "",
-                "urgency": "medium",
-                "timeline": "This week"
-            }],
-            "domain": "Finance",
-            "agent_trace": _feed_trace,
-        }
-
-    all_actions = trace_data.get("actions", [])
-    idx = min(max(0, request.action_index), len(all_actions) - 1) if all_actions else 0
-    ordered_actions = (
-        [all_actions[idx]] + [a for i, a in enumerate(all_actions) if i != idx]
-        if all_actions
-        else []
-    )
-
-    insight_dict = trace_data.get("insight", {})
-    if "impacts" in trace_data:
-        insight_dict["impacts"] = trace_data["impacts"]
-
-    result = simulate_action(
-        actions=ordered_actions,
-        domain=trace_data.get("domain", "Finance"),
-        insight=insight_dict,
-        user_id=user_id,
-        notify_channels=request.notify_channels,
-        user_profile=request.user_profile,
-    )
-
-    agent_trace = append_simulation_trace(
-        trace_data.get("agent_trace", _feed_trace),
-        result,
-    )
-    trace_data["agent_trace"] = agent_trace
-    trace_data["simulation"] = result
-    os.makedirs(DATA_DIR, exist_ok=True)
-    with open(trace_path, "w") as f:
-        json.dump(trace_data, f, default=str)
-
-    result["agent_trace"] = agent_trace
-    return result
-
-
-@app.get("/trace")
-def get_trace(authorization: Optional[str] = Header(None)):
-    """GET /trace — Flutter expects top-level List[AgentStep]."""
-    user_id = get_authenticated_user_id(authorization)
-    trace_path = get_trace_log_path(user_id)
-    try:
-        with open(trace_path) as f:
-            data = json.load(f)
-        return data.get("agent_trace", [])
-    except FileNotFoundError:
-        return _feed_trace if _feed_trace else []
-
-
-# ==================== STATE MANAGEMENT ENDPOINTS ====================
-
-
-@app.get("/state")
-def get_state():
-    """GET /state — Get the current business state including FBR and SBR tax rates."""
-    try:
-        firestore = get_firestore_client()
-        state = firestore.get_business_state()
-        return state
-    except Exception as e:
-        print(f"[State] Error fetching state: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/state")
-def update_state(updates: dict, authorization: Optional[str] = Header(None)):
-    """POST /state — Update the business state directly (e.g. adjust FBR/SBR tax rates)."""
-    auth_uid = get_authenticated_user_id(authorization)
-    if not auth_uid:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    try:
-        firestore = get_firestore_client()
-        success, err = firestore.update_business_state(updates)
-        if err:
-            raise HTTPException(status_code=400, detail=err)
-        return {"status": "success", "state": firestore.get_business_state()}
-    except Exception as e:
-        print(f"[State] Error updating state: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ==================== USER REGISTRATION ENDPOINTS ====================
@@ -498,7 +128,7 @@ def register_user(request: RegisterUserRequest, authorization: Optional[str] = H
             "is_guest": is_guest,
             "eligible_for_alerts": eligible_for_alerts,
         }
-        
+
         # Save to Firestore /users/{user_id}/
         client = get_firestore_client()
         if client.available:
@@ -518,7 +148,7 @@ def register_user(request: RegisterUserRequest, authorization: Optional[str] = H
                 users.append(user_data)
             registry._write_json(users)
             print(f"[Register] Saved user {user_id} to JSON fallback (mode: {mode}, eligible_for_alerts: {eligible_for_alerts})")
-            
+
         return {
             "success": True,
             "user_id": user_id,
@@ -534,7 +164,7 @@ def register_user(request: RegisterUserRequest, authorization: Optional[str] = H
 @app.post("/users/persona")
 def save_user_persona(request: UserPersonaRequest, authorization: Optional[str] = Header(None)):
     """POST /users/persona — Save or update user financial persona.
-    
+
     In guest mode, preferences are recorded locally / marked as guest, and user
     is explicitly NOT eligible for alerts.
     For registered accounts (Email/Password or Google), user is marked eligible for alerts.
@@ -569,7 +199,7 @@ def save_user_persona(request: UserPersonaRequest, authorization: Optional[str] 
         if client.available:
             client.db.collection("users").document(user_id).set(persona_data, merge=True)
             print(f"[Persona] Synced persona for {user_id} (is_guest: {is_guest}, eligible_for_alerts: {eligible_for_alerts})")
-        
+
         registry = get_user_registry()
         registry.update_user(user_id, persona_data)
 
@@ -626,28 +256,28 @@ def delete_account(authorization: Optional[str] = Header(None)):
     user_id = get_authenticated_user_id(authorization)
     if not user_id:
         raise HTTPException(status_code=401, detail="Unauthorized")
-        
+
     try:
         client = get_firestore_client()
         fcm_token = None
-        
+
         # 1. Fetch user to retrieve FCM token before deletion
         if client.available:
             doc_ref = client.db.collection("users").document(user_id)
             doc = doc_ref.get()
             if doc.exists:
                 fcm_token = doc.to_dict().get("fcm_token")
-                
+
                 # Delete subcollection /users/{user_id}/alerts
                 alerts_ref = doc_ref.collection("alerts")
                 alert_docs = alerts_ref.stream()
                 for alert_doc in alert_docs:
                     alert_doc.reference.delete()
-                
+
                 # Delete the main document
                 doc_ref.delete()
                 print(f"[Delete Account] Firestore documents deleted for {user_id}")
-            
+
             # Also clean up from registry (Firestore "registered_users" + JSON fallback)
             registry = get_user_registry()
             if not fcm_token:
@@ -664,7 +294,7 @@ def delete_account(authorization: Optional[str] = Header(None)):
                 fcm_token = user_data.get("fcm_token")
             registry.delete_user(user_id)
             print(f"[Delete Account] Local JSON user deleted for {user_id}")
-            
+
         # 2. Remove FCM token from notification groups
         if fcm_token:
             try:
@@ -673,7 +303,7 @@ def delete_account(authorization: Optional[str] = Header(None)):
                 print(f"[Delete Account] Unsubscribed FCM token from 'all' topic")
             except Exception as e:
                 print(f"[Delete Account] FCM unsubscribe warning (non-fatal): {e}")
-                
+
         # 3. Clean up user trace file if it exists
         trace_path = get_trace_log_path(user_id)
         if os.path.exists(trace_path):

@@ -5,7 +5,7 @@ from email.utils import parsedate_to_datetime
 import feedparser
 from bs4 import BeautifulSoup
 
-from core.rss_sources import RSS_FEEDS
+from legacy.rss_sources import RSS_FEEDS
 
 
 import httpx

@@ -183,7 +183,7 @@ def _fetch_url_text_fallback(url: str, last_error: str) -> str:
     """
     print(f"[Agent2] URL fetch/parsing failed: {last_error}. Falling back to LLM-guided context generation.")
     try:
-        from core.llm_client import call_llm
+        from legacy.llm_client import call_llm
         prompt = f"""
 The user wants to analyze a Pakistani business/financial news article from this URL: {url}
 

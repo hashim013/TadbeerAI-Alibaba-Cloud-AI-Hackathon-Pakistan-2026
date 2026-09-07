@@ -5,8 +5,8 @@ Trade Domain Executor - Real execution for trade-related actions.
 import logging
 from typing import Dict, Any, Tuple
 
-from core.external_api_client import get_external_api_client
-from core.execution_rollback import get_rollback_manager
+from legacy.external_api_client import get_external_api_client
+from legacy.execution_rollback import get_rollback_manager
 
 logger = logging.getLogger(__name__)
 

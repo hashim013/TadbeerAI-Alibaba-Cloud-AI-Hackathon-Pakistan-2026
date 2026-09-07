@@ -1,5 +1,5 @@
-from core.fallbacks import fallback_insight
-from core.llm_client import call_llm_json, normalize_confidence
+from legacy.fallbacks import fallback_insight
+from legacy.llm_client import call_llm_json, normalize_confidence
 
 INSIGHT_SYSTEM_PROMPT = """
 You are a Pakistan Business Intelligence Agent for TadbeerAI.

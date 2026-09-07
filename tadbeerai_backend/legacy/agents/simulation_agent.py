@@ -12,23 +12,23 @@ Executes top-priority actions with:
 import logging
 import re
 from datetime import datetime
-from core.llm_client import call_llm_json
+from legacy.llm_client import call_llm_json
 from typing import Tuple
 from uuid import uuid4
 
 from core.firestore_client import get_firestore_client
 from core.notification_service import get_notification_service
-from core.external_api_client import get_external_api_client
-from core.execution_rollback import get_rollback_manager
-from agents.execution_handlers.energy_executor import execute_energy_action
-from agents.execution_handlers.currency_executor import execute_currency_action
-from agents.execution_handlers.stock_market_executor import execute_stock_market_action
-from agents.execution_handlers.gold_executor import execute_gold_action
-from agents.execution_handlers.logistics_executor import execute_logistics_action
-from agents.execution_handlers.finance_executor import execute_finance_action
-from agents.execution_handlers.policy_executor import execute_policy_action
-from agents.execution_handlers.trade_executor import execute_trade_action
-from agents.execution_handlers.supply_chain_executor import execute_supply_chain_action
+from legacy.external_api_client import get_external_api_client
+from legacy.execution_rollback import get_rollback_manager
+from legacy.agents.execution_handlers.energy_executor import execute_energy_action
+from legacy.agents.execution_handlers.currency_executor import execute_currency_action
+from legacy.agents.execution_handlers.stock_market_executor import execute_stock_market_action
+from legacy.agents.execution_handlers.gold_executor import execute_gold_action
+from legacy.agents.execution_handlers.logistics_executor import execute_logistics_action
+from legacy.agents.execution_handlers.finance_executor import execute_finance_action
+from legacy.agents.execution_handlers.policy_executor import execute_policy_action
+from legacy.agents.execution_handlers.trade_executor import execute_trade_action
+from legacy.agents.execution_handlers.supply_chain_executor import execute_supply_chain_action
 
 logger = logging.getLogger(__name__)
 

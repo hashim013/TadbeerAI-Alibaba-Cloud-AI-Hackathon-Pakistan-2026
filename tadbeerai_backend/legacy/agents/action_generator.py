@@ -1,5 +1,5 @@
-from core.fallbacks import fallback_actions
-from core.llm_client import call_llm_json
+from legacy.fallbacks import fallback_actions
+from legacy.llm_client import call_llm_json
 
 ACTION_SYSTEM_PROMPT = """
 You are a Pakistan Business Action Advisor for TadbeerAI.
