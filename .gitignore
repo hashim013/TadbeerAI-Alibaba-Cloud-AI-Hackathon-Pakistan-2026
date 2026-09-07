@@ -8,6 +8,8 @@
 *.env
 **/.env
 **/.env.*
+# ...but keep the shareable, secret-free template tracked
+!**/.env.example
 app.yaml
 *app.yaml
 **/app.yaml

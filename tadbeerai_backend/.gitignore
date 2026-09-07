@@ -47,3 +47,7 @@ mock_db/system_state.json
 data/feed_cache.json
 data/trace_log.json
 data/mock_db.json
+
+# Runtime user + notification data (auto-regenerated on startup; contains PII)
+data/registered_users.json
+data/notification_log.json
