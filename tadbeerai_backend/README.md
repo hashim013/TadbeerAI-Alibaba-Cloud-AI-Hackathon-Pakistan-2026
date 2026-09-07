@@ -32,13 +32,21 @@ Ensure the API key allows **Generative Language API** (Google AI Studio). If you
 
 ## Deploy to Vercel
 
-The backend runs as a serverless Python (ASGI) function via [`vercel.json`](vercel.json)
-— `@vercel/python` picks up the `app = FastAPI(...)` in `main.py`. Set the Vercel project
-**Root Directory** to `tadbeerai_backend`, then add the environment variables:
-`FIREBASE_SERVICE_ACCOUNT_JSON`, `GOOGLE_CLOUD_PROJECT=tadbeerai2`, `GEMINI_API_KEY`,
-`GROQ_API_KEY`, `AI_PROVIDER`, `DATA_DIR=/tmp/tadbeerai_data`, `APP_ENV=production`, plus
-notification creds. The RSS scheduler is disabled on Vercel (feed refreshes on-demand).
-Build the Flutter app with `--dart-define=API_BASE_URL=https://<project>.vercel.app`.
+The backend runs as a single serverless Python (ASGI) Vercel Function with **zero
+configuration** — there is deliberately no `vercel.json`. Vercel detects FastAPI from
+`requirements.txt` and imports the `app = FastAPI(...)` in `main.py`, which is one of its
+recognised entrypoint filenames; every request is then handed to FastAPI's own router.
+Set the Vercel project **Root Directory** to `tadbeerai_backend`, then add the environment
+variables: `FIREBASE_SERVICE_ACCOUNT_JSON`,
+`GEMINI_API_KEY`, `GROQ_API_KEY`, `AI_PROVIDER`, `DATA_DIR=/tmp/tadbeerai_data`,
+`APP_ENV=production`, plus notification creds. The RSS scheduler is disabled on Vercel
+(feed refreshes on-demand). Build the Flutter app with
+`--dart-define=API_BASE_URL=https://<project>.vercel.app`.
+
+Do not re-add `vercel.json`: the legacy `builds` property cannot be combined with
+`functions` (Vercel rejects the deploy outright), and `functions.maxDuration` is
+unnecessary here because Python functions on Fluid compute already default to 300s —
+which is also the Hobby maximum, so setting it can only lower the timeout.
 
 > Firebase (Firestore + Auth) still runs on Google Cloud and is required — Vercel only
 > hosts the Python code; the finance ledger, user data and ID-token verification all

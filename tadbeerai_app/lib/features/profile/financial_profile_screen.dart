@@ -431,47 +431,59 @@ class _FinancialProfileScreenState
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
           child: Row(
             children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isGuest
-                      ? const Color(0xFF334155).withValues(alpha: 0.5)
-                      : const Color(0xFF10B981).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
+              // Flexible so the pill is capped at the row width on narrow
+              // screens instead of overflowing by its natural size.
+              Flexible(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
                     color: isGuest
-                        ? const Color(0xFF475569)
-                        : const Color(0xFF10B981).withValues(alpha: 0.35),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      isGuest
-                          ? Icons.person_outline_rounded
-                          : Icons.verified_user_outlined,
-                      size: 13,
+                        ? const Color(0xFF334155).withValues(alpha: 0.5)
+                        : const Color(0xFF10B981).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
                       color: isGuest
-                          ? const Color(0xFFCBD5E1)
-                          : const Color(0xFF10B981),
+                          ? const Color(0xFF475569)
+                          : const Color(0xFF10B981).withValues(alpha: 0.35),
+                      width: 1,
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      isGuest
-                          ? 'Guest Mode · Saved locally on device · Alerts inactive'
-                          : 'Registered Account · Price alerts active',
-                      style: GoogleFonts.inter(
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isGuest
+                            ? Icons.person_outline_rounded
+                            : Icons.verified_user_outlined,
+                        size: 13,
                         color: isGuest
                             ? const Color(0xFFCBD5E1)
-                            : const Color(0xFF10B981),
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w500,
+                            : isDark
+                                ? const Color(0xFF10B981)
+                                : AppColors.tealOnLight,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 6),
+                      // Flexible lets the long guest label wrap onto a second
+                      // line instead of pushing the pill past the right edge.
+                      Flexible(
+                        child: Text(
+                          isGuest
+                              ? 'Guest Mode · Saved locally on device · Alerts inactive'
+                              : 'Registered Account · Price alerts active',
+                          style: GoogleFonts.inter(
+                            color: isGuest
+                                ? const Color(0xFFCBD5E1)
+                                : isDark
+                                    ? const Color(0xFF10B981)
+                                    : AppColors.tealOnLight,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -510,11 +522,13 @@ class _FinancialProfileScreenState
                     letterSpacing: -0.5,
                     height: 1.2,
                   ),
-                  children: const [
+                  children: [
                     TextSpan(
                       text: 'yourself',
                       style: TextStyle(
-                        color: Color(0xFF10B981),
+                        color: isDark
+                            ? const Color(0xFF10B981)
+                            : AppColors.tealOnLight,
                       ),
                     ),
                   ],
@@ -638,11 +652,13 @@ class _FinancialProfileScreenState
                     letterSpacing: -0.5,
                     height: 1.2,
                   ),
-                  children: const [
+                  children: [
                     TextSpan(
                       text: 'your finances',
                       style: TextStyle(
-                        color: Color(0xFF10B981),
+                        color: isDark
+                            ? const Color(0xFF10B981)
+                            : AppColors.tealOnLight,
                       ),
                     ),
                   ],
@@ -794,7 +810,9 @@ class _FinancialProfileScreenState
                 child: Text(
                   'Back',
                   style: GoogleFonts.inter(
-                    color: const Color(0xFF10B981),
+                    color: isDark
+                        ? const Color(0xFF10B981)
+                        : AppColors.tealOnLight,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
@@ -829,7 +847,8 @@ class _FinancialProfileScreenState
               Text(
                 'What are your primary\nfinancial goals?',
                 style: GoogleFonts.inter(
-                  color: const Color(0xFF10B981),
+                  color:
+                      isDark ? const Color(0xFF10B981) : AppColors.tealOnLight,
                   fontSize: 25,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.5,
@@ -950,7 +969,9 @@ class _FinancialProfileScreenState
                 child: Text(
                   'Back',
                   style: GoogleFonts.inter(
-                    color: const Color(0xFF10B981),
+                    color: isDark
+                        ? const Color(0xFF10B981)
+                        : AppColors.tealOnLight,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
@@ -999,7 +1020,8 @@ class _FinancialProfileScreenState
               Text(
                 'your information',
                 style: GoogleFonts.inter(
-                  color: const Color(0xFF10B981),
+                  color:
+                      isDark ? const Color(0xFF10B981) : AppColors.tealOnLight,
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.5,
@@ -1022,7 +1044,8 @@ class _FinancialProfileScreenState
               Text(
                 'Your Profile Summary',
                 style: GoogleFonts.inter(
-                  color: const Color(0xFF2DD4BF),
+                  color:
+                      isDark ? const Color(0xFF2DD4BF) : AppColors.tealOnLight,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),
@@ -1201,7 +1224,9 @@ class _FinancialProfileScreenState
                 child: Text(
                   'Back',
                   style: GoogleFonts.inter(
-                    color: const Color(0xFF10B981),
+                    color: isDark
+                        ? const Color(0xFF10B981)
+                        : AppColors.tealOnLight,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),

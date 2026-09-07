@@ -53,6 +53,15 @@ abstract final class AppColors {
       Color(0xFF3E5C76); // Muted slate-blue
   static const Color textOnLightTertiary = Color(0xFF6B8AAB); // Light tertiary
 
+  /// Deepened teal for accent *text* on the light teal-to-blue canvas.
+  ///
+  /// The brand teals (`teal` #2DD4BF and #10B981) sit far too close in
+  /// luminance to [lightThemeGradient] to read as text, so light mode swaps
+  /// accent words, links and pill labels to this tone. It keeps the teal brand
+  /// identity while reaching ~4.5:1 contrast on the gradient and ~7.5:1 on
+  /// [lightCard]. Dark mode keeps using `teal` / #10B981 unchanged.
+  static const Color tealOnLight = Color(0xFF115E59);
+
   // ── Semantic ─────────────────────────────────────────────────────────
   static const Color success = mint;
   static const Color danger = Color(0xFFF87171);
