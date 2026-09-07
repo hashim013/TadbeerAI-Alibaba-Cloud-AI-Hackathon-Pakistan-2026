@@ -6,7 +6,6 @@ import 'package:tadbeerai/core/theme/app_theme.dart';
 import 'package:tadbeerai/data/mock/mock_commodity_data.dart';
 import 'package:tadbeerai/data/repositories/mock_economic_repository.dart';
 import 'package:tadbeerai/features/economy/economic_pulse_screen.dart';
-import 'package:tadbeerai/features/economy/widgets/commodity_card.dart';
 import 'package:tadbeerai/features/economy/widgets/economy_widgets.dart';
 import 'package:tadbeerai/l10n/app_localizations.dart';
 import 'package:tadbeerai/providers/economic_providers.dart';
