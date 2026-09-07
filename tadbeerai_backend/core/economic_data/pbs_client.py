@@ -25,7 +25,13 @@ from urllib.parse import urlparse
 
 import httpx
 
-from .client import EconomicDataError, env_timeout, fetch_json, parse_number
+from .client import (
+    EconomicDataError,
+    env_timeout,
+    fetch_json,
+    optional_gateway_provenance,
+    parse_number,
+)
 from .models import (
     Indicator,
     IndicatorSpec,
@@ -36,6 +42,9 @@ from .models import (
 
 #: indicators this gateway owns (PBS's own price statistics)
 _INDICATORS: tuple[str, ...] = ("inflation_rate_pct",)
+
+#: official PBS price-statistics page — the human-verifiable source of CPI
+_OFFICIAL_SOURCE_URL = "https://www.pbs.gov.pk/price-statistics/"
 
 
 class PBSGatewayClient:
@@ -122,6 +131,9 @@ class PBSGatewayClient:
                     source=self._source_label(),
                     period=period,
                     notes="monthly CPI, year-on-year",
+                    frequency="monthly",
+                    source_url=_OFFICIAL_SOURCE_URL,
+                    **optional_gateway_provenance(entry),
                 )
             )
         return results

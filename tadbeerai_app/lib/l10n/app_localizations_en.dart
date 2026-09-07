@@ -645,8 +645,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String economySourceFooter(String source) {
-    return 'Source: $source · Synthetic demo data — not live';
+    return 'Source: $source';
   }
+
+  @override
+  String get economySourceStatusLive => 'Live official data';
+
+  @override
+  String get economySourceStatusPartial => 'Partly live, partly demo';
+
+  @override
+  String get economySourceStatusDemo => 'Synthetic demo data — not live';
+
+  @override
+  String get economySourceStatusUnavailable => 'Data unavailable';
+
+  @override
+  String get economyHistoryUnavailable => 'Historical data unavailable';
+
+  @override
+  String get economyLatestOfficial => 'Latest official data';
+
+  @override
+  String get economyViewSource => 'View official source';
+
+  @override
+  String get economyAnnualChangeNote => 'Year-on-year change (annual series)';
+
+  @override
+  String get economyFrequencyAnnual => 'Annual';
+
+  @override
+  String get economyFrequencyMonthly => 'Monthly';
+
+  @override
+  String get economyFrequencyWeekly => 'Weekly';
+
+  @override
+  String get economyFrequencyDaily => 'Daily';
+
+  @override
+  String get economyFrequencyPolicy => 'Per policy announcement';
 
   @override
   String get trendRising => 'Rising';
@@ -734,6 +773,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'Steady remittances support the rupee and ease price pressure.';
 
   @override
+  String get indicatorGdp => 'GDP Growth';
+
+  @override
+  String get indicatorGdpDesc =>
+      'How fast the economy\'s output grew over the year.';
+
+  @override
+  String get indicatorGdpWhy =>
+      'Faster growth usually means more jobs and incomes; slower growth squeezes both.';
+
+  @override
   String get economyEventsTitle => 'What\'s changing?';
 
   @override
@@ -781,6 +831,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventAskAction => 'Ask Tadbeer';
 
   @override
+  String economyChangeEventTitle(String name, String direction) {
+    return '$name $direction';
+  }
+
+  @override
+  String get economyDirectionRose => 'rose';
+
+  @override
+  String get economyDirectionFell => 'fell';
+
+  @override
+  String get economyDirectionStable => 'was little changed';
+
+  @override
+  String economyChangeEventBody(
+      String previous, String current, String period) {
+    return 'Moved from $previous to $current ($period).';
+  }
+
+  @override
   String get economyImpactTitle => 'Impact on you';
 
   @override
@@ -822,8 +892,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Steady remittances support the rupee, easing pressure on everyday prices.';
 
   @override
+  String get economyImpactGdpBody =>
+      'Steady growth supports jobs and incomes, which underpins your earning power and savings.';
+
+  @override
   String get economyImpactDisclaimer =>
-      'Estimated scenario from your demo finances — not a forecast.';
+      'Estimated scenario from your finances — not a forecast.';
 
   @override
   String get economyImpactInflationAction =>
@@ -877,6 +951,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get economySuggestedAction => 'Suggested action';
+
+  @override
+  String get essentialPricesEmptyCategory =>
+      'No commodities found in this category.';
 
   @override
   String get askTitle => 'Ask Tadbeer';

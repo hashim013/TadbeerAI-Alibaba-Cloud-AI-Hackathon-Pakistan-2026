@@ -644,8 +644,47 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String economySourceFooter(String source) {
-    return 'ذرائع: $source · مصنوعی ڈیمو ڈیٹا — لائیو نہیں';
+    return 'ذرائع: $source';
   }
+
+  @override
+  String get economySourceStatusLive => 'لائیو سرکاری ڈیٹا';
+
+  @override
+  String get economySourceStatusPartial => 'جزوی لائیو، جزوی ڈیمو';
+
+  @override
+  String get economySourceStatusDemo => 'مصنوعی ڈیمو ڈیٹا — لائیو نہیں';
+
+  @override
+  String get economySourceStatusUnavailable => 'ڈیٹا دستیاب نہیں';
+
+  @override
+  String get economyHistoryUnavailable => 'تاریخی ڈیٹا دستیاب نہیں';
+
+  @override
+  String get economyLatestOfficial => 'تازہ ترین سرکاری ڈیٹا';
+
+  @override
+  String get economyViewSource => 'سرکاری ذریعہ دیکھیں';
+
+  @override
+  String get economyAnnualChangeNote => 'سالانہ بنیاد پر تبدیلی (سالانہ سیریز)';
+
+  @override
+  String get economyFrequencyAnnual => 'سالانہ';
+
+  @override
+  String get economyFrequencyMonthly => 'ماہانہ';
+
+  @override
+  String get economyFrequencyWeekly => 'ہفتہ وار';
+
+  @override
+  String get economyFrequencyDaily => 'روزانہ';
+
+  @override
+  String get economyFrequencyPolicy => 'پالیسی اعلان کے مطابق';
 
   @override
   String get trendRising => 'بڑھ رہا ہے';
@@ -731,6 +770,17 @@ class AppLocalizationsUr extends AppLocalizations {
       'مسلسل ترسیلاتِ زر روپے کو سہارا دیتی ہیں اور قیمتوں پر دباؤ کم کرتی ہیں۔';
 
   @override
+  String get indicatorGdp => 'جی ڈی پی نمو';
+
+  @override
+  String get indicatorGdpDesc =>
+      'گزشتہ سال معیشت کی پیداوار کتنی تیزی سے بڑھی۔';
+
+  @override
+  String get indicatorGdpWhy =>
+      'تیز نمو کا مطلب عموماً زیادہ ملازمتیں اور آمدنی ہے؛ سست نمو دونوں کو دباؤ میں ڈالتی ہے۔';
+
+  @override
   String get economyEventsTitle => 'کیا بدل رہا ہے؟';
 
   @override
@@ -779,6 +829,26 @@ class AppLocalizationsUr extends AppLocalizations {
   String get eventAskAction => 'تدبیر سے پوچھیں';
 
   @override
+  String economyChangeEventTitle(String name, String direction) {
+    return '$name $direction';
+  }
+
+  @override
+  String get economyDirectionRose => 'بڑھا';
+
+  @override
+  String get economyDirectionFell => 'کم ہوا';
+
+  @override
+  String get economyDirectionStable => 'تقریباً بدستور رہا';
+
+  @override
+  String economyChangeEventBody(
+      String previous, String current, String period) {
+    return '$previous سے $current ہوا ($period)۔';
+  }
+
+  @override
   String get economyImpactTitle => 'آپ پر اثر';
 
   @override
@@ -820,8 +890,12 @@ class AppLocalizationsUr extends AppLocalizations {
       'مسلسل ترسیلاتِ زر روپے کو سہارا دیتی ہیں اور روزمرہ قیمتوں پر دباؤ کم کرتی ہیں۔';
 
   @override
+  String get economyImpactGdpBody =>
+      'مستحکم نمو ملازمتوں اور آمدنی کو سہارا دیتی ہے، جو آپ کی کمانے کی صلاحیت اور بچت کی بنیاد ہے۔';
+
+  @override
   String get economyImpactDisclaimer =>
-      'آپ کے ڈیمو فنانسز سے بنایا گیا تخمینی منظرنامہ — پیش گوئی نہیں۔';
+      'آپ کے فنانسز سے بنایا گیا تخمینی منظرنامہ — پیش گوئی نہیں۔';
 
   @override
   String get economyImpactInflationAction =>
@@ -875,6 +949,10 @@ class AppLocalizationsUr extends AppLocalizations {
 
   @override
   String get economySuggestedAction => 'تجویز کردہ اقدام';
+
+  @override
+  String get essentialPricesEmptyCategory =>
+      'اس زمرے میں کوئی اشیاء نہیں ملیں۔';
 
   @override
   String get askTitle => 'تدبیر سے پوچھیں';
@@ -2146,8 +2224,48 @@ class AppLocalizationsUrLatn extends AppLocalizationsUr {
 
   @override
   String economySourceFooter(String source) {
-    return 'Zaria: $source · Synthetic demo data — live nahi';
+    return 'Zaria: $source';
   }
+
+  @override
+  String get economySourceStatusLive => 'Live sarkari data';
+
+  @override
+  String get economySourceStatusPartial => 'Juzwi live, juzwi demo';
+
+  @override
+  String get economySourceStatusDemo => 'Synthetic demo data — live nahi';
+
+  @override
+  String get economySourceStatusUnavailable => 'Data dastiyab nahi';
+
+  @override
+  String get economyHistoryUnavailable => 'Tareekhi data dastiyab nahi';
+
+  @override
+  String get economyLatestOfficial => 'Taaza tareen sarkari data';
+
+  @override
+  String get economyViewSource => 'Sarkari zaria dekhein';
+
+  @override
+  String get economyAnnualChangeNote =>
+      'Saalana bunyad par tabdeeli (saalana series)';
+
+  @override
+  String get economyFrequencyAnnual => 'Saalana';
+
+  @override
+  String get economyFrequencyMonthly => 'Mahana';
+
+  @override
+  String get economyFrequencyWeekly => 'Hafta-waar';
+
+  @override
+  String get economyFrequencyDaily => 'Rozana';
+
+  @override
+  String get economyFrequencyPolicy => 'Policy elaan ke mutabiq';
 
   @override
   String get trendRising => 'Barh raha hai';
@@ -2233,6 +2351,17 @@ class AppLocalizationsUrLatn extends AppLocalizationsUr {
       'Musalsal remittances rupay ko sahara deti hain aur qeemton par dabao kam karti hain.';
 
   @override
+  String get indicatorGdp => 'GDP Growth';
+
+  @override
+  String get indicatorGdpDesc =>
+      'Guzishtah saal economy ki paidawar kitni tezi se barhi.';
+
+  @override
+  String get indicatorGdpWhy =>
+      'Tez growth ka matlab aam tor par zyada jobs aur aamdani hai; sust growth dono par dabao daalti hai.';
+
+  @override
   String get economyEventsTitle => 'Kya badal raha hai?';
 
   @override
@@ -2281,6 +2410,26 @@ class AppLocalizationsUrLatn extends AppLocalizationsUr {
   String get eventAskAction => 'Tadbeer se poochein';
 
   @override
+  String economyChangeEventTitle(String name, String direction) {
+    return '$name $direction';
+  }
+
+  @override
+  String get economyDirectionRose => 'barha';
+
+  @override
+  String get economyDirectionFell => 'kam hua';
+
+  @override
+  String get economyDirectionStable => 'taqreeban badastoor raha';
+
+  @override
+  String economyChangeEventBody(
+      String previous, String current, String period) {
+    return '$previous se $current hua ($period).';
+  }
+
+  @override
   String get economyImpactTitle => 'Aap par asar';
 
   @override
@@ -2322,8 +2471,12 @@ class AppLocalizationsUrLatn extends AppLocalizationsUr {
       'Musalsal remittances rupay ko sahara deti hain aur rozmarra qeemton par dabao kam karti hain.';
 
   @override
+  String get economyImpactGdpBody =>
+      'Mustaqil growth jobs aur aamdani ko sahara deti hai, jo aap ki kamanay ki salahiyat aur bachat ki bunyad hai.';
+
+  @override
   String get economyImpactDisclaimer =>
-      'Aap ke demo finances se banaya gaya andaza scenario — peshgoi nahi.';
+      'Aap ke finances se banaya gaya andaza scenario — peshgoi nahi.';
 
   @override
   String get economyImpactInflationAction =>
@@ -2378,6 +2531,10 @@ class AppLocalizationsUrLatn extends AppLocalizationsUr {
 
   @override
   String get economySuggestedAction => 'Tajweez karda iqdam';
+
+  @override
+  String get essentialPricesEmptyCategory =>
+      'Is category mein koi ashya nahi mili.';
 
   @override
   String get askTitle => 'Tadbeer se poochein';

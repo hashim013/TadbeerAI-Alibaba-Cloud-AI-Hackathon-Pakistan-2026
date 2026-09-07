@@ -8,6 +8,7 @@ import '../../../core/utils/l10n_context.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/data_status_badge.dart';
+import '../../../domain/entities/assistant_api_models.dart';
 import '../../../domain/entities/economic_overview.dart';
 import '../../../domain/services/economic_impact_service.dart';
 import '../../../providers/economic_providers.dart';
@@ -76,8 +77,15 @@ class _EconomicPulseContent extends ConsumerWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          l10n.economyUpdatedAt(
-              economyRelativeDayLabel(l10n, economy.updatedAt)),
+          // Freshness honesty: official data is described as such; only the
+          // demo dataset gets a synthetic "Updated {n} days ago" label.
+          switch (economy.status) {
+            DataStatusKind.live ||
+            DataStatusKind.partial =>
+              l10n.economyLatestOfficial,
+            _ => l10n.economyUpdatedAt(
+                economyRelativeDayLabel(l10n, economy.updatedAt)),
+          },
           style: theme.textTheme.labelSmall?.copyWith(
             color: isDark
                 ? AppColors.textOnDarkTertiary
@@ -124,6 +132,7 @@ class _EconomicPulseContent extends ConsumerWidget {
         SourceFooter(
           source:
               economy.indicators.isEmpty ? '' : economy.indicators.first.source,
+          status: economy.status,
         ),
       ],
     );
@@ -170,7 +179,13 @@ class _EconomicPulseContent extends ConsumerWidget {
     final theme = Theme.of(context);
     final charts = <Widget>[];
 
-    for (final id in const ['inflation', 'usdPkr', 'policyRate']) {
+    for (final id in const [
+      'inflation',
+      'usdPkr',
+      'fxReserves',
+      'remittances',
+      'gdp',
+    ]) {
       final indicator = economy.indicatorById(id);
       if (indicator == null) continue;
       if (charts.isNotEmpty) charts.add(const SizedBox(height: 12));
@@ -461,7 +476,7 @@ class _EssentialPricesSectionState
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Center(
                   child: Text(
-                    'No commodities found in this category.',
+                    l10n.essentialPricesEmptyCategory,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: isDark
                           ? AppColors.textOnDarkTertiary

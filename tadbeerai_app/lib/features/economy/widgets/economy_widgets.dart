@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_format.dart';
 import '../../../core/utils/l10n_context.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../domain/entities/assistant_api_models.dart';
 import '../../../domain/entities/economic_event.dart';
 import '../../../domain/entities/economic_indicator.dart';
 import '../../../l10n/app_localizations.dart';
@@ -25,6 +26,7 @@ String economyIndicatorName(
       'kibor' => l10n.indicatorKibor,
       'fxReserves' => l10n.indicatorFxReserves,
       'remittances' => l10n.indicatorRemittances,
+      'gdp' => l10n.indicatorGdp,
       _ => indicator.name,
     };
 
@@ -38,6 +40,7 @@ String economyIndicatorDesc(
       'kibor' => l10n.indicatorKiborDesc,
       'fxReserves' => l10n.indicatorFxReservesDesc,
       'remittances' => l10n.indicatorRemittancesDesc,
+      'gdp' => l10n.indicatorGdpDesc,
       _ => indicator.name,
     };
 
@@ -51,6 +54,7 @@ String economyIndicatorWhy(
       'kibor' => l10n.indicatorKiborWhy,
       'fxReserves' => l10n.indicatorFxReservesWhy,
       'remittances' => l10n.indicatorRemittancesWhy,
+      'gdp' => l10n.indicatorGdpWhy,
       _ => indicator.name,
     };
 
@@ -62,13 +66,16 @@ IconData economyIndicatorIcon(EconomicIndicator indicator) =>
       'kibor' => Icons.percent_rounded,
       'fxReserves' => Icons.account_balance_wallet_rounded,
       'remittances' => Icons.send_rounded,
+      'gdp' => Icons.show_chart_rounded,
       _ => Icons.public_rounded,
     };
 
 /// Whether a rising value is good news for the household (external buffers
 /// help; rising prices and rates hurt).
 bool economyRisingIsGood(EconomicIndicator indicator) =>
-    indicator.id == 'fxReserves' || indicator.id == 'remittances';
+    indicator.id == 'fxReserves' ||
+    indicator.id == 'remittances' ||
+    indicator.id == 'gdp';
 
 /// Semantic trend color: mint when the direction helps the household, danger
 /// when it hurts; stable stays neutral.
@@ -118,6 +125,37 @@ String economyRelativeDayLabel(AppLocalizations l10n, DateTime date) {
   if (days <= 0) return l10n.today;
   if (days == 1) return l10n.yesterday;
   return l10n.daysAgoLabel(days);
+}
+
+/// Localized cadence label for a backend `frequency` string; empty when the
+/// source stated none (callers then omit it rather than guess).
+String economyFrequencyLabel(AppLocalizations l10n, String frequency) =>
+    switch (frequency.trim().toLowerCase()) {
+      'annual' => l10n.economyFrequencyAnnual,
+      'monthly' => l10n.economyFrequencyMonthly,
+      'weekly' => l10n.economyFrequencyWeekly,
+      'daily' => l10n.economyFrequencyDaily,
+      'policy announcement' => l10n.economyFrequencyPolicy,
+      _ => '',
+    };
+
+/// Localized past-tense direction verb for the derived "What's changing?" copy.
+String economyDirectionWord(AppLocalizations l10n, TrendDirection trend) =>
+    switch (trend) {
+      TrendDirection.rising => l10n.economyDirectionRose,
+      TrendDirection.falling => l10n.economyDirectionFell,
+      TrendDirection.stable => l10n.economyDirectionStable,
+    };
+
+/// Best available period descriptor for an event line: the raw reporting
+/// period, else the localized frequency, else the (nominal) publish month.
+String economyEventPeriodLabel(
+    AppLocalizations l10n, EconomicIndicator indicator) {
+  final period = indicator.period.trim();
+  if (period.isNotEmpty) return period;
+  final frequency = economyFrequencyLabel(l10n, indicator.frequency);
+  if (frequency.isNotEmpty) return frequency;
+  return DateFormat('MMM yyyy').format(indicator.updatedAt);
 }
 
 // ── Widgets ───────────────────────────────────────────────────────────────
@@ -233,7 +271,8 @@ class IndicatorCard extends StatelessWidget {
   }
 }
 
-/// Six-month line chart of one indicator with month labels on the x-axis.
+/// Line chart of one indicator's real history (annual or monthly), with an
+/// honest empty state when the source published fewer than two observations.
 class IndicatorTrendChart extends StatelessWidget {
   const IndicatorTrendChart({super.key, required this.indicator});
 
@@ -241,10 +280,31 @@ class IndicatorTrendChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final labelColor =
         isDark ? AppColors.textOnDarkSecondary : AppColors.textOnLightSecondary;
     final history = indicator.history;
+
+    // Honest empty state: a source that published no trend (e.g. Policy Rate /
+    // KIBOR without a gateway) never gets a fabricated line.
+    if (history.length < 2) {
+      return SizedBox(
+        height: 180,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              l10n.economyHistoryUnavailable,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: labelColor,
+                  ),
+            ),
+          ),
+        ),
+      );
+    }
 
     var minValue = double.maxFinite;
     var maxValue = -double.maxFinite;
@@ -257,6 +317,12 @@ class IndicatorTrendChart extends StatelessWidget {
     final minY = minValue - pad;
     final maxY = maxValue + pad;
     final interval = (maxY - minY) / 3;
+
+    // Annual series (points >~400 days apart) get year labels; monthly series
+    // keep month labels. Either way only ~4 x-labels are drawn to avoid crowding.
+    final spanDays = history.last.month.difference(history.first.month).inDays;
+    final axisFormat = DateFormat(spanDays > 400 ? 'yyyy' : 'MMM');
+    final labelStep = (history.length / 4).ceil().clamp(1, history.length);
 
     return SizedBox(
       height: 180,
@@ -300,10 +366,14 @@ class IndicatorTrendChart extends StatelessWidget {
                   if (index < 0 || index >= history.length) {
                     return const SizedBox.shrink();
                   }
+                  final isLast = index == history.length - 1;
+                  if (index % labelStep != 0 && !isLast) {
+                    return const SizedBox.shrink();
+                  }
                   return Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(
-                      DateFormat('MMM').format(history[index].month),
+                      axisFormat.format(history[index].month),
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                             color: labelColor,
                             fontSize: 11,
@@ -348,7 +418,8 @@ class IndicatorTrendChart extends StatelessWidget {
       value.abs() >= 100 ? value.round().toString() : value.toStringAsFixed(1);
 }
 
-/// One item of the "What's changing?" feed.
+/// One item of the "What's changing?" feed, derived from a real indicator
+/// movement (name + direction + current vs previous + period).
 class EconomicEventCard extends StatelessWidget {
   const EconomicEventCard({
     super.key,
@@ -369,28 +440,16 @@ class EconomicEventCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final (title, description, impact) = switch (event.id) {
-      'inflationUp' => (
-          l10n.eventInflationUpTitle,
-          l10n.eventInflationUpDesc,
-          l10n.eventInflationUpImpact
-        ),
-      'rupeeSlip' => (
-          l10n.eventRupeeSlipTitle,
-          l10n.eventRupeeSlipDesc,
-          l10n.eventRupeeSlipImpact
-        ),
-      'rateCut' => (
-          l10n.eventRateCutTitle,
-          l10n.eventRateCutDesc,
-          l10n.eventRateCutImpact
-        ),
-      _ => (
-          l10n.eventRemittancesUpTitle,
-          l10n.eventRemittancesUpDesc,
-          l10n.eventRemittancesUpImpact
-        ),
-    };
+    // Derived from the linked real indicator — never a fixed narrative.
+    final title = l10n.economyChangeEventTitle(
+      economyIndicatorName(l10n, indicator),
+      economyDirectionWord(l10n, indicator.trend),
+    );
+    final body = l10n.economyChangeEventBody(
+      economyNumberLabel(indicator, indicator.previousValue),
+      economyNumberLabel(indicator, indicator.currentValue),
+      economyEventPeriodLabel(l10n, indicator),
+    );
 
     return AppCard(
       onTap: onOpenDetail,
@@ -419,16 +478,7 @@ class EconomicEventCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text(description, style: theme.textTheme.bodySmall),
-          const SizedBox(height: 4),
-          Text(
-            impact,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: isDark
-                  ? AppColors.textOnDarkSecondary
-                  : AppColors.textOnLightSecondary,
-            ),
-          ),
+          Text(body, style: theme.textTheme.bodySmall),
           const SizedBox(height: 6),
           TextButton.icon(
             onPressed: onAsk,
@@ -515,17 +565,30 @@ class _ImpactRow extends StatelessWidget {
   }
 }
 
-/// Small trust footer attributing the synthetic dataset.
+/// Trust footer attributing the data source, with an honest status phrase
+/// composed from the snapshot's real provenance (never a hardcoded demo claim).
 class SourceFooter extends StatelessWidget {
-  const SourceFooter({super.key, required this.source});
+  const SourceFooter({super.key, required this.source, required this.status});
 
   final String source;
+  final DataStatusKind status;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final statusPhrase = switch (status) {
+      DataStatusKind.live => l10n.economySourceStatusLive,
+      DataStatusKind.partial => l10n.economySourceStatusPartial,
+      DataStatusKind.scenario => l10n.economySourceStatusDemo,
+      DataStatusKind.demo => l10n.economySourceStatusDemo,
+      DataStatusKind.unavailable => l10n.economySourceStatusUnavailable,
+    };
+    final text = source.trim().isEmpty
+        ? statusPhrase
+        : '${l10n.economySourceFooter(source)} · $statusPhrase';
     return Text(
-      context.l10n.economySourceFooter(source),
+      text,
       style: Theme.of(context).textTheme.labelSmall?.copyWith(
             color: isDark
                 ? AppColors.textOnDarkTertiary

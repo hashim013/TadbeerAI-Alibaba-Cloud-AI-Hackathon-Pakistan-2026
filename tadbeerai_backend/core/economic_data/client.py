@@ -53,6 +53,43 @@ def parse_number(value: Any) -> float | None:
     return None
 
 
+def optional_gateway_provenance(entry: Any) -> dict[str, Any]:
+    """Extract optional trend/provenance fields from a gateway entry.
+
+    The documented gateway contract only requires ``value``/``period``. A
+    richer gateway MAY also supply ``previous_value``, ``change_value``,
+    ``change_percent``, ``last_updated`` and an oldest-first ``history``
+    list of ``{"period", "value"}`` objects. Anything absent is simply not
+    returned, so the caller's Indicator keeps its honest empty defaults and
+    the UI can report "historical data unavailable" instead of inventing a
+    trend. Values are rounded to 2 decimals, matching the World Bank path.
+    """
+    if not isinstance(entry, dict):
+        return {}
+    extra: dict[str, Any] = {}
+    for key in ("previous_value", "change_value", "change_percent"):
+        number = parse_number(entry.get(key))
+        if number is not None:
+            extra[key] = round(number, 2)
+    last_updated = str(entry.get("last_updated") or "").strip()
+    if last_updated:
+        extra["last_updated"] = last_updated
+    raw_history = entry.get("history")
+    if isinstance(raw_history, list):
+        history: list[tuple[str, float]] = []
+        for point in raw_history:
+            if not isinstance(point, dict):
+                continue
+            value = parse_number(point.get("value"))
+            period = str(point.get("period") or "").strip()
+            if value is None or not period:
+                continue
+            history.append((period, round(value, 2)))
+        if history:
+            extra["history"] = tuple(history)
+    return extra
+
+
 def fetch_json(
     client: httpx.Client,
     url: str,

@@ -95,6 +95,15 @@ abstract final class MockEconomicData {
         months: months,
         now: now,
       ),
+      _indicator(
+        id: 'gdp',
+        name: 'GDP Growth',
+        unit: '%',
+        category: 'growth',
+        values: const [2.6, 2.9, 3.1, 3.3, 3.5, 3.7],
+        months: months,
+        now: now,
+      ),
     ];
   }
 

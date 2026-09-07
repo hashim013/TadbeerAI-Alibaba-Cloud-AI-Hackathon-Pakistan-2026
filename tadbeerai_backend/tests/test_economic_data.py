@@ -72,20 +72,60 @@ def _wb_envelope(code: str, name: str, value, date: str = "2025"):
     ]
 
 
+def _wb_series(code: str, name: str, observations, lastupdated: str = "2026-07-13"):
+    """Verified World Bank multi-observation envelope (newest-first).
+
+    ``observations`` is a list of ``(date, value)`` pairs in API order
+    (newest first); a ``None`` value models a year without data, which the
+    client must skip. Mirrors the real date-range response so history,
+    previous value and year-on-year change can be asserted.
+    """
+    return [
+        {
+            "page": 1,
+            "pages": 1,
+            "per_page": 50,
+            "total": len(observations),
+            "lastupdated": lastupdated,
+        },
+        [
+            {
+                "indicator": {"id": code, "value": name},
+                "country": {"id": "PK", "value": "Pakistan"},
+                "countryiso3code": "PAK",
+                "date": date,
+                "value": value,
+            }
+            for date, value in observations
+        ],
+    ]
+
+
 _WB_LIVE_PAYLOADS = {
-    "FP.CPI.TOTL.ZG": _wb_envelope(
-        "FP.CPI.TOTL.ZG", "Inflation, consumer prices (annual %)", 3.54555214890893
+    "FP.CPI.TOTL.ZG": _wb_series(
+        "FP.CPI.TOTL.ZG",
+        "Inflation, consumer prices (annual %)",
+        [("2025", 3.54555214890893), ("2024", 23.41), ("2023", 19.88)],
     ),
-    "PA.NUS.FCRF": _wb_envelope(
+    "PA.NUS.FCRF": _wb_series(
         "PA.NUS.FCRF",
         "Official exchange rate (LCU per US$, period average)",
-        281.143001173202,
+        [("2025", 281.143001173202), ("2024", 278.5), ("2023", 250.0)],
     ),
-    "FI.RES.TOTL.CD": _wb_envelope(
-        "FI.RES.TOTL.CD", "Total reserves (includes gold, current US$)", 26455819675.7312
+    "FI.RES.TOTL.CD": _wb_series(
+        "FI.RES.TOTL.CD",
+        "Total reserves (includes gold, current US$)",
+        [("2025", 26455819675.7312), ("2024", 14000000000.0), ("2023", 9000000000.0)],
     ),
-    "BX.TRF.PWKR.CD.DT": _wb_envelope(
-        "BX.TRF.PWKR.CD.DT", "Personal remittances, received (current US$)", 40478000000
+    "BX.TRF.PWKR.CD.DT": _wb_series(
+        "BX.TRF.PWKR.CD.DT",
+        "Personal remittances, received (current US$)",
+        [("2025", 40478000000.0), ("2024", 35000000000.0), ("2023", 30000000000.0)],
+    ),
+    "NY.GDP.MKTP.KD.ZG": _wb_series(
+        "NY.GDP.MKTP.KD.ZG",
+        "GDP growth (annual %)",
+        [("2025", 3.70), ("2024", 3.08), ("2023", 2.50)],
     ),
 }
 
@@ -174,6 +214,35 @@ class TestWorldBankParsing:
             assert ind.period == "2025"
             assert ind.source.startswith("World Bank API (")
         assert indicators["inflation_rate_pct"].source == "World Bank API (FP.CPI.TOTL.ZG)"
+
+    def test_history_and_change_derived_from_series(self):
+        indicators = {ind.name: ind for ind in _live_wb_client().fetch_indicators()}
+        inflation = indicators["inflation_rate_pct"]
+
+        assert inflation.frequency == "annual"
+        assert inflation.last_updated == "2026-07-13"
+        assert inflation.source_url == (
+            "https://api.worldbank.org/v2/country/PAK/indicator/FP.CPI.TOTL.ZG"
+        )
+        # oldest-first history; the last point IS the headline value
+        assert inflation.history == (("2023", 19.88), ("2024", 23.41), ("2025", 3.55))
+        assert inflation.has_history is True
+        assert inflation.value == inflation.history[-1][1]
+        assert inflation.previous_value == 23.41
+        assert inflation.change_value == -19.86
+        assert inflation.change_percent == pytest.approx(-84.84, abs=0.01)
+
+    def test_gdp_growth_is_live_with_history(self):
+        indicators = {ind.name: ind for ind in _live_wb_client().fetch_indicators()}
+        gdp = indicators["gdp_growth_pct"]
+
+        assert gdp.status == STATUS_LIVE
+        assert gdp.value == 3.7
+        assert gdp.source == "World Bank API (NY.GDP.MKTP.KD.ZG)"
+        assert gdp.frequency == "annual"
+        assert gdp.previous_value == 3.08
+        assert gdp.change_value == 0.62
+        assert gdp.history[-1] == ("2025", 3.7)
 
     def test_malformed_response_degrades_per_indicator(self):
         client = _live_wb_client({"FP.CPI.TOTL.ZG": {"unexpected": True}})
@@ -359,6 +428,7 @@ class TestServiceMerge:
             "usd_pkr",
             "fx_reserves_usd_bn",
             "remittances_usd_bn",
+            "gdp_growth_pct",
         ]
         demo = ["policy_rate_pct", "kibor_3m_pct"]
         for name in live:
@@ -671,6 +741,44 @@ class TestAPIContract:
         assert body["metrics"]["policy_rate_pct"] == 11.0  # demo fallback
         # pure economic question: no personal agents, no deterministic tools
         assert body["agentsUsed"] == ["economic_intelligence"]
+
+    def test_economy_snapshot_exposes_history_and_provenance(self, make_client):
+        set_economic_service(_service(_live_wb_client()))
+        primary = ScriptedAgentProvider(
+            replies_by_marker=_graph_scripts(), final_answer="unused"
+        )
+        client = make_client(primary=primary)
+
+        response = client.get("/v1/economy/snapshot")
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["status"] == "partial"
+        inflation = body["indicators"]["inflation_rate_pct"]
+        for field in (
+            "previous_value",
+            "change_value",
+            "change_percent",
+            "frequency",
+            "source_url",
+            "last_updated",
+            "history",
+        ):
+            assert field in inflation
+        assert inflation["frequency"] == "annual"
+        assert inflation["last_updated"] == "2026-07-13"
+        assert inflation["previous_value"] == 23.41
+        assert inflation["history"] == [
+            {"period": "2023", "value": 19.88},
+            {"period": "2024", "value": 23.41},
+            {"period": "2025", "value": 3.55},
+        ]
+        # GDP is now a live World Bank indicator
+        assert body["indicators"]["gdp_growth_pct"]["status"] == "live"
+        # demo indicators stay demo and carry no fabricated history
+        policy = body["indicators"]["policy_rate_pct"]
+        assert policy["status"] == "demo"
+        assert policy["history"] == []
 
 
 # --------------------------------------------------------------------------- #

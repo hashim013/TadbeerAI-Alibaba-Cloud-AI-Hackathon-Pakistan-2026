@@ -26,7 +26,15 @@ DEMO_SOURCE = "demo snapshot (not live data)"
 
 @dataclass(frozen=True)
 class Indicator:
-    """One normalized economic indicator with honest provenance."""
+    """One normalized economic indicator with honest provenance.
+
+    ``previous_value``/``change_value``/``change_percent`` and ``history``
+    (oldest-first ``(period, value)`` pairs) are only populated when a real
+    source supplied them; a gateway that returns just the latest figure leaves
+    them empty so the UI can honestly say "historical data unavailable"
+    instead of fabricating a trend. ``frequency``/``source_url``/
+    ``last_updated`` carry the natural cadence and provenance of the number.
+    """
 
     name: str
     value: float | None
@@ -36,10 +44,22 @@ class Indicator:
     source: str
     period: str = ""
     notes: str = ""
+    previous_value: float | None = None
+    change_value: float | None = None
+    change_percent: float | None = None
+    frequency: str = ""
+    source_url: str = ""
+    last_updated: str = ""
+    history: tuple[tuple[str, float], ...] = ()
 
     @property
     def has_value(self) -> bool:
         return self.value is not None
+
+    @property
+    def has_history(self) -> bool:
+        """True when at least two real observations exist (a drawable trend)."""
+        return len(self.history) >= 2
 
 
 @dataclass(frozen=True)
@@ -52,7 +72,7 @@ class IndicatorSpec:
     unit: str
 
 
-#: the six prioritized indicators (Phase 2 demo values kept as fallback)
+#: the prioritized indicators (Phase 2 demo values kept as fallback)
 INDICATOR_CATALOG: tuple[IndicatorSpec, ...] = (
     IndicatorSpec("inflation_rate_pct", "CPI inflation (YoY)", 11.8, "%"),
     IndicatorSpec("policy_rate_pct", "SBP policy rate", 11.0, "%"),
@@ -60,6 +80,7 @@ INDICATOR_CATALOG: tuple[IndicatorSpec, ...] = (
     IndicatorSpec("usd_pkr", "USD/PKR exchange rate", 278.5, "PKR"),
     IndicatorSpec("fx_reserves_usd_bn", "SBP liquid FX reserves", 9.4, "USD bn"),
     IndicatorSpec("remittances_usd_bn", "Workers' remittances", 3.2, "USD bn"),
+    IndicatorSpec("gdp_growth_pct", "GDP growth (annual %)", 3.7, "%"),
 )
 
 _CATALOG_BY_NAME: dict[str, IndicatorSpec] = {

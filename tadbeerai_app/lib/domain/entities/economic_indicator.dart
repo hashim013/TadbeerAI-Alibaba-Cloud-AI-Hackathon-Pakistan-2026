@@ -6,11 +6,12 @@ enum TrendDirection { rising, falling, stable }
 /// Provenance of the numbers backing an indicator.
 typedef DataStatus = DataStatusKind;
 
-/// One historical observation of an indicator, at monthly granularity.
+/// One historical observation of an indicator (annual or monthly granularity).
 class IndicatorPoint {
   const IndicatorPoint({required this.month, required this.value});
 
-  /// Any moment inside the month (normalized to day 1).
+  /// The observation's period as a timestamp: `DateTime(year)` for annual
+  /// series, or any moment inside the month (normalized to day 1) for monthly.
   final DateTime month;
   final double value;
 }
@@ -34,6 +35,8 @@ class EconomicIndicator {
     required this.history,
     this.period = '',
     this.notes = '',
+    this.frequency = '',
+    this.sourceUrl = '',
   });
 
   /// 'inflation' | 'usdPkr' | 'policyRate' | 'kibor' | 'fxReserves'
@@ -66,10 +69,20 @@ class EconomicIndicator {
   /// Technical notes or source methodology.
   final String notes;
 
+  /// Natural reporting cadence of the source ('annual', 'monthly', 'daily',
+  /// 'policy announcement'); empty when the source did not state one.
+  final String frequency;
+
+  /// Official, human-verifiable source URL (empty when none is published).
+  /// Rendered as selectable text — never launched, never fabricated.
+  final String sourceUrl;
+
   /// When this value was (nominally) published.
   final DateTime updatedAt;
 
-  /// Monthly observations, oldest first, ending with the current value.
+  /// Historical observations, oldest first, ending with the current value.
+  /// Annual for World Bank series, monthly for the demo dataset; empty or
+  /// single-point when the source published no trend (UI then says so).
   final List<IndicatorPoint> history;
 
   /// Absolute movement since the previous period, in the indicator's unit.

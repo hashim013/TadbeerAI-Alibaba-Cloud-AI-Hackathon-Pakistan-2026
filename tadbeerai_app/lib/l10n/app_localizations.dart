@@ -1248,8 +1248,86 @@ abstract class AppLocalizations {
   /// No description provided for @economySourceFooter.
   ///
   /// In en, this message translates to:
-  /// **'Source: {source} · Synthetic demo data — not live'**
+  /// **'Source: {source}'**
   String economySourceFooter(String source);
+
+  /// No description provided for @economySourceStatusLive.
+  ///
+  /// In en, this message translates to:
+  /// **'Live official data'**
+  String get economySourceStatusLive;
+
+  /// No description provided for @economySourceStatusPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Partly live, partly demo'**
+  String get economySourceStatusPartial;
+
+  /// No description provided for @economySourceStatusDemo.
+  ///
+  /// In en, this message translates to:
+  /// **'Synthetic demo data — not live'**
+  String get economySourceStatusDemo;
+
+  /// No description provided for @economySourceStatusUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Data unavailable'**
+  String get economySourceStatusUnavailable;
+
+  /// No description provided for @economyHistoryUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Historical data unavailable'**
+  String get economyHistoryUnavailable;
+
+  /// No description provided for @economyLatestOfficial.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest official data'**
+  String get economyLatestOfficial;
+
+  /// No description provided for @economyViewSource.
+  ///
+  /// In en, this message translates to:
+  /// **'View official source'**
+  String get economyViewSource;
+
+  /// No description provided for @economyAnnualChangeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Year-on-year change (annual series)'**
+  String get economyAnnualChangeNote;
+
+  /// No description provided for @economyFrequencyAnnual.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual'**
+  String get economyFrequencyAnnual;
+
+  /// No description provided for @economyFrequencyMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get economyFrequencyMonthly;
+
+  /// No description provided for @economyFrequencyWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get economyFrequencyWeekly;
+
+  /// No description provided for @economyFrequencyDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get economyFrequencyDaily;
+
+  /// No description provided for @economyFrequencyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Per policy announcement'**
+  String get economyFrequencyPolicy;
 
   /// No description provided for @trendRising.
   ///
@@ -1383,6 +1461,24 @@ abstract class AppLocalizations {
   /// **'Steady remittances support the rupee and ease price pressure.'**
   String get indicatorRemittancesWhy;
 
+  /// No description provided for @indicatorGdp.
+  ///
+  /// In en, this message translates to:
+  /// **'GDP Growth'**
+  String get indicatorGdp;
+
+  /// No description provided for @indicatorGdpDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'How fast the economy\'s output grew over the year.'**
+  String get indicatorGdpDesc;
+
+  /// No description provided for @indicatorGdpWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Faster growth usually means more jobs and incomes; slower growth squeezes both.'**
+  String get indicatorGdpWhy;
+
   /// No description provided for @economyEventsTitle.
   ///
   /// In en, this message translates to:
@@ -1467,6 +1563,36 @@ abstract class AppLocalizations {
   /// **'Ask Tadbeer'**
   String get eventAskAction;
 
+  /// No description provided for @economyChangeEventTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} {direction}'**
+  String economyChangeEventTitle(String name, String direction);
+
+  /// No description provided for @economyDirectionRose.
+  ///
+  /// In en, this message translates to:
+  /// **'rose'**
+  String get economyDirectionRose;
+
+  /// No description provided for @economyDirectionFell.
+  ///
+  /// In en, this message translates to:
+  /// **'fell'**
+  String get economyDirectionFell;
+
+  /// No description provided for @economyDirectionStable.
+  ///
+  /// In en, this message translates to:
+  /// **'was little changed'**
+  String get economyDirectionStable;
+
+  /// No description provided for @economyChangeEventBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Moved from {previous} to {current} ({period}).'**
+  String economyChangeEventBody(String previous, String current, String period);
+
   /// No description provided for @economyImpactTitle.
   ///
   /// In en, this message translates to:
@@ -1506,10 +1632,16 @@ abstract class AppLocalizations {
   /// **'Steady remittances support the rupee, easing pressure on everyday prices.'**
   String get economyImpactRemittancesBody;
 
+  /// No description provided for @economyImpactGdpBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Steady growth supports jobs and incomes, which underpins your earning power and savings.'**
+  String get economyImpactGdpBody;
+
   /// No description provided for @economyImpactDisclaimer.
   ///
   /// In en, this message translates to:
-  /// **'Estimated scenario from your demo finances — not a forecast.'**
+  /// **'Estimated scenario from your finances — not a forecast.'**
   String get economyImpactDisclaimer;
 
   /// No description provided for @economyImpactInflationAction.
@@ -1607,6 +1739,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Suggested action'**
   String get economySuggestedAction;
+
+  /// No description provided for @essentialPricesEmptyCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'No commodities found in this category.'**
+  String get essentialPricesEmptyCategory;
 
   /// No description provided for @askTitle.
   ///

@@ -28,11 +28,26 @@ from urllib.parse import urlparse
 
 import httpx
 
-from .client import EconomicDataError, env_timeout, fetch_json, parse_number
+from .client import (
+    EconomicDataError,
+    env_timeout,
+    fetch_json,
+    optional_gateway_provenance,
+    parse_number,
+)
 from .models import Indicator, STATUS_LIVE, STATUS_UNAVAILABLE, spec_for
 
 #: indicators this gateway owns (SBP's own rates)
 _INDICATORS: tuple[str, ...] = ("policy_rate_pct", "kibor_3m_pct")
+
+#: official SBP economic-data page — the human-verifiable source of the rates
+_OFFICIAL_SOURCE_URL = "https://www.sbp.org.pk/economic-data"
+
+#: natural publication cadence of each SBP rate
+_FREQUENCY: dict[str, str] = {
+    "policy_rate_pct": "policy announcement",
+    "kibor_3m_pct": "daily",
+}
 
 
 class SBPGatewayClient:
@@ -118,6 +133,9 @@ class SBPGatewayClient:
                     status=STATUS_LIVE,
                     source=self._source_label(),
                     period=period,
+                    frequency=_FREQUENCY.get(name, ""),
+                    source_url=_OFFICIAL_SOURCE_URL,
+                    **optional_gateway_provenance(entry),
                 )
             )
         return results

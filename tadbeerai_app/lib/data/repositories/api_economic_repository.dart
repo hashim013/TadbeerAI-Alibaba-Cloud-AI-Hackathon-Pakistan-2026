@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../core/config/api_config.dart';
 import '../../domain/entities/assistant_api_models.dart';
 import '../../domain/entities/commodity_price.dart';
+import '../../domain/entities/economic_event.dart';
 import '../../domain/entities/economic_indicator.dart';
 import '../../domain/entities/economic_overview.dart';
 import '../../domain/repositories/economic_repository.dart';
@@ -60,6 +61,11 @@ class ApiEconomicRepository implements EconomicRepository {
       name: 'Remittances',
       category: 'external',
     ),
+    'gdp_growth_pct': (
+      id: 'gdp',
+      name: 'GDP Growth',
+      category: 'growth',
+    ),
   };
 
   @override
@@ -71,8 +77,7 @@ class ApiEconomicRepository implements EconomicRepository {
         throw const FormatException('Malformed economic snapshot payload');
       }
 
-      final snapshotMap =
-          data.map((key, value) => MapEntry('$key', value));
+      final snapshotMap = data.map((key, value) => MapEntry('$key', value));
       final rawStatus = snapshotMap['status'] as String?;
       final overallStatus = dataStatusFromName(rawStatus);
 
@@ -101,76 +106,54 @@ class ApiEconomicRepository implements EconomicRepository {
         }
       }
 
-      final now = DateTime.now();
-      final baselineOverview = MockEconomicData.seed(now);
       final List<EconomicIndicator> indicators = [];
 
       for (final entry in _catalogMap.entries) {
-        final backendKey = entry.key;
         final meta = entry.value;
-        final baselineIndicator = baselineOverview.indicatorById(meta.id);
+        final raw = indicatorsMap[entry.key];
+        if (raw is! Map) continue;
+        final item = raw.map((k, v) => MapEntry('$k', v));
 
-        if (indicatorsMap.containsKey(backendKey)) {
-          final item = indicatorsMap[backendKey];
-          if (item is Map) {
-            final itemMap = item.map((k, v) => MapEntry('$k', v));
-            final value = (itemMap['value'] as num?)?.toDouble() ??
-                baselineIndicator?.currentValue ??
-                0.0;
-            final unit = itemMap['unit'] as String? ??
-                baselineIndicator?.unit ??
-                '';
-            final source = itemMap['source'] as String? ??
-                baselineIndicator?.source ??
-                '';
-            final statusStr = itemMap['status'] as String?;
-            final indStatus = dataStatusFromName(statusStr);
-            final period = itemMap['period'] as String? ?? '';
-            final notes = itemMap['notes'] as String? ?? '';
+        // An indicator with no value has no honest number to show — skip it
+        // rather than substituting a demo/baseline figure.
+        final value = (item['value'] as num?)?.toDouble();
+        if (value == null) continue;
 
-            // Previous value & trend baseline from historical series
-            final previousValue = baselineIndicator?.previousValue ?? value;
-            final history = baselineIndicator?.history ??
-                [
-                  IndicatorPoint(month: now, value: value),
-                ];
+        final indStatus = dataStatusFromName(item['status'] as String?);
+        final period = item['period'] as String? ?? '';
+        final lastUpdated = item['last_updated'] as String? ?? '';
 
-            indicators.add(
-              EconomicIndicator(
-                id: meta.id,
-                name: meta.name,
-                currentValue: value,
-                previousValue: previousValue,
-                unit: unit,
-                category: meta.category,
-                source: source,
-                dataStatus: indStatus,
-                updatedAt: fetchedAt,
-                history: history,
-                period: period,
-                notes: notes,
-              ),
-            );
-            continue;
-          }
-        }
+        // Real history straight from the backend series (oldest-first); no
+        // demo trend is ever merged onto a live value.
+        final history = _parseHistory(item['history']);
+        final previousValue = (item['previous_value'] as num?)?.toDouble() ??
+            (history.length >= 2 ? history[history.length - 2].value : value);
+        final updatedAt =
+            DateTime.tryParse(lastUpdated) ?? _parsePeriod(period) ?? fetchedAt;
 
-        // If an indicator was omitted in the backend payload, preserve baseline
-        if (baselineIndicator != null) {
-          indicators.add(baselineIndicator);
-        }
-      }
-
-      // Preserve any baseline indicators (e.g. fuel prices, gold) not in catalog map
-      for (final baseline in baselineOverview.indicators) {
-        if (!indicators.any((ind) => ind.id == baseline.id)) {
-          indicators.add(baseline);
-        }
+        indicators.add(
+          EconomicIndicator(
+            id: meta.id,
+            name: meta.name,
+            currentValue: value,
+            previousValue: previousValue,
+            unit: item['unit'] as String? ?? '',
+            category: meta.category,
+            source: item['source'] as String? ?? '',
+            dataStatus: indStatus,
+            updatedAt: updatedAt,
+            history: history,
+            period: period,
+            notes: item['notes'] as String? ?? '',
+            frequency: item['frequency'] as String? ?? '',
+            sourceUrl: item['source_url'] as String? ?? '',
+          ),
+        );
       }
 
       return EconomicOverview(
         indicators: indicators,
-        events: baselineOverview.events,
+        events: _deriveEvents(indicators),
         updatedAt: fetchedAt,
         status: overallStatus,
         fallbackReasons: fallbackReasons,
@@ -188,6 +171,60 @@ class ApiEconomicRepository implements EconomicRepository {
         },
       );
     }
+  }
+
+  /// Parses the backend `history` array (oldest-first `{period, value}`) into
+  /// [IndicatorPoint]s, skipping entries without a usable period or value.
+  static List<IndicatorPoint> _parseHistory(dynamic raw) {
+    if (raw is! List) return const [];
+    final points = <IndicatorPoint>[];
+    for (final entry in raw) {
+      if (entry is! Map) continue;
+      final date = _parsePeriod('${entry['period'] ?? ''}');
+      final value = (entry['value'] as num?)?.toDouble();
+      if (date == null || value == null) continue;
+      points.add(IndicatorPoint(month: date, value: value));
+    }
+    return points;
+  }
+
+  /// Parses a backend period label into a timestamp: a bare year (`"2025"`)
+  /// becomes 1 Jan of that year, `"YYYY-MM"` becomes that month, and a full
+  /// ISO date is parsed as-is. Returns null when unparseable (e.g. the demo
+  /// snapshot's `"demo snapshot"` period).
+  static DateTime? _parsePeriod(String period) {
+    final text = period.trim();
+    if (text.isEmpty) return null;
+    final yearOnly = int.tryParse(text);
+    if (yearOnly != null && yearOnly > 1000 && yearOnly < 3000) {
+      return DateTime(yearOnly);
+    }
+    final parts = text.split('-');
+    if (parts.length == 2) {
+      final year = int.tryParse(parts[0]);
+      final month = int.tryParse(parts[1]);
+      if (year != null && month != null && month >= 1 && month <= 12) {
+        return DateTime(year, month);
+      }
+    }
+    return DateTime.tryParse(text);
+  }
+
+  /// Builds the "What's changing?" feed from REAL movements only: an entry
+  /// appears just when an indicator moved against a genuine previous value
+  /// (a non-stable trend). Newest first; no fabricated narratives.
+  static List<EconomicEvent> _deriveEvents(List<EconomicIndicator> indicators) {
+    final events = <EconomicEvent>[
+      for (final indicator in indicators)
+        if (indicator.trend != TrendDirection.stable)
+          EconomicEvent(
+            id: 'change_${indicator.id}',
+            indicatorId: indicator.id,
+            occurredAt: indicator.updatedAt,
+          ),
+    ];
+    events.sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
+    return events;
   }
 
   @override

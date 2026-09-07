@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_format.dart';
 import '../../../core/utils/l10n_context.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/data_status_badge.dart';
 import '../../../domain/entities/economic_indicator.dart';
 import '../../../domain/services/economic_impact_service.dart';
 import '../../../l10n/app_localizations.dart';
@@ -64,6 +65,13 @@ class _EconomicDetailContent extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
     final input = ref.watch(economicImpactInputProvider);
     final trendColor = economyTrendColor(context, indicator);
+    final frequencyLabel = economyFrequencyLabel(l10n, indicator.frequency);
+    final periodLabel = indicator.period.trim();
+    final provenance = [
+      if (frequencyLabel.isNotEmpty) frequencyLabel,
+      if (periodLabel.isNotEmpty) periodLabel,
+    ].join(' · ');
+    final isAnnual = indicator.frequency.trim().toLowerCase() == 'annual';
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
@@ -210,23 +218,64 @@ class _EconomicDetailContent extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                l10n.economySourceFooter(indicator.source),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: isDark
-                      ? AppColors.textOnDarkSecondary
-                      : AppColors.textOnLightSecondary,
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.economySourceFooter(indicator.source),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: isDark
+                            ? AppColors.textOnDarkSecondary
+                            : AppColors.textOnLightSecondary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  DataStatusBadge(status: indicator.dataStatus),
+                ],
               ),
-              const SizedBox(height: 6),
-              Text(
-                l10n.economyStatusDemo,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: isDark
-                      ? AppColors.textOnDarkTertiary
-                      : AppColors.textOnLightSecondary,
+              if (provenance.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  provenance,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: isDark
+                        ? AppColors.textOnDarkTertiary
+                        : AppColors.textOnLightSecondary,
+                  ),
                 ),
-              ),
+              ],
+              if (isAnnual) ...[
+                const SizedBox(height: 6),
+                Text(
+                  l10n.economyAnnualChangeNote,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: isDark
+                        ? AppColors.textOnDarkTertiary
+                        : AppColors.textOnLightSecondary,
+                  ),
+                ),
+              ],
+              if (indicator.sourceUrl.trim().isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Text(
+                  l10n.economyViewSource,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: isDark
+                        ? AppColors.textOnDarkSecondary
+                        : AppColors.textOnLightSecondary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                SelectableText(
+                  indicator.sourceUrl,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -343,6 +392,8 @@ class _ImpactSectionCard extends StatelessWidget {
         ];
       case 'fxReserves':
         return [Text(l10n.economyImpactReservesBody, style: style)];
+      case 'gdp':
+        return [Text(l10n.economyImpactGdpBody, style: style)];
       default:
         return [Text(l10n.economyImpactRemittancesBody, style: style)];
     }

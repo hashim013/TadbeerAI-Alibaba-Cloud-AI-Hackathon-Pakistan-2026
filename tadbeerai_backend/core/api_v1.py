@@ -89,6 +89,16 @@ def v1_economy_snapshot(
                 "source": ind.source,
                 "period": ind.period,
                 "notes": ind.notes,
+                "previous_value": ind.previous_value,
+                "change_value": ind.change_value,
+                "change_percent": ind.change_percent,
+                "frequency": ind.frequency,
+                "source_url": ind.source_url,
+                "last_updated": ind.last_updated,
+                "history": [
+                    {"period": point_period, "value": point_value}
+                    for point_period, point_value in ind.history
+                ],
             }
             for name, ind in snapshot.indicators.items()
         },

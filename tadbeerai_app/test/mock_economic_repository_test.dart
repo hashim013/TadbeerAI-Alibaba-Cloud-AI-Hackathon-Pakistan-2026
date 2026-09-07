@@ -17,7 +17,7 @@ void main() {
   });
 
   group('overview', () {
-    test('serves six indicators in display-priority order', () async {
+    test('serves seven indicators in display-priority order', () async {
       final overview = await repository.getOverview();
 
       expect(
@@ -29,6 +29,7 @@ void main() {
           'kibor',
           'fxReserves',
           'remittances',
+          'gdp',
         ],
       );
       expect(overview.updatedAt, now);
@@ -78,6 +79,7 @@ void main() {
       expect(byId['kibor']!.trend, TrendDirection.falling);
       expect(byId['fxReserves']!.trend, TrendDirection.rising);
       expect(byId['remittances']!.trend, TrendDirection.rising);
+      expect(byId['gdp']!.trend, TrendDirection.rising);
     });
 
     test('current values and changes match the seeded series', () async {
