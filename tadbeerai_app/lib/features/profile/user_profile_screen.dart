@@ -54,6 +54,7 @@ class UserProfileScreen extends ConsumerWidget {
     final profile = profileAsync.valueOrNull;
     final currentLocale = ref.watch(appLocaleProvider);
     final currentLanguage = AppLanguage.fromLocale(currentLocale);
+    final themeMode = ref.watch(appThemeModeProvider);
 
     final displayName = (user?.name.trim().isNotEmpty == true)
         ? user!.name.trim()
@@ -69,8 +70,14 @@ class UserProfileScreen extends ConsumerWidget {
     final isGuest = user?.isGuest ?? true;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        context.go('/home');
+      },
+      child: Scaffold(
+        backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
       body: DecoratedBox(
         decoration: BoxDecoration(
           color: isDark ? AppColors.navyBg : null,
@@ -109,9 +116,10 @@ class UserProfileScreen extends ConsumerWidget {
                       const Spacer(),
                       // Quick edit shortcut
                       IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.mode_edit_outline_rounded,
-                          color: AppColors.teal,
+                          color:
+                              isDark ? AppColors.teal : const Color(0xFF0D9488),
                           size: 20,
                         ),
                         tooltip: 'Edit Personal Details',
@@ -358,13 +366,53 @@ class UserProfileScreen extends ConsumerWidget {
                   child: _MenuGroupCard(
                     items: [
                       _ProfileMenuItem(
-                        icon: Icons.tune_rounded,
-                        iconBgColor: const Color(0xFF06B6D4),
-                        title: 'App Settings',
-                        subtitle: 'Notifications, Alerts & Theme',
+                        icon: isDark
+                            ? Icons.dark_mode_rounded
+                            : Icons.light_mode_rounded,
+                        iconBgColor:
+                            isDark ? AppColors.teal : const Color(0xFF0284C7),
+                        title: 'Theme Appearance',
+                        subtitle: themeMode == ThemeMode.dark
+                            ? 'Dark • Midnight Navy'
+                            : (themeMode == ThemeMode.light
+                                ? 'Light • Teal & Blue'
+                                : 'System Default'),
+                        trailingWidget: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: (isDark
+                                    ? AppColors.teal
+                                    : const Color(0xFF0284C7))
+                                .withValues(alpha: 0.14),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: (isDark
+                                      ? AppColors.teal
+                                      : const Color(0xFF0284C7))
+                                  .withValues(alpha: 0.35),
+                            ),
+                          ),
+                          child: Text(
+                            themeMode == ThemeMode.dark
+                                ? 'Dark'
+                                : (themeMode == ThemeMode.light
+                                    ? 'Light'
+                                    : 'System'),
+                            style: GoogleFonts.inter(
+                              color: isDark
+                                  ? AppColors.teal
+                                  : const Color(0xFF0284C7),
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                         onTap: () {
                           HapticFeedback.lightImpact();
-                          _showAppSettingsSheet(context, ref);
+                          _showThemeSelectorSheet(context, ref);
                         },
                       ),
                       _ProfileMenuItem(
@@ -389,16 +437,20 @@ class UserProfileScreen extends ConsumerWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.public_rounded,
                                 size: 13,
-                                color: Color(0xFF60A5FA),
+                                color: isDark
+                                    ? const Color(0xFF60A5FA)
+                                    : const Color(0xFF2563EB),
                               ),
                               const SizedBox(width: 5),
                               Text(
                                 currentLanguage.displayName,
                                 style: GoogleFonts.inter(
-                                  color: const Color(0xFF93C5FD),
+                                  color: isDark
+                                      ? const Color(0xFF93C5FD)
+                                      : const Color(0xFF1D4ED8),
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -479,6 +531,7 @@ class UserProfileScreen extends ConsumerWidget {
           ),
         ),
       ),
+    ),
     );
   }
 
@@ -506,6 +559,7 @@ class UserProfileScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        final fieldAccent = isDark ? AppColors.teal : const Color(0xFF0D9488);
         return _ModalContainer(
           title: 'Personal Information',
           icon: Icons.person_rounded,
@@ -555,9 +609,9 @@ class UserProfileScreen extends ConsumerWidget {
                         ? AppColors.textOnDarkTertiary
                         : AppColors.textOnLightTertiary,
                   ),
-                  prefixIcon: const Icon(
+                  prefixIcon: Icon(
                     Icons.badge_outlined,
-                    color: AppColors.teal,
+                    color: fieldAccent,
                     size: 19,
                   ),
                   contentPadding:
@@ -580,8 +634,8 @@ class UserProfileScreen extends ConsumerWidget {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(
-                      color: AppColors.teal,
+                    borderSide: BorderSide(
+                      color: fieldAccent,
                       width: 1.5,
                     ),
                   ),
@@ -616,9 +670,9 @@ class UserProfileScreen extends ConsumerWidget {
                         ? AppColors.textOnDarkTertiary
                         : AppColors.textOnLightTertiary,
                   ),
-                  prefixIcon: const Icon(
+                  prefixIcon: Icon(
                     Icons.phone_android_rounded,
-                    color: AppColors.teal,
+                    color: fieldAccent,
                     size: 19,
                   ),
                   contentPadding:
@@ -641,8 +695,8 @@ class UserProfileScreen extends ConsumerWidget {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
-                    borderSide: const BorderSide(
-                      color: AppColors.teal,
+                    borderSide: BorderSide(
+                      color: fieldAccent,
                       width: 1.5,
                     ),
                   ),
@@ -779,13 +833,7 @@ class UserProfileScreen extends ConsumerWidget {
     );
   }
 
-  void _showAppSettingsSheet(BuildContext context, WidgetRef ref) {
-    final pushNotifications = ref.watch(pushNotificationsProvider);
-    final marketAlerts = ref.watch(marketAlertsProvider);
-    final haptics = ref.watch(hapticsEnabledProvider);
-    final themeMode = ref.watch(appThemeModeProvider);
-    final user = ref.watch(authControllerProvider);
-
+  void _showThemeSelectorSheet(BuildContext context, WidgetRef ref) {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -793,118 +841,76 @@ class UserProfileScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (ctx) => Consumer(
         builder: (context, ref, _) {
+          final themeMode = ref.watch(appThemeModeProvider);
+          final user = ref.watch(authControllerProvider);
           final isDark = Theme.of(context).brightness == Brightness.dark;
+
           return _ModalContainer(
-            title: 'App Settings',
-            icon: Icons.tune_rounded,
-            iconColor: const Color(0xFF06B6D4),
+            title: 'Theme Appearance',
+            icon: isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+            iconColor: isDark ? AppColors.teal : const Color(0xFF0284C7),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _SettingsToggleRow(
-                  title: 'Push Notifications',
-                  subtitle: 'Daily financial digests and market insights',
-                  value: pushNotifications,
-                  onChanged: (val) {
-                    ref.read(pushNotificationsProvider.notifier).set(val);
-                  },
-                ),
-                Divider(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : AppColors.borderLight,
-                  height: 16,
-                ),
-                _SettingsToggleRow(
-                  title: 'Market & Commodity Alerts',
-                  subtitle:
-                      'Immediate alerts when essential food or fuel shifts',
-                  value: marketAlerts,
-                  onChanged: (val) {
-                    ref.read(marketAlertsProvider.notifier).set(val);
-                  },
-                ),
-                Divider(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : AppColors.borderLight,
-                  height: 16,
-                ),
-                _SettingsToggleRow(
-                  title: 'Haptic Feedback',
-                  subtitle: 'Tactile vibrations on key app interactions',
-                  value: haptics,
-                  onChanged: (val) {
-                    ref.read(hapticsEnabledProvider.notifier).set(val);
-                  },
-                ),
-                Divider(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : AppColors.borderLight,
-                  height: 20,
-                ),
                 Text(
-                  'Theme Appearance',
-                  style: GoogleFonts.inter(
-                    color: isDark ? Colors.white : AppColors.textOnLight,
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  'Choose how Tadbeer AI looks on your device',
+                  'Select your preferred appearance for Tadbeer AI',
                   style: GoogleFonts.inter(
                     color: isDark
                         ? AppColors.textOnDarkSecondary
                         : AppColors.textOnLightSecondary,
-                    fontSize: 12,
+                    fontSize: 13,
                   ),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    _ThemeOptionCard(
-                      title: 'Dark',
-                      subtitle: 'Navy & Teal',
-                      icon: Icons.dark_mode_rounded,
-                      isSelected: themeMode == ThemeMode.dark,
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        ref
-                            .read(appThemeModeProvider.notifier)
-                            .setThemeMode(ThemeMode.dark, userId: user?.id);
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    _ThemeOptionCard(
-                      title: 'Light',
-                      subtitle: 'Clean & Navy',
-                      icon: Icons.light_mode_rounded,
-                      isSelected: themeMode == ThemeMode.light,
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        ref
-                            .read(appThemeModeProvider.notifier)
-                            .setThemeMode(ThemeMode.light, userId: user?.id);
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    _ThemeOptionCard(
-                      title: 'System',
-                      subtitle: 'Auto Match',
-                      icon: Icons.brightness_auto_rounded,
-                      isSelected: themeMode == ThemeMode.system,
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        ref
-                            .read(appThemeModeProvider.notifier)
-                            .setThemeMode(ThemeMode.system, userId: user?.id);
-                      },
-                    ),
-                  ],
+                const SizedBox(height: 16),
+                _ThemeSelectionTile(
+                  title: 'Light Theme',
+                  subtitle:
+                      'Teal Light + Blue Light gradient background with clean high-contrast cards',
+                  icon: Icons.light_mode_rounded,
+                  iconColor: const Color(0xFF0284C7),
+                  previewGradient: AppColors.lightThemeGradient,
+                  isSelected: themeMode == ThemeMode.light,
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    ref
+                        .read(appThemeModeProvider.notifier)
+                        .setThemeMode(ThemeMode.light, userId: user?.id);
+                    Navigator.pop(ctx);
+                  },
+                ),
+                const SizedBox(height: 10),
+                _ThemeSelectionTile(
+                  title: 'Dark Theme',
+                  subtitle:
+                      'Midnight Navy (#010717) canvas with glowing teal & mint accents',
+                  icon: Icons.dark_mode_rounded,
+                  iconColor: AppColors.teal,
+                  previewColor: AppColors.navyBg,
+                  isSelected: themeMode == ThemeMode.dark,
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    ref
+                        .read(appThemeModeProvider.notifier)
+                        .setThemeMode(ThemeMode.dark, userId: user?.id);
+                    Navigator.pop(ctx);
+                  },
+                ),
+                const SizedBox(height: 10),
+                _ThemeSelectionTile(
+                  title: 'System Default',
+                  subtitle:
+                      'Automatically match your device appearance settings',
+                  icon: Icons.brightness_auto_rounded,
+                  iconColor: const Color(0xFF3B82F6),
+                  isSelected: themeMode == ThemeMode.system,
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    ref
+                        .read(appThemeModeProvider.notifier)
+                        .setThemeMode(ThemeMode.system, userId: user?.id);
+                    Navigator.pop(ctx);
+                  },
                 ),
                 const SizedBox(height: 16),
               ],
@@ -1003,9 +1009,10 @@ class UserProfileScreen extends ConsumerWidget {
                     ),
                   ),
                   trailing: isSelected
-                      ? const Icon(
+                      ? Icon(
                           Icons.check_circle_rounded,
-                          color: AppColors.teal,
+                          color:
+                              isDark ? AppColors.teal : const Color(0xFF0D9488),
                           size: 20,
                         )
                       : null,
@@ -1129,14 +1136,15 @@ class UserProfileScreen extends ConsumerWidget {
                   color:
                       isDark ? AppColors.navyElevated : AppColors.lightSurface,
                   border: Border.all(
-                    color: AppColors.teal.withValues(alpha: 0.3),
+                    color: (isDark ? AppColors.teal : const Color(0xFF0D9488))
+                        .withValues(alpha: 0.3),
                     width: 2,
                   ),
                 ),
-                child: const Center(
+                child: Center(
                   child: Icon(
                     Icons.auto_awesome_rounded,
-                    color: AppColors.teal,
+                    color: isDark ? AppColors.teal : const Color(0xFF0D9488),
                     size: 28,
                   ),
                 ),
@@ -1285,11 +1293,14 @@ class UserProfileScreen extends ConsumerWidget {
 
 // ── Supporting Widgets ───────────────────────────────────────────────────────
 
-class _ThemeOptionCard extends StatelessWidget {
-  const _ThemeOptionCard({
+class _ThemeSelectionTile extends StatelessWidget {
+  const _ThemeSelectionTile({
     required this.title,
     required this.subtitle,
     required this.icon,
+    required this.iconColor,
+    this.previewGradient,
+    this.previewColor,
     required this.isSelected,
     required this.onTap,
   });
@@ -1297,71 +1308,126 @@ class _ThemeOptionCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final IconData icon;
+  final Color iconColor;
+  final Gradient? previewGradient;
+  final Color? previewColor;
   final bool isSelected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Expanded(
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-            decoration: BoxDecoration(
+    final activeColor = isDark ? AppColors.teal : const Color(0xFF0284C7);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? activeColor.withValues(alpha: isDark ? 0.14 : 0.08)
+                : (isDark ? AppColors.navyElevated : AppColors.lightBg),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
               color: isSelected
-                  ? AppColors.teal.withValues(alpha: isDark ? 0.16 : 0.12)
-                  : (isDark ? AppColors.navyElevated : AppColors.lightBg),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: isSelected
-                    ? AppColors.teal
-                    : (isDark
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : AppColors.borderLight),
-                width: isSelected ? 1.5 : 1,
-              ),
+                  ? activeColor
+                  : (isDark
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : AppColors.borderLight),
+              width: isSelected ? 1.8 : 1,
             ),
-            child: Column(
-              children: [
-                Icon(
-                  icon,
-                  size: 22,
-                  color: isSelected
-                      ? (isDark ? AppColors.teal : AppColors.tealDeep)
-                      : (isDark
-                          ? AppColors.textOnDarkSecondary
-                          : AppColors.textOnLightSecondary),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  title,
-                  style: GoogleFonts.inter(
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: previewColor ?? activeColor.withValues(alpha: 0.12),
+                  gradient: previewGradient,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
                     color: isSelected
-                        ? (isDark ? AppColors.teal : AppColors.tealDeep)
-                        : (isDark ? Colors.white : AppColors.textOnLight),
-                    fontSize: 13,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                        ? activeColor
+                        : (isDark
+                            ? Colors.white.withValues(alpha: 0.15)
+                            : AppColors.borderLight),
+                    width: 1,
+                  ),
+                  boxShadow: previewGradient != null
+                      ? [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Center(
+                  child: Icon(
+                    icon,
+                    size: 22,
+                    color: previewGradient != null
+                        ? const Color(0xFF0F2740)
+                        : (previewColor != null ? AppColors.teal : iconColor),
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.inter(
-                    color: isDark
-                        ? AppColors.textOnDarkTertiary
-                        : AppColors.textOnLightSecondary,
-                    fontSize: 10.5,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.inter(
+                        color: isDark ? Colors.white : AppColors.textOnLight,
+                        fontSize: 15,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.inter(
+                        color: isDark
+                            ? AppColors.textOnDarkSecondary
+                            : AppColors.textOnLightSecondary,
+                        fontSize: 12,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 10),
+              if (isSelected)
+                Icon(
+                  Icons.check_circle_rounded,
+                  color: activeColor,
+                  size: 22,
+                )
+              else
+                Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.2)
+                          : Colors.black.withValues(alpha: 0.2),
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -1386,15 +1452,22 @@ class _NavBackButton extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.navyCard
-                : AppColors.lightCard.withValues(alpha: 0.7),
+            color: isDark ? AppColors.navyCard : AppColors.lightCard,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: isDark
                   ? Colors.white.withValues(alpha: 0.08)
                   : AppColors.borderLight,
             ),
+            boxShadow: isDark
+                ? null
+                : [
+                    const BoxShadow(
+                      color: AppColors.lightCardShadow,
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
           ),
           child: Icon(
             Icons.arrow_back_ios_new_rounded,
@@ -1757,62 +1830,6 @@ class _InfoTile extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _SettingsToggleRow extends StatelessWidget {
-  const _SettingsToggleRow({
-    required this.title,
-    required this.subtitle,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final String title;
-  final String subtitle;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: GoogleFonts.inter(
-                  color: isDark ? Colors.white : AppColors.textOnLight,
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: GoogleFonts.inter(
-                  color: isDark
-                      ? AppColors.textOnDarkSecondary
-                      : AppColors.textOnLightSecondary,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Switch(
-          value: value,
-          activeThumbColor: AppColors.teal,
-          onChanged: (val) {
-            HapticFeedback.selectionClick();
-            onChanged(val);
-          },
-        ),
-      ],
     );
   }
 }

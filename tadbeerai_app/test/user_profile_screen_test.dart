@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tadbeerai/core/constants/app_constants.dart';
 import 'package:tadbeerai/domain/entities/app_user.dart';
 import 'package:tadbeerai/domain/entities/financial_profile.dart';
 import 'package:tadbeerai/domain/repositories/auth_repository.dart';
@@ -152,7 +153,8 @@ void main() {
       expect(find.text('Financial Information'), findsOneWidget);
 
       expect(find.text('PREFERENCES & SYSTEM'), findsOneWidget);
-      expect(find.text('App Settings'), findsOneWidget);
+      expect(find.text('Theme Appearance'), findsOneWidget);
+      expect(find.text('App Settings'), findsNothing);
       expect(find.text('Language'), findsOneWidget);
 
       expect(find.text('SUPPORT & INFORMATION'), findsOneWidget);
@@ -236,7 +238,8 @@ void main() {
       expect(find.text('Edit in Financial Wizard'), findsOneWidget);
     });
 
-    testWidgets('tapping App Settings opens settings toggle sheet',
+    testWidgets(
+        'Theme Appearance is present directly in Preferences & System without App Settings',
         (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 2.0;
@@ -245,13 +248,42 @@ void main() {
       await tester.pumpWidget(_buildTestApp(user: null, profile: null));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('App Settings'));
+      expect(find.text('App Settings'), findsNothing);
+      expect(find.text('Theme Appearance'), findsOneWidget);
+    });
+
+    testWidgets(
+        'tapping Theme Appearance opens theme selection sheet and allows selecting Light/Dark/System',
+        (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(_buildTestApp(user: null, profile: null));
       await tester.pumpAndSettle();
 
-      expect(find.text('Push Notifications'), findsOneWidget);
-      expect(find.text('Market & Commodity Alerts'), findsOneWidget);
-      expect(find.text('Haptic Feedback'), findsOneWidget);
-      expect(find.text('Theme Appearance'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Theme Appearance').first, 200);
+      await tester.tap(find.text('Theme Appearance').first);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Select your preferred appearance for Tadbeer AI'),
+        findsOneWidget,
+      );
+      expect(find.text('Dark Theme'), findsOneWidget);
+      expect(find.text('Light Theme'), findsOneWidget);
+      expect(find.text('System Default'), findsOneWidget);
+
+      // Tap Light Theme
+      await tester.tap(find.text('Light Theme'));
+      await tester.pumpAndSettle();
+
+      // Bottom sheet closes after selection
+      expect(
+        find.text('Select your preferred appearance for Tadbeer AI'),
+        findsNothing,
+      );
+      expect(testPrefs.getString(AppConstants.prefThemeMode), 'light');
     });
 
     testWidgets(

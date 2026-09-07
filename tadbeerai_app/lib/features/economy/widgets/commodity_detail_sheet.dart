@@ -35,11 +35,13 @@ class CommodityDetailSheet extends StatelessWidget {
     final Color trendColor;
     final String trendText;
     if (commodity.isIncreasing) {
-      trendColor = AppColors.danger;
-      trendText = '+${commodity.changePercent?.toStringAsFixed(1) ?? '0.0'}% WoW';
+      trendColor = isDark ? AppColors.danger : const Color(0xFFDC2626);
+      trendText =
+          '+${commodity.changePercent?.toStringAsFixed(1) ?? '0.0'}% WoW';
     } else if (commodity.isDecreasing) {
-      trendColor = AppColors.success;
-      trendText = '${commodity.changePercent?.toStringAsFixed(1) ?? '0.0'}% WoW';
+      trendColor = isDark ? AppColors.success : const Color(0xFF047857);
+      trendText =
+          '${commodity.changePercent?.toStringAsFixed(1) ?? '0.0'}% WoW';
     } else {
       trendColor = isDark
           ? AppColors.textOnDarkTertiary
@@ -70,9 +72,7 @@ class CommodityDetailSheet extends StatelessWidget {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.borderDark
-                      : AppColors.borderLight,
+                  color: isDark ? AppColors.borderDark : AppColors.borderLight,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -276,7 +276,8 @@ class CommodityDetailSheet extends StatelessWidget {
               width: double.infinity,
               child: AppButton(
                 label: 'Ask Tadbeer about this price change',
-                trailingIcon: const Icon(Icons.chat_bubble_outline_rounded, size: 18),
+                trailingIcon:
+                    const Icon(Icons.chat_bubble_outline_rounded, size: 18),
                 onPressed: () {
                   Navigator.of(context).pop();
                   context.go(

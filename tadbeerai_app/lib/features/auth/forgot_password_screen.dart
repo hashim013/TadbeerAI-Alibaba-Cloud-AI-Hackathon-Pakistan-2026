@@ -479,16 +479,18 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.key_rounded,
                         size: 13,
-                        color: AppColors.teal,
+                        color:
+                            isDark ? AppColors.teal : const Color(0xFF0D9488),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         l10n.demoCodeHint,
                         style: GoogleFonts.inter(
-                          color: AppColors.teal,
+                          color:
+                              isDark ? AppColors.teal : const Color(0xFF0D9488),
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -615,9 +617,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.check_rounded,
-              color: AppColors.teal,
+              color: isDark ? AppColors.teal : const Color(0xFF0D9488),
               size: 48,
             ),
           ),

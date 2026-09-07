@@ -10,6 +10,7 @@ import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/utils/l10n_context.dart';
 import '../../core/widgets/app_button.dart';
+import '../../core/widgets/app_canvas.dart';
 import '../../core/widgets/app_text_field.dart';
 import '../../providers/repository_providers.dart';
 import 'auth_controller.dart';
@@ -202,6 +203,7 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final isBusy = _signingInEmail != null;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return PopScope(
       canPop: false,
@@ -211,8 +213,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: SafeArea(
+        backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
+        body: AppCanvas(
+          useSafeArea: true,
           child: Column(
             children: [
               // ── Top Navigation Bar (Clean Browser / Native App Header) ──
@@ -305,10 +308,10 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.lock_rounded,
                   size: 12,
-                  color: AppColors.teal,
+                  color: isDark ? AppColors.teal : const Color(0xFF0D9488),
                 ),
                 const SizedBox(width: 5),
                 Text(
@@ -357,10 +360,10 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
         children: [
           // Google Hairline Indeterminate Progress Bar
           if (isBusy)
-            const LinearProgressIndicator(
+            LinearProgressIndicator(
               minHeight: 2.5,
               backgroundColor: Colors.transparent,
-              color: AppColors.teal,
+              color: isDark ? AppColors.teal : const Color(0xFF0D9488),
             )
           else
             const SizedBox(height: 2.5),
@@ -447,19 +450,19 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
                 ),
                 if (isBusy) ...[
                   const SizedBox(width: 8),
-                  const SizedBox(
+                  SizedBox(
                     width: 12,
                     height: 12,
                     child: CircularProgressIndicator(
                       strokeWidth: 1.8,
-                      color: AppColors.teal,
+                      color: isDark ? AppColors.teal : const Color(0xFF0D9488),
                     ),
                   ),
                   const SizedBox(width: 6),
                   Text(
                     l10n.googleSigningIn,
                     style: GoogleFonts.inter(
-                      color: AppColors.teal,
+                      color: isDark ? AppColors.teal : const Color(0xFF0D9488),
                       fontSize: 11.5,
                       fontWeight: FontWeight.w500,
                     ),
@@ -599,12 +602,12 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
               const SizedBox(width: 8),
 
               if (isSelected)
-                const SizedBox(
+                SizedBox(
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: AppColors.teal,
+                    color: isDark ? AppColors.teal : const Color(0xFF0D9488),
                   ),
                 )
               else
@@ -709,9 +712,9 @@ class _GoogleAuthScreenState extends ConsumerState<GoogleAuthScreen> {
               label: l10n.googleEnterEmailHint,
               hintText: 'username@gmail.com',
               keyboardType: TextInputType.emailAddress,
-              prefixIcon: const Icon(
+              prefixIcon: Icon(
                 Icons.alternate_email_rounded,
-                color: AppColors.teal,
+                color: isDark ? AppColors.teal : const Color(0xFF0D9488),
                 size: 18,
               ),
               validator: (val) {

@@ -342,8 +342,10 @@ class _FinancialProfileScreenState
         ),
         child: SafeArea(
           child: profileAsync.when(
-            loading: () => const Center(
-              child: CircularProgressIndicator(color: AppColors.teal),
+            loading: () => Center(
+              child: CircularProgressIndicator(
+                color: isDark ? AppColors.teal : const Color(0xFF0D9488),
+              ),
             ),
             error: (error, _) => Center(
               child: Text(
@@ -417,7 +419,9 @@ class _FinancialProfileScreenState
               Text(
                 'Step $_currentStep of 4',
                 style: GoogleFonts.inter(
-                  color: AppColors.textOnDarkSecondary,
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary
+                      : AppColors.textOnLightSecondary,
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
@@ -2341,16 +2345,16 @@ class _ContinueButton extends StatelessWidget {
                 Text(
                   'Continue',
                   style: GoogleFonts.inter(
-                    color: Colors.white,
+                    color: isDark ? AppColors.navyBg : Colors.white,
                     fontSize: 16.5,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.2,
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Icon(
+                Icon(
                   Icons.arrow_forward_rounded,
-                  color: Colors.white,
+                  color: isDark ? AppColors.navyBg : Colors.white,
                   size: 20,
                 ),
               ],
@@ -2404,12 +2408,12 @@ class _CompleteProfileButton extends StatelessWidget {
           onTap: loading ? null : onPressed,
           child: Center(
             child: loading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 22,
                     height: 22,
                     child: CircularProgressIndicator(
                       strokeWidth: 2.5,
-                      color: Colors.white,
+                      color: isDark ? AppColors.navyBg : Colors.white,
                     ),
                   )
                 : Row(
@@ -2418,16 +2422,16 @@ class _CompleteProfileButton extends StatelessWidget {
                       Text(
                         'Complete Profile',
                         style: GoogleFonts.inter(
-                          color: Colors.white,
+                          color: isDark ? AppColors.navyBg : Colors.white,
                           fontSize: 16.5,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.2,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Icon(
+                      Icon(
                         Icons.check_rounded,
-                        color: Colors.white,
+                        color: isDark ? AppColors.navyBg : Colors.white,
                         size: 22,
                       ),
                     ],

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_format.dart';
 import '../../../core/utils/l10n_context.dart';
+import '../../../core/widgets/app_canvas.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/entities/finance_data.dart';
 import '../../../domain/entities/goal.dart';
@@ -22,19 +23,23 @@ class GoalsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(financeControllerProvider);
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
       appBar: AppBar(title: Text(l10n.navGoalsTitle)),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openGoalForm(context, ref),
         child: const Icon(Icons.add_rounded),
       ),
-      body: asyncData.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text(l10n.errorTitle)),
-        data: (data) => _GoalsContent(
-          data: data,
-          onEdit: (goal) => _openGoalForm(context, ref, existing: goal),
+      body: AppCanvas(
+        child: asyncData.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => Center(child: Text(l10n.errorTitle)),
+          data: (data) => _GoalsContent(
+            data: data,
+            onEdit: (goal) => _openGoalForm(context, ref, existing: goal),
+          ),
         ),
       ),
     );
@@ -115,10 +120,13 @@ class _GoalCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final scheme = theme.colorScheme;
     final status = FinanceCalculations.goalStatus(goal, DateTime.now());
     final icon = CategoryVisuals.goalIcon(goal.icon);
-    final progressColor = status.isComplete ? AppColors.mint : AppColors.teal;
+    final progressColor = status.isComplete
+        ? (isDark ? AppColors.mint : const Color(0xFF047857))
+        : (isDark ? AppColors.teal : const Color(0xFF0D9488));
 
     return AppCard(
       onTap: onTap,
@@ -155,7 +163,9 @@ class _GoalCard extends ConsumerWidget {
                           : DateFormat('MMM yyyy').format(goal.targetDate),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: status.isComplete
-                            ? AppColors.mint
+                            ? (isDark
+                                ? AppColors.mint
+                                : const Color(0xFF047857))
                             : scheme.onSurfaceVariant,
                         fontWeight: status.isComplete ? FontWeight.w600 : null,
                       ),

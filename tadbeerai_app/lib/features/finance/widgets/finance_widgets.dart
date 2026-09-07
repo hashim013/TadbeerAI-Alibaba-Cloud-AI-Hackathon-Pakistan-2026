@@ -100,6 +100,16 @@ class StatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final effectiveColor = isDark
+        ? color
+        : (color == AppColors.mint
+            ? const Color(0xFF047857)
+            : (color == AppColors.teal
+                ? const Color(0xFF0D9488)
+                : (color == AppColors.danger
+                    ? const Color(0xFFDC2626)
+                    : color)));
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -115,7 +125,7 @@ class StatTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 16, color: color),
+              Icon(icon, size: 16, color: effectiveColor),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
@@ -137,7 +147,7 @@ class StatTile extends StatelessWidget {
             child: Text(
               value,
               style: theme.textTheme.titleMedium?.copyWith(
-                color: color,
+                color: effectiveColor,
                 fontWeight: FontWeight.w700,
               ),
               maxLines: 1,
@@ -347,16 +357,22 @@ class FinanceEmptyState extends StatelessWidget {
 
 /// Semantic color for a health score (or any 0–100 score).
 Color healthColor(BuildContext context, int score) {
-  if (score >= 85) return AppColors.mint;
-  if (score >= 65) return AppColors.teal;
-  if (score >= 45) return AppColors.warning;
-  return AppColors.danger;
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  if (score >= 85) return isDark ? AppColors.mint : const Color(0xFF047857);
+  if (score >= 65) return isDark ? AppColors.teal : const Color(0xFF0D9488);
+  if (score >= 45) return isDark ? AppColors.warning : const Color(0xFFD97706);
+  return isDark ? AppColors.danger : const Color(0xFFDC2626);
 }
 
 /// Progress color by budget utilization: teal under 90%, amber near the
 /// limit, danger when over. Deliberately calm — no flashing red.
 Color budgetUtilizationColor(BuildContext context, double utilization) {
-  if (utilization > 1.0) return AppColors.danger;
-  if (utilization >= 0.9) return AppColors.warning;
-  return AppColors.teal;
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  if (utilization > 1.0) {
+    return isDark ? AppColors.danger : const Color(0xFFDC2626);
+  }
+  if (utilization >= 0.9) {
+    return isDark ? AppColors.warning : const Color(0xFFD97706);
+  }
+  return isDark ? AppColors.teal : const Color(0xFF0D9488);
 }

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_format.dart';
 import '../../../core/utils/l10n_context.dart';
+import '../../../core/widgets/app_canvas.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/entities/finance_data.dart';
 import '../../../domain/services/finance_calculations.dart';
@@ -21,13 +22,17 @@ class MyFinancesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(financeControllerProvider);
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
       appBar: AppBar(title: Text(l10n.navMyFinancesTitle)),
-      body: asyncData.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text(l10n.errorTitle)),
-        data: (data) => _MyFinancesContent(data: data),
+      body: AppCanvas(
+        child: asyncData.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => Center(child: Text(l10n.errorTitle)),
+          data: (data) => _MyFinancesContent(data: data),
+        ),
       ),
     );
   }
@@ -167,12 +172,24 @@ class _SummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final effectiveColor = isDark
+        ? color
+        : (color == AppColors.mint
+            ? const Color(0xFF047857)
+            : (color == AppColors.teal
+                ? const Color(0xFF0D9488)
+                : (color == AppColors.danger
+                    ? const Color(0xFFDC2626)
+                    : color)));
+
     return Row(
       children: [
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          decoration:
+              BoxDecoration(color: effectiveColor, shape: BoxShape.circle),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -180,7 +197,10 @@ class _SummaryRow extends StatelessWidget {
         ),
         Text(
           value,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(color: color),
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall
+              ?.copyWith(color: effectiveColor),
         ),
       ],
     );
@@ -305,6 +325,7 @@ class _SavingsTrendChart extends StatelessWidget {
     final maxValue = series.fold<double>(
         0, (max, p) => p.savings.abs() > max ? p.savings.abs() : max);
     final niceMax = maxValue <= 0 ? 100.0 : maxValue * 1.2;
+    final chartLineColor = isDark ? AppColors.mint : const Color(0xFF047857);
 
     return AppCard(
       padding: const EdgeInsets.fromLTRB(12, 16, 16, 12),
@@ -372,20 +393,20 @@ class _SavingsTrendChart extends StatelessWidget {
                 ],
                 isCurved: true,
                 preventCurveOverShooting: true,
-                color: AppColors.mint,
+                color: chartLineColor,
                 barWidth: 3,
                 dotData: FlDotData(
                   show: true,
                   getDotPainter: (spot, percent, bar, index) =>
                       FlDotCirclePainter(
                     radius: 4,
-                    color: AppColors.mint,
+                    color: chartLineColor,
                     strokeWidth: 0,
                   ),
                 ),
                 belowBarData: BarAreaData(
                   show: true,
-                  color: AppColors.mint.withValues(alpha: 0.10),
+                  color: chartLineColor.withValues(alpha: 0.12),
                 ),
               ),
             ],

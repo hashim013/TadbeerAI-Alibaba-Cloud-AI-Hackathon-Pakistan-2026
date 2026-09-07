@@ -9,22 +9,26 @@ import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/data_status_badge.dart';
 import '../../../domain/entities/assistant_api_models.dart';
+import '../../../domain/entities/economic_indicator.dart';
 import '../../../domain/entities/economic_overview.dart';
 import '../../../domain/services/economic_impact_service.dart';
 import '../../../providers/economic_providers.dart';
 import '../finance/widgets/finance_widgets.dart';
 import 'widgets/economy_widgets.dart';
 
-/// The Economy tab root: Pakistan's key indicators at a glance, with a
-/// personalized impact preview.
+/// The Economy tab root: Pakistan's key indicators at a glance with zero data
+/// duplication, interactive trend analysis, and comprehensive PBS essential
+/// commodity price tracking.
 class EconomicPulseScreen extends ConsumerWidget {
   const EconomicPulseScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(economicPulseProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
       body: SafeArea(
         child: asyncData.when(
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -39,30 +43,57 @@ class EconomicPulseScreen extends ConsumerWidget {
   }
 }
 
-class _EconomicPulseContent extends ConsumerWidget {
+class _EconomicPulseContent extends ConsumerStatefulWidget {
   const _EconomicPulseContent({required this.economy});
 
   final EconomicOverview economy;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_EconomicPulseContent> createState() =>
+      _EconomicPulseContentState();
+}
+
+class _EconomicPulseContentState extends ConsumerState<_EconomicPulseContent> {
+  late String _selectedIndicatorId;
+
+  @override
+  void initState() {
+    super.initState();
+    // Default to inflation or the first available indicator.
+    _selectedIndicatorId = widget.economy.indicators.isNotEmpty
+        ? widget.economy.indicators.first.id
+        : 'inflation';
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final input = ref.watch(economicImpactInputProvider);
+    final economy = widget.economy;
+
+    final selectedIndicator = economy.indicatorById(_selectedIndicatorId) ??
+        (economy.indicators.isNotEmpty ? economy.indicators.first : null);
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
       children: [
-        // ── Header ─────────────────────────────────────────────────────────
+        // ── Executive Header ───────────────────────────────────────────────
         Row(
           children: [
             Expanded(
               child: Text(
                 l10n.economyPulseTitle,
-                style: theme.textTheme.headlineSmall,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
+            const SizedBox(width: 8),
             DataStatusBadge(status: economy.status),
           ],
         ),
@@ -76,39 +107,64 @@ class _EconomicPulseContent extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 2),
-        Text(
-          // Freshness honesty: official data is described as such; only the
-          // demo dataset gets a synthetic "Updated {n} days ago" label.
-          switch (economy.status) {
-            DataStatusKind.live ||
-            DataStatusKind.partial =>
-              l10n.economyLatestOfficial,
-            _ => l10n.economyUpdatedAt(
-                economyRelativeDayLabel(l10n, economy.updatedAt)),
-          },
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: isDark
-                ? AppColors.textOnDarkTertiary
-                : AppColors.textOnLightSecondary,
-          ),
+        Row(
+          children: [
+            Container(
+              width: 6,
+              height: 6,
+              decoration: const BoxDecoration(
+                color: AppColors.mint,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                switch (economy.status) {
+                  DataStatusKind.live ||
+                  DataStatusKind.partial =>
+                    l10n.economyLatestOfficial,
+                  _ => l10n.economyUpdatedAt(
+                      economyRelativeDayLabel(l10n, economy.updatedAt)),
+                },
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: isDark
+                      ? AppColors.textOnDarkTertiary
+                      : AppColors.textOnLightSecondary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
-        // ── Key indicator cards ───────────────────────────────────────────
+        // ── Macroeconomic Intelligence: KPI Matrix (No Duplication) ─────────
         SectionHeader(l10n.economyKeyIndicatorsTitle),
-        ..._indicatorGrid(context, economy),
-        const SizedBox(height: 24),
+        _buildKpiMatrix(context, economy),
+        const SizedBox(height: 12),
 
-        // ── Essential Prices — Pakistan ──────────────────────────────────
+        // ── Unified Interactive Trend Explorer ──────────────────────────────
+        if (selectedIndicator != null) ...[
+          _InteractiveTrendCard(
+            indicator: selectedIndicator,
+            allIndicators: economy.indicators,
+            onSelectIndicator: (id) {
+              setState(() => _selectedIndicatorId = id);
+            },
+            onDeepDive: () {
+              context.push('/economy/indicator/${selectedIndicator.id}');
+            },
+          ),
+          const SizedBox(height: 24),
+        ],
+
+        // ── Essential Prices — Pakistan (PBS SPI Module) ────────────────────
         const _EssentialPricesSection(),
         const SizedBox(height: 24),
 
-        // ── Trend charts for the headline indicators ─────────────────────
-        SectionHeader(l10n.economyDetailHistory),
-        ..._chartCards(context, economy),
-        const SizedBox(height: 24),
-
-        // ── Personalized impact preview ──────────────────────────────────
+        // ── Personalized Household Impact (Only if finance data exists) ─────
         if (input != null) ...[
           SectionHeader(l10n.economyImpactTitle),
           _ImpactPreviewCard(input: input),
@@ -120,15 +176,10 @@ class _EconomicPulseContent extends ConsumerWidget {
               onPressed: () => context.go('/ask'),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
         ],
 
-        // ── What's changing? ─────────────────────────────────────────────
-        SectionHeader(l10n.economyEventsTitle),
-        ..._eventCards(context, economy),
-        const SizedBox(height: 16),
-
-        // ── Trust footer ─────────────────────────────────────────────────
+        // ── Institutional Trust & Attribution Footer ────────────────────────
         SourceFooter(
           source:
               economy.indicators.isEmpty ? '' : economy.indicators.first.source,
@@ -138,108 +189,579 @@ class _EconomicPulseContent extends ConsumerWidget {
     );
   }
 
-  List<Widget> _indicatorGrid(BuildContext context, EconomicOverview economy) {
-    final rows = <Widget>[];
-    for (var i = 0; i < economy.indicators.length; i += 2) {
-      final left = economy.indicators[i];
-      final hasRight = i + 1 < economy.indicators.length;
-      rows.add(
-        Padding(
-          padding: EdgeInsets.only(
-              bottom: hasRight || i + 1 < economy.indicators.length ? 10 : 0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: IndicatorCard(
-                  indicator: left,
-                  onTap: () => context.push('/economy/indicator/${left.id}'),
+  Widget _buildKpiMatrix(BuildContext context, EconomicOverview economy) {
+    // Pick the 4 core headline indicators for high-density, executive presentation
+    final headlineIds = ['inflation', 'usdPkr', 'policyRate', 'fxReserves'];
+    final headlineIndicators = headlineIds
+        .map((id) => economy.indicatorById(id))
+        .whereType<EconomicIndicator>()
+        .toList();
+
+    // Fallback if indicators have different IDs
+    final displayList = headlineIndicators.isNotEmpty
+        ? headlineIndicators
+        : economy.indicators.take(4).toList();
+
+    return Column(
+      children: [
+        for (var i = 0; i < displayList.length; i += 2)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _MacroKpiTile(
+                    indicator: displayList[i],
+                    isSelected: _selectedIndicatorId == displayList[i].id,
+                    onTap: () {
+                      setState(() => _selectedIndicatorId = displayList[i].id);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: i + 1 < displayList.length
+                      ? _MacroKpiTile(
+                          indicator: displayList[i + 1],
+                          isSelected:
+                              _selectedIndicatorId == displayList[i + 1].id,
+                          onTap: () {
+                            setState(() =>
+                                _selectedIndicatorId = displayList[i + 1].id);
+                          },
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// A dense, executive-styled macroeconomic KPI tile.
+class _MacroKpiTile extends StatelessWidget {
+  const _MacroKpiTile({
+    required this.indicator,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final EconomicIndicator indicator;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final isDark = theme.brightness == Brightness.dark;
+    final trendColor = economyTrendColor(context, indicator);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.navyCard : AppColors.lightCard,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected
+                ? theme.colorScheme.primary
+                : (isDark ? AppColors.borderDark : AppColors.borderLight),
+            width: isSelected ? 1.8 : 1.0,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  economyIndicatorIcon(indicator),
+                  size: 15,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : (isDark
+                          ? AppColors.textOnDarkSecondary
+                          : AppColors.textOnLightSecondary),
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Text(
+                    economyIndicatorName(l10n, indicator),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: isDark
+                          ? AppColors.textOnDarkSecondary
+                          : AppColors.textOnLightSecondary,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                economyValueLabel(indicator),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
                 ),
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: hasRight
-                    ? IndicatorCard(
-                        indicator: economy.indicators[i + 1],
-                        onTap: () => context.push(
-                            '/economy/indicator/${economy.indicators[i + 1].id}'),
-                      )
-                    : const SizedBox.shrink(),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Text(
+                  economyChangeLabel(indicator),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: trendColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 11,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const Spacer(),
+                if (isSelected)
+                  Container(
+                    width: 5,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+              ],
+            ),
+          ],
         ),
-      );
-    }
-    return rows;
+      ),
+    );
   }
+}
 
-  List<Widget> _chartCards(BuildContext context, EconomicOverview economy) {
-    final l10n = context.l10n;
+/// A unified interactive trend explorer that allows switching indicators
+/// dynamically rather than stacking 5 duplicate charts down the screen.
+class _InteractiveTrendCard extends StatelessWidget {
+  const _InteractiveTrendCard({
+    required this.indicator,
+    required this.allIndicators,
+    required this.onSelectIndicator,
+    required this.onDeepDive,
+  });
+
+  final EconomicIndicator indicator;
+  final List<EconomicIndicator> allIndicators;
+  final ValueChanged<String> onSelectIndicator;
+  final VoidCallback onDeepDive;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final charts = <Widget>[];
+    final l10n = context.l10n;
+    final isDark = theme.brightness == Brightness.dark;
 
-    for (final id in const [
-      'inflation',
-      'usdPkr',
-      'fxReserves',
-      'remittances',
-      'gdp',
-    ]) {
-      final indicator = economy.indicatorById(id);
-      if (indicator == null) continue;
-      if (charts.isNotEmpty) charts.add(const SizedBox(height: 12));
-      charts.add(
-        AppCard(
-          padding: const EdgeInsets.fromLTRB(12, 16, 16, 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(14, 16, 16, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Header & Deep Dive Action ────────────────────────────────────
+          Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(4, 0, 0, 8),
-                child: Row(
+              Icon(
+                economyIndicatorIcon(indicator),
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(economyIndicatorIcon(indicator),
-                        size: 16, color: theme.colorScheme.primary),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        economyIndicatorName(l10n, indicator),
-                        style: theme.textTheme.titleSmall,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    Text(
+                      '${economyIndicatorName(l10n, indicator)} 6-Month Trend',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      economyEventPeriodLabel(l10n, indicator),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: isDark
+                            ? AppColors.textOnDarkTertiary
+                            : AppColors.textOnLightSecondary,
+                        fontSize: 11,
                       ),
                     ),
-                    TrendChip(indicator: indicator),
                   ],
                 ),
               ),
-              IndicatorTrendChart(indicator: indicator),
+              TrendChip(indicator: indicator),
+              const SizedBox(width: 6),
+              IconButton(
+                icon: const Icon(Icons.open_in_new_rounded, size: 18),
+                tooltip: 'Indicator Details',
+                visualDensity: VisualDensity.compact,
+                onPressed: onDeepDive,
+              ),
             ],
           ),
-        ),
-      );
-    }
-    return charts;
-  }
+          const SizedBox(height: 12),
 
-  List<Widget> _eventCards(BuildContext context, EconomicOverview economy) {
-    final cards = <Widget>[];
-    for (final event in economy.events) {
-      final indicator = economy.indicatorById(event.indicatorId);
-      if (indicator == null) continue;
-      if (cards.isNotEmpty) cards.add(const SizedBox(height: 12));
-      cards.add(
-        EconomicEventCard(
-          event: event,
-          indicator: indicator,
-          onOpenDetail: () =>
-              context.push('/economy/indicator/${event.indicatorId}'),
-          onAsk: () => context.go('/ask'),
+          // ── Segmented Indicator Selector Pills ───────────────────────────
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: allIndicators.map((item) {
+                final isSelected = item.id == indicator.id;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: ChoiceChip(
+                    label: Text(economyIndicatorName(l10n, item)),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      if (selected) onSelectIndicator(item.id);
+                    },
+                    labelStyle: TextStyle(
+                      fontSize: 11,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.w500,
+                      color: isSelected
+                          ? (isDark ? AppColors.navyBg : Colors.white)
+                          : (isDark
+                              ? AppColors.textOnDarkSecondary
+                              : AppColors.textOnLight),
+                    ),
+                    selectedColor: theme.colorScheme.primary,
+                    backgroundColor:
+                        isDark ? AppColors.navyBg : AppColors.lightCard,
+                    side: BorderSide(
+                      color: isSelected
+                          ? theme.colorScheme.primary
+                          : (isDark
+                              ? AppColors.borderDark
+                              : AppColors.borderLight),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    showCheckmark: false,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // ── The Trend Chart ──────────────────────────────────────────────
+          IndicatorTrendChart(indicator: indicator),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Essential Commodity Prices section: Flour, Eggs, Meat, Petrol, Diesel, etc.
+class _EssentialPricesSection extends ConsumerStatefulWidget {
+  const _EssentialPricesSection();
+
+  @override
+  ConsumerState<_EssentialPricesSection> createState() =>
+      _EssentialPricesSectionState();
+}
+
+class _EssentialPricesSectionState
+    extends ConsumerState<_EssentialPricesSection> {
+  bool _expanded = false;
+
+  static const _categories = [
+    'All',
+    'Cooking & Fuel',
+    'Food & Staples',
+    'Dairy & Poultry',
+    'Vegetables',
+    'Pulses',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final l10n = context.l10n;
+    final selectedCategory = ref.watch(selectedCommodityCategoryProvider);
+    final pricesAsync = ref.watch(essentialPricesProvider);
+
+    return pricesAsync.when(
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 24),
+          child: CircularProgressIndicator(),
         ),
-      );
-    }
-    return cards;
+      ),
+      error: (e, _) => AppCard(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            const Icon(Icons.error_outline_rounded,
+                size: 32, color: AppColors.danger),
+            const SizedBox(height: 8),
+            Text(
+              l10n.essentialPricesUnavailable,
+              style: theme.textTheme.titleSmall,
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () => ref.invalidate(essentialPricesProvider),
+              child: Text(l10n.retryAction),
+            ),
+          ],
+        ),
+      ),
+      data: (overview) {
+        final items = overview.items;
+        // Show initial 6 primary staple items; expand to show all 20
+        final visibleItems = _expanded ? items : items.take(6).toList();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Section Title & Status ────────────────────────────────────
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.essentialPricesTitle,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${l10n.essentialPricesSubtitle} • ${overview.period}',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: isDark
+                              ? AppColors.textOnDarkTertiary
+                              : AppColors.textOnLightSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                DataStatusBadge(status: overview.status),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // ── Category Filter Pills ─────────────────────────────────────
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _categories.map((category) {
+                  final isSelected = selectedCategory == category;
+                  final label = switch (category) {
+                    'All' => l10n.essentialPricesCategoryAll,
+                    'Vegetables' => l10n.essentialPricesCategoryVegetables,
+                    'Dairy & Poultry' => l10n.essentialPricesCategoryDairy,
+                    'Food & Staples' => l10n.essentialPricesCategoryStaples,
+                    'Pulses' => l10n.essentialPricesCategoryPulses,
+                    'Cooking & Fuel' => l10n.essentialPricesCategoryCookingFuel,
+                    _ => category,
+                  };
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      label: Text(label),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        if (selected) {
+                          ref
+                              .read(selectedCommodityCategoryProvider.notifier)
+                              .state = category;
+                        }
+                      },
+                      labelStyle: TextStyle(
+                        fontSize: 12,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected
+                            ? (isDark ? AppColors.navyBg : Colors.white)
+                            : (isDark
+                                ? AppColors.textOnDark
+                                : AppColors.textOnLight),
+                      ),
+                      selectedColor: theme.colorScheme.primary,
+                      backgroundColor:
+                          isDark ? AppColors.navyCard : AppColors.lightCard,
+                      side: BorderSide(
+                        color: isSelected
+                            ? theme.colorScheme.primary
+                            : (isDark
+                                ? AppColors.borderDark
+                                : AppColors.borderLight),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      showCheckmark: false,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // ── Items List ────────────────────────────────────────────────
+            if (visibleItems.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: Text(
+                    l10n.essentialPricesEmptyCategory,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: isDark
+                          ? AppColors.textOnDarkTertiary
+                          : AppColors.textOnLightSecondary,
+                    ),
+                  ),
+                ),
+              )
+            else
+              ...visibleItems.map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: CommodityCard(
+                    commodity: item,
+                    onTap: () => CommodityDetailSheet.show(context, item),
+                  ),
+                ),
+              ),
+
+            // ── View All Toggle ───────────────────────────────────────────
+            if (items.length > 6)
+              Center(
+                child: TextButton.icon(
+                  icon: Icon(
+                    _expanded
+                        ? Icons.keyboard_arrow_up_rounded
+                        : Icons.keyboard_arrow_down_rounded,
+                    size: 18,
+                  ),
+                  label: Text(_expanded
+                      ? l10n.essentialPricesShowLess
+                      : '${l10n.essentialPricesViewAll} (${items.length})'),
+                  onPressed: () => setState(() => _expanded = !_expanded),
+                ),
+              ),
+            const SizedBox(height: 8),
+
+            // ── Household Budget Impact Card (No Duplication) ─────────────
+            AppCard(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.info_outline_rounded,
+                          size: 18, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.essentialPricesWhyTitle,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.essentialPricesWhyBody,
+                    style: theme.textTheme.bodySmall?.copyWith(height: 1.4),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          icon: const Icon(Icons.chat_bubble_outline_rounded,
+                              size: 16),
+                          label: Text(
+                            l10n.essentialPricesAskImpact,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          onPressed: () => context.go(
+                            '/ask',
+                            extra: {
+                              'initialQuery':
+                                  'How are recent grocery and essential price changes (flour, petrol, diesel, meat, eggs) affecting my budget?'
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: FilledButton.tonalIcon(
+                          icon: const Icon(Icons.calculate_outlined, size: 16),
+                          label: Text(
+                            l10n.essentialPricesTryWhatIf,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          onPressed: () => context.go(
+                            '/ask',
+                            extra: {
+                              'initialQuery':
+                                  'What if my monthly fuel and grocery expenses increase by 10%?'
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -316,267 +838,6 @@ class _EconomyErrorView extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _EssentialPricesSection extends ConsumerStatefulWidget {
-  const _EssentialPricesSection();
-
-  @override
-  ConsumerState<_EssentialPricesSection> createState() =>
-      _EssentialPricesSectionState();
-}
-
-class _EssentialPricesSectionState
-    extends ConsumerState<_EssentialPricesSection> {
-  bool _expanded = false;
-
-  static const _categories = [
-    'All',
-    'Vegetables',
-    'Dairy & Poultry',
-    'Food & Staples',
-    'Pulses',
-    'Cooking & Fuel',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final l10n = context.l10n;
-    final selectedCategory = ref.watch(selectedCommodityCategoryProvider);
-    final pricesAsync = ref.watch(essentialPricesProvider);
-
-    return pricesAsync.when(
-      loading: () => const Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 24),
-          child: CircularProgressIndicator(),
-        ),
-      ),
-      error: (e, _) => AppCard(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const Icon(Icons.error_outline_rounded,
-                size: 32, color: AppColors.danger),
-            const SizedBox(height: 8),
-            Text(
-              l10n.essentialPricesUnavailable,
-              style: theme.textTheme.titleSmall,
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () => ref.invalidate(essentialPricesProvider),
-              child: Text(l10n.retryAction),
-            ),
-          ],
-        ),
-      ),
-      data: (overview) {
-        final items = overview.items;
-        final visibleItems = _expanded ? items : items.take(4).toList();
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Section Title & Status ────────────────────────────────────
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.essentialPricesTitle,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${l10n.essentialPricesSubtitle} • ${overview.period}',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: isDark
-                              ? AppColors.textOnDarkTertiary
-                              : AppColors.textOnLightSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                DataStatusBadge(status: overview.status),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // ── Category Pills ────────────────────────────────────────────
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _categories.map((category) {
-                  final isSelected = selectedCategory == category;
-                  final label = switch (category) {
-                    'All' => l10n.essentialPricesCategoryAll,
-                    'Vegetables' => l10n.essentialPricesCategoryVegetables,
-                    'Dairy & Poultry' => l10n.essentialPricesCategoryDairy,
-                    'Food & Staples' => l10n.essentialPricesCategoryStaples,
-                    'Pulses' => l10n.essentialPricesCategoryPulses,
-                    'Cooking & Fuel' => l10n.essentialPricesCategoryCookingFuel,
-                    _ => category,
-                  };
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(label),
-                      selected: isSelected,
-                      onSelected: (selected) {
-                        if (selected) {
-                          ref
-                              .read(selectedCommodityCategoryProvider.notifier)
-                              .state = category;
-                        }
-                      },
-                      labelStyle: TextStyle(
-                        fontSize: 12,
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
-                        color: isSelected
-                            ? Colors.white
-                            : (isDark
-                                ? AppColors.textOnDark
-                                : AppColors.textOnLight),
-                      ),
-                      selectedColor: theme.colorScheme.primary,
-                      backgroundColor:
-                          isDark ? AppColors.navyCard : AppColors.lightCard,
-                      side: BorderSide(
-                        color: isSelected
-                            ? theme.colorScheme.primary
-                            : (isDark
-                                ? AppColors.borderDark
-                                : AppColors.borderLight),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      showCheckmark: false,
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // ── Items List ────────────────────────────────────────────────
-            if (visibleItems.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Center(
-                  child: Text(
-                    l10n.essentialPricesEmptyCategory,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark
-                          ? AppColors.textOnDarkTertiary
-                          : AppColors.textOnLightSecondary,
-                    ),
-                  ),
-                ),
-              )
-            else
-              ...visibleItems.map(
-                (item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: CommodityCard(
-                    commodity: item,
-                    onTap: () => CommodityDetailSheet.show(context, item),
-                  ),
-                ),
-              ),
-
-            // ── View All Toggle ───────────────────────────────────────────
-            if (items.length > 4)
-              Center(
-                child: TextButton.icon(
-                  icon: Icon(
-                    _expanded
-                        ? Icons.keyboard_arrow_up_rounded
-                        : Icons.keyboard_arrow_down_rounded,
-                    size: 18,
-                  ),
-                  label: Text(_expanded
-                      ? l10n.essentialPricesShowLess
-                      : '${l10n.essentialPricesViewAll} (${items.length})'),
-                  onPressed: () => setState(() => _expanded = !_expanded),
-                ),
-              ),
-            const SizedBox(height: 8),
-
-            // ── Why It Matters Card ───────────────────────────────────────
-            AppCard(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.info_outline_rounded,
-                          size: 18, color: theme.colorScheme.primary),
-                      const SizedBox(width: 8),
-                      Text(
-                        l10n.essentialPricesWhyTitle,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.essentialPricesWhyBody,
-                    style: theme.textTheme.bodySmall?.copyWith(height: 1.4),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          icon: const Icon(Icons.chat_bubble_outline_rounded,
-                              size: 16),
-                          label: Text(l10n.essentialPricesAskImpact),
-                          onPressed: () => context.go(
-                            '/ask',
-                            extra: {
-                              'initialQuery':
-                                  'How are recent grocery and essential price changes affecting my budget?'
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: FilledButton.tonalIcon(
-                          icon: const Icon(Icons.calculate_outlined, size: 16),
-                          label: Text(l10n.essentialPricesTryWhatIf),
-                          onPressed: () => context.go(
-                            '/ask',
-                            extra: {
-                              'initialQuery':
-                                  'What if my grocery expenses increase by 10%?'
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }

@@ -169,9 +169,9 @@ abstract final class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: isDark ? AppColors.navyCard : AppColors.lightCard,
-        elevation: 0,
+        elevation: isDark ? 0 : 2,
         margin: EdgeInsets.zero,
-        shadowColor: isDark ? null : AppColors.lightCardShadow,
+        shadowColor: isDark ? null : const Color(0x140F2740),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(

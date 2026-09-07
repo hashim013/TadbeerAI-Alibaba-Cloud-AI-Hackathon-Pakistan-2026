@@ -58,6 +58,7 @@ class _MainShellState extends State<MainShell>
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final destinations = [
       _NavDestination(
@@ -90,7 +91,8 @@ class _MainShellState extends State<MainShell>
       ),
     ];
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final selectedIndex =
+        _calculateSelectedIndex(context, widget.navigationShell);
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
@@ -108,14 +110,27 @@ class _MainShellState extends State<MainShell>
         ),
       ),
       bottomNavigationBar: _ModernBottomNavBar(
-        currentIndex: widget.navigationShell.currentIndex,
+        currentIndex: selectedIndex,
         onDestinationSelected: (index) => widget.navigationShell.goBranch(
           index,
-          initialLocation: index == widget.navigationShell.currentIndex,
+          initialLocation: index == selectedIndex,
         ),
         destinations: destinations,
       ),
     );
+  }
+
+  int _calculateSelectedIndex(
+      BuildContext context, StatefulNavigationShell shell) {
+    try {
+      final location = GoRouterState.of(context).uri.path;
+      if (location.startsWith('/home')) return 0;
+      if (location.startsWith('/finance')) return 1;
+      if (location.startsWith('/economy')) return 2;
+      if (location.startsWith('/ask')) return 3;
+      if (location.startsWith('/profile')) return 4;
+    } catch (_) {}
+    return shell.currentIndex;
   }
 }
 

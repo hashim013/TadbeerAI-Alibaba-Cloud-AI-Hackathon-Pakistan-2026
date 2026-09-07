@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_format.dart';
 import '../../../core/utils/l10n_context.dart';
+import '../../../core/widgets/app_canvas.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/entities/finance_data.dart';
 import '../../../domain/entities/transaction.dart';
@@ -37,31 +38,36 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
   Widget build(BuildContext context) {
     final asyncData = ref.watch(financeControllerProvider);
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
       appBar: AppBar(title: Text(l10n.navExpensesTitle)),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openTransactionForm(context),
         child: const Icon(Icons.add_rounded),
       ),
-      body: asyncData.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text(l10n.errorTitle)),
-        data: (data) => Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
-              child: _SearchAndFilters(
-                controller: _searchController,
-                onChanged: (value) => setState(() => _query = value),
-                filter: _filter,
-                onFilterSelected: (filter) => setState(() => _filter = filter),
+      body: AppCanvas(
+        child: asyncData.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => Center(child: Text(l10n.errorTitle)),
+          data: (data) => Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+                child: _SearchAndFilters(
+                  controller: _searchController,
+                  onChanged: (value) => setState(() => _query = value),
+                  filter: _filter,
+                  onFilterSelected: (filter) =>
+                      setState(() => _filter = filter),
+                ),
               ),
-            ),
-            Expanded(
-              child: _buildBody(context, data),
-            ),
-          ],
+              Expanded(
+                child: _buildBody(context, data),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -227,6 +233,7 @@ class _TransactionListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final scheme = theme.colorScheme;
     final isIncome = transaction.type == TransactionType.income;
     final visual = CategoryVisuals.of(transaction.category);
@@ -275,7 +282,9 @@ class _TransactionListTile extends StatelessWidget {
             Text(
               '${isIncome ? '+' : '-'}${CurrencyFormat.pkr(transaction.amount)}',
               style: theme.textTheme.titleSmall?.copyWith(
-                color: isIncome ? AppColors.mint : scheme.onSurface,
+                color: isIncome
+                    ? (isDark ? AppColors.mint : const Color(0xFF047857))
+                    : scheme.onSurface,
                 fontWeight: FontWeight.w700,
               ),
             ),

@@ -204,8 +204,9 @@ void main() {
       expect(find.text('Financial Profile'), findsNothing);
     });
 
-    // ── 3. Completed card shown when profile is completed ────────────────
-    testWidgets('shows completed status when profileCompleted is true',
+    // ── 3. Profile card hidden on home once completed ────────────────────
+    testWidgets(
+        'does not show financial profile or edit button on homescreen once profile is completed',
         (tester) async {
       await _pumpHome(
         tester,
@@ -218,9 +219,9 @@ void main() {
         ),
       );
 
-      expect(find.text('Financial Profile'), findsOneWidget);
-      expect(find.text('Personalized insights enabled'), findsOneWidget);
-      expect(find.text('Edit'), findsOneWidget);
+      expect(find.text('Financial Profile'), findsNothing);
+      expect(find.text('Personalized insights enabled'), findsNothing);
+      expect(find.text('Edit'), findsNothing);
       expect(find.text('Personalize Tadbeer'), findsNothing);
       expect(find.text('Complete Profile'), findsNothing);
     });
@@ -230,26 +231,6 @@ void main() {
       final router = await _pumpHome(tester, profile: null);
 
       await tester.tap(find.text('Complete Profile'));
-      await tester.pumpAndSettle();
-
-      expect(router.state.matchedLocation, '/profile/financial');
-    });
-
-    // ── 5. Edit navigates to /profile/financial ─────────────────────────
-    testWidgets('tapping Edit on completed card navigates to profile',
-        (tester) async {
-      final router = await _pumpHome(
-        tester,
-        profile: const FinancialProfile(
-          persona: Persona.salaried,
-          monthlyIncome: 80000,
-          monthlyEssentialExpenses: 55000,
-          primaryGoal: PrimaryGoal.saveMore,
-          profileCompleted: true,
-        ),
-      );
-
-      await tester.tap(find.text('Edit'));
       await tester.pumpAndSettle();
 
       expect(router.state.matchedLocation, '/profile/financial');

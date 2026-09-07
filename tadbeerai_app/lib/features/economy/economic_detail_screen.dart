@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_format.dart';
 import '../../../core/utils/l10n_context.dart';
+import '../../../core/widgets/app_canvas.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/data_status_badge.dart';
 import '../../../domain/entities/economic_indicator.dart';
@@ -23,9 +24,11 @@ class EconomicDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(economicPulseProvider);
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final indicator = asyncData.value?.indicatorById(indicatorId);
 
     return Scaffold(
+      backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
       appBar: AppBar(
         title: Text(
           indicator == null
@@ -33,20 +36,22 @@ class EconomicDetailScreen extends ConsumerWidget {
               : economyIndicatorName(l10n, indicator),
         ),
       ),
-      body: SafeArea(
-        child: asyncData.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => _EconomyDetailErrorView(
-            message: l10n.errorTitle,
-            onRetry: () => ref.invalidate(economicPulseProvider),
+      body: AppCanvas(
+        child: SafeArea(
+          child: asyncData.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, _) => _EconomyDetailErrorView(
+              message: l10n.errorTitle,
+              onRetry: () => ref.invalidate(economicPulseProvider),
+            ),
+            data: (economy) {
+              final resolved = economy.indicatorById(indicatorId);
+              if (resolved == null) {
+                return Center(child: Text(l10n.errorTitle));
+              }
+              return _EconomicDetailContent(indicator: resolved);
+            },
           ),
-          data: (economy) {
-            final resolved = economy.indicatorById(indicatorId);
-            if (resolved == null) {
-              return Center(child: Text(l10n.errorTitle));
-            }
-            return _EconomicDetailContent(indicator: resolved);
-          },
         ),
       ),
     );

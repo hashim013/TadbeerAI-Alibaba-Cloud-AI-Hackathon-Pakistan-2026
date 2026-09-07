@@ -12,10 +12,11 @@ import 'package:tadbeerai/providers/repository_providers.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('SplashScreen renders all branding, typography, and indicator widgets',
+  testWidgets(
+      'SplashScreen renders all branding, typography, and indicator widgets on first launch',
       (tester) async {
     SharedPreferences.setMockInitialValues({
-      AppConstants.prefOnboardingComplete: true,
+      AppConstants.prefOnboardingComplete: false,
     });
     final prefs = await SharedPreferences.getInstance();
 
@@ -73,10 +74,63 @@ void main() {
     expect(find.byType(CustomPaint), findsWidgets);
 
     // Complete the splash delay timer
-    await tester.pump(AppConstants.splashDuration + const Duration(milliseconds: 200));
+    await tester
+        .pump(AppConstants.splashDuration + const Duration(milliseconds: 200));
     await tester.pumpAndSettle();
 
-    // Verify navigation reached /onboarding for testing
+    // Verify first launch routes to onboarding
     expect(find.text('ONBOARDING'), findsOneWidget);
+  });
+
+  testWidgets(
+      'SplashScreen skips onboarding and routes to login for returning user',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({
+      AppConstants.prefOnboardingComplete: true,
+    });
+    final prefs = await SharedPreferences.getInstance();
+
+    final router = GoRouter(
+      initialLocation: '/splash',
+      routes: [
+        GoRoute(
+          path: '/splash',
+          builder: (context, state) => const SplashScreen(),
+        ),
+        GoRoute(
+          path: '/onboarding',
+          builder: (context, state) => const Scaffold(body: Text('ONBOARDING')),
+        ),
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => const Scaffold(body: Text('LOGIN')),
+        ),
+        GoRoute(
+          path: '/home',
+          builder: (context, state) => const Scaffold(body: Text('HOME')),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [sharedPrefsProvider.overrideWithValue(prefs)],
+        child: MaterialApp.router(
+          theme: AppTheme.dark(),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      ),
+    );
+
+    // Complete the splash delay timer
+    await tester
+        .pump(AppConstants.splashDuration + const Duration(milliseconds: 200));
+    await tester.pumpAndSettle();
+
+    // Verify returning user skips onboarding and routes to login
+    expect(find.text('LOGIN'), findsOneWidget);
+    expect(find.text('ONBOARDING'), findsNothing);
   });
 }

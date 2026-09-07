@@ -375,10 +375,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                       // Guest Sign-in Card
                       _SocialAuthCard(
-                        logo: const Icon(
+                        logo: Icon(
                           Icons.person_outline_rounded,
                           size: 20,
-                          color: AppColors.teal,
+                          color:
+                              isDark ? AppColors.teal : const Color(0xFF0D9488),
                         ),
                         label: l10n.actionContinueAsGuest,
                         onTap: _continueAsGuest,
@@ -476,13 +477,13 @@ class _SocialAuthCard extends StatelessWidget {
                   ],
           ),
           child: loading
-              ? const Center(
+              ? Center(
                   child: SizedBox(
                     height: 20,
                     width: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: AppColors.teal,
+                      color: isDark ? AppColors.teal : const Color(0xFF0D9488),
                     ),
                   ),
                 )

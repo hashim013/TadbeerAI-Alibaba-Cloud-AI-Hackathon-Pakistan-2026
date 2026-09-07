@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
+import '../../providers/repository_providers.dart';
 
 /// Redesigned brand splash screen for Tadbeer AI 2.0.
 ///
@@ -46,14 +47,26 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   Future<void> _bootstrap() async {
     // Brand moment before routing (comfortable testing duration)
     await Future<void>.delayed(AppConstants.splashDuration);
-    _navigateToOnboarding();
+    await _proceedNext();
   }
 
-  void _navigateToOnboarding() {
+  Future<void> _proceedNext() async {
     if (!mounted || _hasNavigated) return;
     _hasNavigated = true;
-    // Always route to onboarding for testing without checking saved settings
-    context.go('/onboarding');
+    final isComplete =
+        await ref.read(settingsRepositoryProvider).isOnboardingComplete();
+    if (!mounted) return;
+    if (isComplete) {
+      final user = await ref.read(authRepositoryProvider).currentUser();
+      if (!mounted) return;
+      if (user != null) {
+        context.go('/home');
+      } else {
+        context.go('/login');
+      }
+    } else {
+      context.go('/onboarding');
+    }
   }
 
   @override
@@ -73,7 +86,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       backgroundColor: bgBase,
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: _navigateToOnboarding,
+        onTap: _proceedNext,
         child: AnnotatedRegion<SystemUiOverlayStyle>(
           value:
               (isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)

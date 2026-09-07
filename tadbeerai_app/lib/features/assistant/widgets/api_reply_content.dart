@@ -107,25 +107,31 @@ class ScenarioCard extends StatelessWidget {
         : AppColors.textOnLightSecondary;
     final calculated = scenario.status == 'calculated';
 
+    final isDark = theme.brightness == Brightness.dark;
+    final warningColor = isDark ? AppColors.warning : const Color(0xFFD97706);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.10),
+        color: warningColor.withValues(alpha: isDark ? 0.10 : 0.12),
         borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: warningColor.withValues(alpha: isDark ? 0.25 : 0.35),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.tune_rounded,
-                  size: 14, color: AppColors.warning),
+              Icon(Icons.tune_rounded, size: 14, color: warningColor),
               const SizedBox(width: 6),
               Text(
                 l10n.scenarioLabel,
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: AppColors.warning,
+                  color: warningColor,
                   fontWeight: FontWeight.w700,
                 ),
               ),

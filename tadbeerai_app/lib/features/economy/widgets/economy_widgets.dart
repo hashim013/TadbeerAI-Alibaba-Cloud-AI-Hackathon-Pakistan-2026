@@ -80,13 +80,16 @@ bool economyRisingIsGood(EconomicIndicator indicator) =>
 /// Semantic trend color: mint when the direction helps the household, danger
 /// when it hurts; stable stays neutral.
 Color economyTrendColor(BuildContext context, EconomicIndicator indicator) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final goodColor = isDark ? AppColors.mint : const Color(0xFF047857);
+  final badColor = isDark ? AppColors.danger : const Color(0xFFDC2626);
   switch (indicator.trend) {
     case TrendDirection.stable:
       return Theme.of(context).colorScheme.onSurfaceVariant;
     case TrendDirection.rising:
-      return economyRisingIsGood(indicator) ? AppColors.mint : AppColors.danger;
+      return economyRisingIsGood(indicator) ? goodColor : badColor;
     case TrendDirection.falling:
-      return economyRisingIsGood(indicator) ? AppColors.danger : AppColors.mint;
+      return economyRisingIsGood(indicator) ? badColor : goodColor;
   }
 }
 
@@ -284,6 +287,7 @@ class IndicatorTrendChart extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final labelColor =
         isDark ? AppColors.textOnDarkSecondary : AppColors.textOnLightSecondary;
+    final chartColor = isDark ? AppColors.teal : const Color(0xFF0D9488);
     final history = indicator.history;
 
     // Honest empty state: a source that published no trend (e.g. Policy Rate /
@@ -392,20 +396,20 @@ class IndicatorTrendChart extends StatelessWidget {
               ],
               isCurved: true,
               preventCurveOverShooting: true,
-              color: AppColors.teal,
+              color: chartColor,
               barWidth: 3,
               dotData: FlDotData(
                 show: true,
                 getDotPainter: (spot, percent, bar, index) =>
                     FlDotCirclePainter(
                   radius: 4,
-                  color: AppColors.teal,
+                  color: chartColor,
                   strokeWidth: 0,
                 ),
               ),
               belowBarData: BarAreaData(
                 show: true,
-                color: AppColors.teal.withValues(alpha: 0.10),
+                color: chartColor.withValues(alpha: 0.12),
               ),
             ),
           ],
@@ -545,12 +549,22 @@ class _ImpactRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final effectiveColor = !isDark && color == AppColors.mint
+        ? const Color(0xFF047857)
+        : (!isDark && color == AppColors.teal
+            ? const Color(0xFF0D9488)
+            : (!isDark && color == AppColors.danger
+                ? const Color(0xFFDC2626)
+                : color));
+
     return Row(
       children: [
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          decoration:
+              BoxDecoration(color: effectiveColor, shape: BoxShape.circle),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -558,7 +572,10 @@ class _ImpactRow extends StatelessWidget {
         ),
         Text(
           value,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(color: color),
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall
+              ?.copyWith(color: effectiveColor),
         ),
       ],
     );

@@ -521,5 +521,14 @@ BoxDecoration assistantBubbleDecoration(BuildContext context) {
     border: Border.all(
       color: isDark ? AppColors.borderDark : AppColors.borderLight,
     ),
+    boxShadow: isDark
+        ? null
+        : const [
+            BoxShadow(
+              color: AppColors.lightCardShadow,
+              blurRadius: 10,
+              offset: Offset(0, 2),
+            ),
+          ],
   );
 }

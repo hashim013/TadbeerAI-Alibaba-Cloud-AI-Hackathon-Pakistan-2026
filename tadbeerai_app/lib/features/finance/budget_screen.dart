@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_format.dart';
 import '../../../core/utils/l10n_context.dart';
+import '../../../core/widgets/app_canvas.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/entities/budget.dart';
 import '../../../domain/entities/finance_data.dart';
@@ -21,19 +22,23 @@ class BudgetScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(financeControllerProvider);
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
       appBar: AppBar(title: Text(l10n.navBudgetTitle)),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openBudgetForm(context, ref),
         child: const Icon(Icons.add_rounded),
       ),
-      body: asyncData.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text(l10n.errorTitle)),
-        data: (data) => _BudgetContent(
-          data: data,
-          onEdit: (budget) => _openBudgetForm(context, ref, existing: budget),
+      body: AppCanvas(
+        child: asyncData.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => Center(child: Text(l10n.errorTitle)),
+          data: (data) => _BudgetContent(
+            data: data,
+            onEdit: (budget) => _openBudgetForm(context, ref, existing: budget),
+          ),
         ),
       ),
     );
@@ -201,6 +206,7 @@ class _BudgetRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final scheme = theme.colorScheme;
     final status = FinanceCalculations.budgetStatus(budget, spent);
     final color = budgetUtilizationColor(context, status.utilization);
@@ -241,7 +247,11 @@ class _BudgetRow extends StatelessWidget {
                               CurrencyFormat.pkr(-status.remaining))
                           : '${l10n.remainingLabel}: ${CurrencyFormat.pkr(status.remaining)}',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: status.isOver ? AppColors.danger : color,
+                        color: status.isOver
+                            ? (isDark
+                                ? AppColors.danger
+                                : const Color(0xFFDC2626))
+                            : color,
                         fontWeight: status.isOver ? FontWeight.w600 : null,
                       ),
                       maxLines: 1,

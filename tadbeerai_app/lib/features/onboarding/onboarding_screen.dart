@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/utils/l10n_context.dart';
+import '../../providers/repository_providers.dart';
 
 /// Three-step introductory journey: Understand → Manage → Plan.
 ///
@@ -34,8 +35,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Future<void> _finish() async {
-    // Note: Kept unpersisted during visual testing mode as requested
-    // await ref.read(settingsRepositoryProvider).completeOnboarding();
+    await ref.read(settingsRepositoryProvider).completeOnboarding();
     if (mounted) context.go('/login');
   }
 

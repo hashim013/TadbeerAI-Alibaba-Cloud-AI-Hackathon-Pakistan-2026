@@ -19,8 +19,10 @@ class FinanceOverviewScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(financeControllerProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
       body: SafeArea(
         child: asyncData.when(
           loading: () => const Center(child: CircularProgressIndicator()),
