@@ -16,7 +16,7 @@ class ApiConfig {
   /// Base URL of the FastAPI backend.
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://10.0.2.2:8000',
+    defaultValue: 'https://tadbeer-ai-backend-haddx.vercel.app',
   );
 
   /// Endpoint of the multi-agent assistant chat.
