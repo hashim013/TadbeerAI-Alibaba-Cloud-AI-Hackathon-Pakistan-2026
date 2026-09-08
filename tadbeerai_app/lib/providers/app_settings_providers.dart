@@ -7,15 +7,9 @@ import '../core/constants/app_constants.dart';
 import '../features/auth/auth_controller.dart';
 import 'repository_providers.dart';
 
-/// Supported locales in Tadbeer AI.
+/// Supported language in Tadbeer AI (English only).
 enum AppLanguage {
-  english(Locale('en'), 'English', 'English'),
-  urdu(Locale('ur'), 'اردو', 'Urdu (Nastaliq)'),
-  romanUrdu(
-    Locale.fromSubtags(languageCode: 'ur', scriptCode: 'Latn'),
-    'Roman Urdu',
-    'Urdu (Latin script)',
-  );
+  english(Locale('en'), 'English', 'English (Default)');
 
   const AppLanguage(this.locale, this.displayName, this.nativeSubtitle);
 
@@ -24,10 +18,6 @@ enum AppLanguage {
   final String nativeSubtitle;
 
   static AppLanguage fromLocale(Locale locale) {
-    if (locale.languageCode == 'ur') {
-      if (locale.scriptCode == 'Latn') return AppLanguage.romanUrdu;
-      return AppLanguage.urdu;
-    }
     return AppLanguage.english;
   }
 }
@@ -38,11 +28,11 @@ class AppLocaleNotifier extends Notifier<Locale> {
   Locale build() => const Locale('en');
 
   void setLocale(Locale newLocale) {
-    state = newLocale;
+    state = const Locale('en');
   }
 
   void setLanguage(AppLanguage language) {
-    state = language.locale;
+    state = const Locale('en');
   }
 }
 

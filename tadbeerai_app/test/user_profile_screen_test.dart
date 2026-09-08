@@ -239,6 +239,92 @@ void main() {
     });
 
     testWidgets(
+        'tapping each financial option separately opens individual editor and updates profile',
+        (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      const testProfile = FinancialProfile(
+        name: 'Hamza Malik',
+        persona: Persona.businessOwner,
+        monthlyIncome: 350000,
+        monthlyEssentialExpenses: 120000,
+        totalSavings: 800000,
+        primaryGoal: PrimaryGoal.emergencyFund,
+        profileCompleted: true,
+      );
+
+      final profileRepo = _FakeProfileRepo(testProfile);
+
+      await tester.pumpWidget(ProviderScope(
+        overrides: [
+          sharedPrefsProvider.overrideWithValue(testPrefs),
+          financialProfileRepositoryProvider.overrideWithValue(profileRepo),
+          authRepositoryProvider.overrideWithValue(_FakeAuthRepo(null)),
+          authControllerProvider.overrideWith(() => _TestAuthController(null)),
+        ],
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: UserProfileScreen(),
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      // Open Financial Information sheet
+      await tester.tap(find.text('Financial Information'));
+      await tester.pumpAndSettle();
+
+      // Verify instruction banner
+      expect(
+        find.text('Tap any item to edit it separately at once.'),
+        findsOneWidget,
+      );
+
+      // 1. Edit Persona directly
+      await tester.tap(find.text('Assigned Persona'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Update Persona'), findsWidgets);
+      // Select Salaried Professional
+      await tester.tap(find.text('Salaried Professional').last);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Update Persona').last);
+      await tester.pumpAndSettle();
+
+      expect(profileRepo.stored?.persona, Persona.salaried);
+
+      // 2. Edit Monthly Income directly
+      await tester.tap(find.text('Monthly Income'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Update Monthly Income'), findsWidgets);
+      // Select quick preset chip
+      await tester.tap(find.text('PKR 200k'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Update Monthly Income').last);
+      await tester.pumpAndSettle();
+
+      expect(profileRepo.stored?.monthlyIncome, 200000);
+
+      // 3. Edit Primary Financial Goal directly
+      await tester.tap(find.text('Primary Financial Goal'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Update Financial Goal'), findsOneWidget);
+      await tester.tap(find.text('Save More'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Update Primary Goal'));
+      await tester.pumpAndSettle();
+
+      expect(profileRepo.stored?.primaryGoal, PrimaryGoal.saveMore);
+    });
+
+    testWidgets(
         'Theme Appearance is present directly in Preferences & System without App Settings',
         (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
@@ -287,7 +373,7 @@ void main() {
     });
 
     testWidgets(
-        'tapping Language opens language selection sheet and switches locale',
+        'tapping Language opens language sheet and shows English as active language',
         (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 2.0;
@@ -299,17 +385,16 @@ void main() {
       await tester.tap(find.text('Language'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Select Language'), findsOneWidget);
+      expect(find.text('Language'), findsWidgets);
       expect(find.text('English'), findsWidgets);
-      expect(find.text('اردو'), findsOneWidget);
-      expect(find.text('Roman Urdu'), findsOneWidget);
+      expect(find.text('Default language (English only)'), findsOneWidget);
 
-      // Tap Urdu option
-      await tester.tap(find.text('اردو'));
+      // Tap English option
+      await tester.tap(find.text('English').last);
       await tester.pumpAndSettle();
 
       // Bottom sheet closes after selection
-      expect(find.text('Select Language'), findsNothing);
+      expect(find.text('Default language (English only)'), findsNothing);
     });
 
     testWidgets(

@@ -47,6 +47,26 @@ class UserProfileScreen extends ConsumerWidget {
     return 'Rs. $buffer';
   }
 
+  String _formatGoalTitle(PrimaryGoal? goal) {
+    if (goal == null) return 'Emergency Fund';
+    switch (goal) {
+      case PrimaryGoal.emergencyFund:
+        return 'Emergency Fund';
+      case PrimaryGoal.saveMore:
+        return 'Save More';
+      case PrimaryGoal.education:
+        return 'Education & Skills';
+      case PrimaryGoal.newDevice:
+        return 'New Device / Laptop';
+      case PrimaryGoal.businessGrowth:
+        return 'Business Growth';
+      case PrimaryGoal.reduceSpending:
+        return 'Reduce Spending';
+      case PrimaryGoal.other:
+        return 'Personal Goal';
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authControllerProvider);
@@ -104,17 +124,20 @@ class UserProfileScreen extends ConsumerWidget {
                           },
                         ),
                         const SizedBox(width: 14),
-                        Text(
-                          'My Profile',
-                          style: GoogleFonts.inter(
-                            color:
-                                isDark ? Colors.white : AppColors.textOnLight,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.3,
+                        Expanded(
+                          child: Text(
+                            'My Profile',
+                            style: GoogleFonts.inter(
+                              color:
+                                  isDark ? Colors.white : AppColors.textOnLight,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.3,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const Spacer(),
                         // Quick edit shortcut
                         IconButton(
                           icon: Icon(
@@ -762,77 +785,868 @@ class UserProfileScreen extends ConsumerWidget {
   }
 
   void _showFinancialInfoSheet(
-      BuildContext context, FinancialProfile? profile) {
+      BuildContext context, FinancialProfile? initialProfile) {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => _ModalContainer(
-        title: 'Financial Information',
-        icon: Icons.account_balance_wallet_rounded,
-        iconColor: AppColors.teal,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _InfoTile(
-              label: 'Assigned Persona',
-              value: _formatPersonaTitle(profile?.persona),
-              icon: Icons.badge_outlined,
-            ),
-            const SizedBox(height: 10),
-            _InfoTile(
-              label: 'Monthly Income',
-              value: _formatCurrency(profile?.monthlyIncome),
-              icon: Icons.trending_up_rounded,
-            ),
-            const SizedBox(height: 10),
-            _InfoTile(
-              label: 'Monthly Essential Expenses',
-              value: _formatCurrency(profile?.monthlyEssentialExpenses),
-              icon: Icons.receipt_long_rounded,
-            ),
-            const SizedBox(height: 10),
-            _InfoTile(
-              label: 'Total Savings Stash',
-              value: _formatCurrency(profile?.totalSavings),
-              icon: Icons.savings_outlined,
-            ),
-            const SizedBox(height: 10),
-            _InfoTile(
-              label: 'Primary Financial Goal',
-              value: profile?.primaryGoal?.name ?? 'Emergency Fund',
-              icon: Icons.flag_outlined,
-            ),
-            const SizedBox(height: 22),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.tonal(
-                onPressed: () {
-                  Navigator.of(ctx).pop();
-                  context.push('/profile/financial');
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.teal.withValues(alpha: 0.16),
-                  foregroundColor: AppColors.teal,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+      builder: (ctx) => Consumer(
+        builder: (sheetContext, ref, _) {
+          final profile =
+              ref.watch(financialProfileControllerProvider).valueOrNull ??
+                  initialProfile;
+          final isDark = Theme.of(sheetContext).brightness == Brightness.dark;
+
+          return _ModalContainer(
+            title: 'Financial Information',
+            icon: Icons.account_balance_wallet_rounded,
+            iconColor: AppColors.teal,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  margin: const EdgeInsets.only(bottom: 14),
+                  decoration: BoxDecoration(
+                    color: (isDark ? AppColors.teal : const Color(0xFF0D9488))
+                        .withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: (isDark ? AppColors.teal : const Color(0xFF0D9488))
+                          .withValues(alpha: 0.25),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.touch_app_outlined,
+                        size: 16,
+                        color:
+                            isDark ? AppColors.teal : const Color(0xFF0D9488),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Tap any item to edit it separately at once.',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: isDark
+                                ? AppColors.teal
+                                : const Color(0xFF0D9488),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Text(
-                  'Edit Financial Information',
-                  style: GoogleFonts.inter(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
+                _InfoTile(
+                  label: 'Assigned Persona',
+                  value: _formatPersonaTitle(profile?.persona),
+                  icon: Icons.badge_outlined,
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    _showEditPersonaSheet(context, ref, profile);
+                  },
+                ),
+                const SizedBox(height: 10),
+                _InfoTile(
+                  label: 'Monthly Income',
+                  value: _formatCurrency(profile?.monthlyIncome),
+                  icon: Icons.trending_up_rounded,
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    _showEditAmountSheet(
+                      context,
+                      ref,
+                      profile,
+                      _FinancialAmountField.income,
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+                _InfoTile(
+                  label: 'Monthly Essential Expenses',
+                  value: _formatCurrency(profile?.monthlyEssentialExpenses),
+                  icon: Icons.receipt_long_rounded,
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    _showEditAmountSheet(
+                      context,
+                      ref,
+                      profile,
+                      _FinancialAmountField.expenses,
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+                _InfoTile(
+                  label: 'Total Savings Stash',
+                  value: _formatCurrency(profile?.totalSavings),
+                  icon: Icons.savings_outlined,
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    _showEditAmountSheet(
+                      context,
+                      ref,
+                      profile,
+                      _FinancialAmountField.savings,
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+                _InfoTile(
+                  label: 'Primary Financial Goal',
+                  value: _formatGoalTitle(profile?.primaryGoal),
+                  icon: Icons.flag_outlined,
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    _showEditGoalSheet(context, ref, profile);
+                  },
+                ),
+                const SizedBox(height: 22),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.tonal(
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      context.push('/profile/financial');
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.teal.withValues(alpha: 0.16),
+                      foregroundColor: AppColors.teal,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text(
+                      'Edit Financial Information',
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showEditPersonaSheet(
+    BuildContext context,
+    WidgetRef ref,
+    FinancialProfile? profile,
+  ) {
+    Persona selectedPersona = profile?.persona ?? Persona.salaried;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+
+          Widget buildPersonaOption({
+            required Persona persona,
+            required String title,
+            required String subtitle,
+            required IconData icon,
+            required Color color,
+          }) {
+            final isSelected = selectedPersona == persona;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    setModalState(() => selectedPersona = persona);
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? (isDark ? AppColors.teal : const Color(0xFF0D9488))
+                              .withValues(alpha: isDark ? 0.14 : 0.08)
+                          : (isDark
+                              ? AppColors.navyElevated
+                              : AppColors.lightBg),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isSelected
+                            ? (isDark
+                                ? AppColors.teal
+                                : const Color(0xFF0D9488))
+                            : (isDark
+                                ? Colors.white.withValues(alpha: 0.08)
+                                : AppColors.borderLight),
+                        width: isSelected ? 1.8 : 1.0,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.16),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(icon, color: color, size: 22),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title,
+                                style: GoogleFonts.inter(
+                                  color: isDark
+                                      ? Colors.white
+                                      : AppColors.textOnLight,
+                                  fontSize: 15,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                subtitle,
+                                style: GoogleFonts.inter(
+                                  color: isDark
+                                      ? AppColors.textOnDarkSecondary
+                                      : AppColors.textOnLightSecondary,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        if (isSelected)
+                          Icon(
+                            Icons.check_circle_rounded,
+                            color: isDark
+                                ? AppColors.teal
+                                : const Color(0xFF0D9488),
+                            size: 22,
+                          )
+                        else
+                          Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isDark ? Colors.white30 : Colors.black26,
+                                width: 1.5,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
+            );
+          }
+
+          return _ModalContainer(
+            title: 'Update Persona',
+            icon: Icons.badge_outlined,
+            iconColor: AppColors.teal,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Select your financial profile type to optimize AI insights:',
+                  style: GoogleFonts.inter(
+                    color: isDark
+                        ? AppColors.textOnDarkSecondary
+                        : AppColors.textOnLightSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                buildPersonaOption(
+                  persona: Persona.student,
+                  title: 'Student',
+                  subtitle: 'Allowance, education costs, early savings',
+                  icon: Icons.school_rounded,
+                  color: const Color(0xFF10B981),
+                ),
+                buildPersonaOption(
+                  persona: Persona.salaried,
+                  title: 'Salaried Professional',
+                  subtitle: 'Paycheck, monthly bills, committed goals',
+                  icon: Icons.work_rounded,
+                  color: const Color(0xFF2DD4BF),
+                ),
+                buildPersonaOption(
+                  persona: Persona.shopOwner,
+                  title: 'Shop Owner / Retailer',
+                  subtitle: 'Daily sales, store inventory, cash flow',
+                  icon: Icons.storefront_rounded,
+                  color: const Color(0xFF38BDF8),
+                ),
+                buildPersonaOption(
+                  persona: Persona.businessOwner,
+                  title: 'Business Owner',
+                  subtitle: 'Commercial revenue, corporate accounts, payroll',
+                  icon: Icons.apartment_rounded,
+                  color: const Color(0xFFA78BFA),
+                ),
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () async {
+                      HapticFeedback.lightImpact();
+                      final current = ref
+                              .read(financialProfileControllerProvider)
+                              .valueOrNull ??
+                          profile;
+                      final updated = (current ??
+                              const FinancialProfile(profileCompleted: true))
+                          .copyWith(
+                        persona: selectedPersona,
+                        profileCompleted: true,
+                      );
+                      await ref
+                          .read(financialProfileControllerProvider.notifier)
+                          .saveProfile(updated);
+                      if (context.mounted) {
+                        Navigator.of(ctx).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Persona updated to ${_formatPersonaTitle(selectedPersona)}.',
+                            ),
+                            behavior: SnackBarBehavior.floating,
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor:
+                          isDark ? AppColors.teal : AppColors.navyBg,
+                      foregroundColor: isDark ? AppColors.navyBg : Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text(
+                      'Update Persona',
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
             ),
-            const SizedBox(height: 12),
-          ],
-        ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showEditAmountSheet(
+    BuildContext context,
+    WidgetRef ref,
+    FinancialProfile? profile,
+    _FinancialAmountField field,
+  ) {
+    final double initialVal = switch (field) {
+      _FinancialAmountField.income => profile?.monthlyIncome ?? 0.0,
+      _FinancialAmountField.expenses =>
+        profile?.monthlyEssentialExpenses ?? 0.0,
+      _FinancialAmountField.savings => profile?.totalSavings ?? 0.0,
+    };
+
+    final controller = TextEditingController(
+      text: initialVal > 0 ? initialVal.toInt().toString() : '',
+    );
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final bottomInset = MediaQuery.of(ctx).viewInsets.bottom;
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: bottomInset),
+          child: _ModalContainer(
+            title: field.title,
+            icon: field.icon,
+            iconColor: AppColors.teal,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  field.hint,
+                  style: GoogleFonts.inter(
+                    color: isDark
+                        ? AppColors.textOnDarkSecondary
+                        : AppColors.textOnLightSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Amount Text Field
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.navyElevated : AppColors.lightBg,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.teal.withValues(alpha: 0.3)
+                          : const Color(0xFF0D9488).withValues(alpha: 0.35),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        'PKR ',
+                        style: GoogleFonts.inter(
+                          color:
+                              isDark ? AppColors.teal : const Color(0xFF0D9488),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Expanded(
+                        child: TextFormField(
+                          controller: controller,
+                          keyboardType: TextInputType.number,
+                          autofocus: true,
+                          style: GoogleFonts.inter(
+                            color:
+                                isDark ? Colors.white : AppColors.textOnLight,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          decoration: const InputDecoration(
+                            hintText: '0',
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      ValueListenableBuilder<TextEditingValue>(
+                        valueListenable: controller,
+                        builder: (_, val, __) {
+                          if (val.text.isEmpty) return const SizedBox.shrink();
+                          return IconButton(
+                            icon: const Icon(Icons.clear_rounded, size: 18),
+                            onPressed: () => controller.clear(),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Quick presets
+                Text(
+                  'Quick Presets:',
+                  style: GoogleFonts.inter(
+                    color: isDark
+                        ? AppColors.textOnDarkTertiary
+                        : AppColors.textOnLightSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children:
+                      [25000, 50000, 100000, 200000, 350000, 500000].map((amt) {
+                    final label = amt >= 1000000
+                        ? '${(amt / 1000000).toStringAsFixed(1)}M'
+                        : '${(amt / 1000).toStringAsFixed(0)}k';
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        controller.text = amt.toString();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF1E293B).withValues(alpha: 0.7)
+                              : AppColors.lightSurfaceVariant
+                                  .withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.1)
+                                : AppColors.borderLight,
+                          ),
+                        ),
+                        child: Text(
+                          'PKR $label',
+                          style: GoogleFonts.inter(
+                            color: isDark
+                                ? const Color(0xFF94A3B8)
+                                : AppColors.textOnLightSecondary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+
+                const SizedBox(height: 22),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () async {
+                      HapticFeedback.lightImpact();
+                      final raw = controller.text.replaceAll(',', '').trim();
+                      final double? parsed = double.tryParse(raw);
+                      if (parsed == null || parsed < 0) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Please enter a valid non-negative amount.'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                        return;
+                      }
+
+                      final current = ref
+                              .read(financialProfileControllerProvider)
+                              .valueOrNull ??
+                          profile;
+                      final base = current ??
+                          const FinancialProfile(profileCompleted: true);
+                      final updated = switch (field) {
+                        _FinancialAmountField.income => base.copyWith(
+                            monthlyIncome: parsed,
+                            profileCompleted: true,
+                          ),
+                        _FinancialAmountField.expenses => base.copyWith(
+                            monthlyEssentialExpenses: parsed,
+                            profileCompleted: true,
+                          ),
+                        _FinancialAmountField.savings => base.copyWith(
+                            totalSavings: parsed,
+                            profileCompleted: true,
+                          ),
+                      };
+
+                      await ref
+                          .read(financialProfileControllerProvider.notifier)
+                          .saveProfile(updated);
+
+                      if (context.mounted) {
+                        Navigator.of(ctx).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '${field.title} updated to ${_formatCurrency(parsed)}.',
+                            ),
+                            behavior: SnackBarBehavior.floating,
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor:
+                          isDark ? AppColors.teal : AppColors.navyBg,
+                      foregroundColor: isDark ? AppColors.navyBg : Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text(
+                      'Update ${field.title}',
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showEditGoalSheet(
+    BuildContext context,
+    WidgetRef ref,
+    FinancialProfile? profile,
+  ) {
+    PrimaryGoal selectedGoal =
+        profile?.primaryGoal ?? PrimaryGoal.emergencyFund;
+
+    final goals = [
+      (
+        PrimaryGoal.emergencyFund,
+        'Emergency Fund',
+        'Build 3 to 6 months of living expenses reserve',
+        Icons.shield_outlined
+      ),
+      (
+        PrimaryGoal.saveMore,
+        'Save More',
+        'Increase monthly savings rate and invest surplus',
+        Icons.savings_outlined
+      ),
+      (
+        PrimaryGoal.education,
+        'Education & Skills',
+        'Fund university courses, certificates, or books',
+        Icons.school_outlined
+      ),
+      (
+        PrimaryGoal.newDevice,
+        'New Device / Laptop',
+        'Save for a new phone, laptop, or work equipment',
+        Icons.laptop_mac_outlined
+      ),
+      (
+        PrimaryGoal.businessGrowth,
+        'Business Growth',
+        'Reinvest in business stock, inventory, and marketing',
+        Icons.trending_up_rounded
+      ),
+      (
+        PrimaryGoal.reduceSpending,
+        'Reduce Spending',
+        'Cut down discretionary expenses and manage cash flow',
+        Icons.shopping_bag_outlined
+      ),
+      (
+        PrimaryGoal.other,
+        'Personal Goal',
+        'Target a customized personal financial milestone',
+        Icons.more_horiz_rounded
+      ),
+    ];
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+
+          return _ModalContainer(
+            title: 'Update Financial Goal',
+            icon: Icons.flag_outlined,
+            iconColor: AppColors.teal,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Select your primary goal to help Tadbeer AI track progress:',
+                  style: GoogleFonts.inter(
+                    color: isDark
+                        ? AppColors.textOnDarkSecondary
+                        : AppColors.textOnLightSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+                for (final item in goals) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          setModalState(() => selectedGoal = item.$1);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: selectedGoal == item.$1
+                                ? (isDark
+                                        ? AppColors.teal
+                                        : const Color(0xFF0D9488))
+                                    .withValues(alpha: isDark ? 0.14 : 0.08)
+                                : (isDark
+                                    ? AppColors.navyElevated
+                                    : AppColors.lightBg),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: selectedGoal == item.$1
+                                  ? (isDark
+                                      ? AppColors.teal
+                                      : const Color(0xFF0D9488))
+                                  : (isDark
+                                      ? Colors.white.withValues(alpha: 0.08)
+                                      : AppColors.borderLight),
+                              width: selectedGoal == item.$1 ? 1.8 : 1.0,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                item.$4,
+                                color: selectedGoal == item.$1
+                                    ? (isDark
+                                        ? AppColors.teal
+                                        : const Color(0xFF0D9488))
+                                    : (isDark
+                                        ? Colors.white70
+                                        : AppColors.textOnLightSecondary),
+                                size: 22,
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.$2,
+                                      style: GoogleFonts.inter(
+                                        color: isDark
+                                            ? Colors.white
+                                            : AppColors.textOnLight,
+                                        fontSize: 14.5,
+                                        fontWeight: selectedGoal == item.$1
+                                            ? FontWeight.w700
+                                            : FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      item.$3,
+                                      style: GoogleFonts.inter(
+                                        color: isDark
+                                            ? AppColors.textOnDarkSecondary
+                                            : AppColors.textOnLightSecondary,
+                                        fontSize: 11.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (selectedGoal == item.$1) ...[
+                                const SizedBox(width: 8),
+                                Icon(
+                                  Icons.check_circle_rounded,
+                                  color: isDark
+                                      ? AppColors.teal
+                                      : const Color(0xFF0D9488),
+                                  size: 20,
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () async {
+                      HapticFeedback.lightImpact();
+                      final current = ref
+                              .read(financialProfileControllerProvider)
+                              .valueOrNull ??
+                          profile;
+                      final updated = (current ??
+                              const FinancialProfile(profileCompleted: true))
+                          .copyWith(
+                        primaryGoal: selectedGoal,
+                        profileCompleted: true,
+                      );
+                      await ref
+                          .read(financialProfileControllerProvider.notifier)
+                          .saveProfile(updated);
+                      if (context.mounted) {
+                        Navigator.of(ctx).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Financial goal updated to ${_formatGoalTitle(selectedGoal)}.',
+                            ),
+                            behavior: SnackBarBehavior.floating,
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor:
+                          isDark ? AppColors.teal : AppColors.navyBg,
+                      foregroundColor: isDark ? AppColors.navyBg : Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text(
+                      'Update Primary Goal',
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -926,9 +1740,6 @@ class UserProfileScreen extends ConsumerWidget {
   }
 
   void _showLanguageSelectorSheet(BuildContext context, WidgetRef ref) {
-    final activeLocale = ref.watch(appLocaleProvider);
-    final activeLanguage = AppLanguage.fromLocale(activeLocale);
-
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -937,33 +1748,25 @@ class UserProfileScreen extends ConsumerWidget {
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return _ModalContainer(
-          title: 'Select Language',
+          title: 'Language',
           icon: Icons.language_rounded,
           iconColor: const Color(0xFF3B82F6),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: AppLanguage.values.map((lang) {
-              final isSelected = lang == activeLanguage;
-              return Container(
+            children: [
+              Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.teal.withValues(alpha: isDark ? 0.12 : 0.10)
-                      : (isDark ? AppColors.navyElevated : AppColors.lightBg),
+                  color: AppColors.teal.withValues(alpha: isDark ? 0.12 : 0.10),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isSelected
-                        ? AppColors.teal
-                        : (isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : AppColors.borderLight),
-                    width: isSelected ? 1.5 : 1,
+                    color: AppColors.teal,
+                    width: 1.5,
                   ),
                 ),
                 child: ListTile(
                   onTap: () {
                     HapticFeedback.selectionClick();
-                    ref.read(appLocaleProvider.notifier).setLanguage(lang);
                     Navigator.of(ctx).pop();
                   },
                   leading: Container(
@@ -971,23 +1774,13 @@ class UserProfileScreen extends ConsumerWidget {
                     height: 38,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isSelected
-                          ? AppColors.teal.withValues(alpha: 0.2)
-                          : (isDark
-                              ? Colors.white.withValues(alpha: 0.05)
-                              : AppColors.teal.withValues(alpha: 0.08)),
+                      color: AppColors.teal.withValues(alpha: 0.2),
                     ),
                     child: Center(
                       child: Text(
-                        lang == AppLanguage.english
-                            ? 'EN'
-                            : (lang == AppLanguage.urdu ? 'UR' : 'RU'),
+                        'EN',
                         style: GoogleFonts.inter(
-                          color: isSelected
-                              ? AppColors.teal
-                              : (isDark
-                                  ? Colors.white70
-                                  : AppColors.textOnLightSecondary),
+                          color: AppColors.teal,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                         ),
@@ -995,16 +1788,15 @@ class UserProfileScreen extends ConsumerWidget {
                     ),
                   ),
                   title: Text(
-                    lang.displayName,
+                    'English',
                     style: GoogleFonts.inter(
                       color: isDark ? Colors.white : AppColors.textOnLight,
                       fontSize: 15,
-                      fontWeight:
-                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   subtitle: Text(
-                    lang.nativeSubtitle,
+                    'Default language (English only)',
                     style: GoogleFonts.inter(
                       color: isDark
                           ? AppColors.textOnDarkSecondary
@@ -1012,17 +1804,14 @@ class UserProfileScreen extends ConsumerWidget {
                       fontSize: 12.5,
                     ),
                   ),
-                  trailing: isSelected
-                      ? Icon(
-                          Icons.check_circle_rounded,
-                          color:
-                              isDark ? AppColors.teal : const Color(0xFF0D9488),
-                          size: 20,
-                        )
-                      : null,
+                  trailing: Icon(
+                    Icons.check_circle_rounded,
+                    color: isDark ? AppColors.teal : const Color(0xFF0D9488),
+                    size: 20,
+                  ),
                 ),
-              );
-            }).toList(),
+              ),
+            ],
           ),
         );
       },
@@ -1743,15 +2532,18 @@ class _ModalContainer extends StatelessWidget {
                 child: Icon(icon, color: iconColor, size: 20),
               ),
               const SizedBox(width: 12),
-              Text(
-                title,
-                style: GoogleFonts.inter(
-                  color: isDark ? Colors.white : AppColors.textOnLight,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
+              Expanded(
+                child: Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    color: isDark ? Colors.white : AppColors.textOnLight,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const Spacer(),
               IconButton(
                 icon: Icon(
                   Icons.close_rounded,
@@ -1776,63 +2568,151 @@ class _ModalContainer extends StatelessWidget {
   }
 }
 
+enum _FinancialAmountField {
+  income(
+    'Monthly Income',
+    Icons.trending_up_rounded,
+    'Enter your typical monthly earnings or allowance:',
+  ),
+  expenses(
+    'Monthly Essential Expenses',
+    Icons.receipt_long_rounded,
+    'Enter your monthly essential expenses (rent, food, utilities):',
+  ),
+  savings(
+    'Total Savings Stash',
+    Icons.savings_outlined,
+    'Enter your liquid cash reserves or emergency savings:',
+  );
+
+  const _FinancialAmountField(this.title, this.icon, this.hint);
+  final String title;
+  final IconData icon;
+  final String hint;
+}
+
 class _InfoTile extends StatelessWidget {
   const _InfoTile({
     required this.label,
     required this.value,
     required this.icon,
+    this.onTap,
   });
 
   final String label;
   final String value;
   final IconData icon;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.navyElevated : AppColors.lightBg,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.06)
-              : AppColors.borderLight,
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(icon,
-              color: isDark ? AppColors.teal : AppColors.tealDeep, size: 18),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.inter(
-                    color: isDark
-                        ? AppColors.textOnDarkTertiary
-                        : AppColors.textOnLightSecondary,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w500,
-                  ),
+        splashColor: AppColors.teal.withValues(alpha: 0.12),
+        highlightColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.navyElevated : AppColors.lightBg,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: onTap != null
+                  ? (isDark
+                      ? AppColors.teal.withValues(alpha: 0.25)
+                      : const Color(0xFF0D9488).withValues(alpha: 0.3))
+                  : (isDark
+                      ? Colors.white.withValues(alpha: 0.06)
+                      : AppColors.borderLight),
+              width: onTap != null ? 1.2 : 1.0,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: (isDark ? AppColors.teal : AppColors.tealDeep)
+                      .withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: GoogleFonts.inter(
-                    color: isDark ? Colors.white : AppColors.textOnLight,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                child: Icon(
+                  icon,
+                  color: isDark ? AppColors.teal : AppColors.tealDeep,
+                  size: 19,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: GoogleFonts.inter(
+                        color: isDark
+                            ? AppColors.textOnDarkTertiary
+                            : AppColors.textOnLightSecondary,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      value,
+                      style: GoogleFonts.inter(
+                        color: isDark ? Colors.white : AppColors.textOnLight,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (onTap != null) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: (isDark ? AppColors.teal : const Color(0xFF0D9488))
+                        .withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: (isDark ? AppColors.teal : const Color(0xFF0D9488))
+                          .withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.edit_outlined,
+                        size: 13,
+                        color:
+                            isDark ? AppColors.teal : const Color(0xFF0D9488),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Edit',
+                        style: GoogleFonts.inter(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color:
+                              isDark ? AppColors.teal : const Color(0xFF0D9488),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -12,6 +12,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/utils/l10n_context.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_text_field.dart';
+import '../../providers/repository_providers.dart';
 import 'auth_controller.dart';
 
 /// Modern, professional Account Creation screen for Tadbeer AI 2.0.
@@ -34,6 +35,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
   bool _loading = false;
+  bool _googleLoading = false;
 
   @override
   void dispose() {
@@ -101,9 +103,42 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     }
   }
 
+  Future<void> _continueWithGoogle() async {
+    if (_loading || _googleLoading) return;
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() => _googleLoading = true);
+
+    final authNotifier = ref.read(authControllerProvider.notifier);
+    final success = await authNotifier.signInWithGoogle();
+    if (!mounted) return;
+
+    if (success) {
+      final profile =
+          await ref.read(financialProfileRepositoryProvider).loadProfile();
+      if (!mounted) return;
+      if (profile == null || !profile.profileCompleted) {
+        context.go('/profile/financial');
+      } else {
+        context.go('/home');
+      }
+    } else {
+      if (mounted) setState(() => _googleLoading = false);
+      final errorMsg = authNotifier.lastErrorMessage;
+      if (errorMsg != null && errorMsg.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
+    }
+  }
+
   void _socialAuth(String provider) {
     if (provider == 'Google') {
-      context.push('/auth/google');
+      _continueWithGoogle();
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
@@ -381,6 +416,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           logo: const _GoogleLogo(),
                           label: 'Continue with Google',
                           onTap: () => _socialAuth('Google'),
+                          loading: _googleLoading,
                         ),
 
                         const SizedBox(height: 24),
@@ -437,11 +473,13 @@ class _SocialAuthCard extends StatelessWidget {
     required this.logo,
     required this.label,
     required this.onTap,
+    this.loading = false,
   });
 
   final Widget logo;
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -449,7 +487,7 @@ class _SocialAuthCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
+        onTap: loading ? null : onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
           height: 52,
@@ -472,26 +510,37 @@ class _SocialAuthCard extends StatelessWidget {
                     ),
                   ],
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              logo,
-              const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    color: isDark ? Colors.white : AppColors.textOnLight,
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w600,
+          child: loading
+              ? Center(
+                  child: SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: isDark ? AppColors.teal : const Color(0xFF0D9488),
+                    ),
                   ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    logo,
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          color: isDark ? Colors.white : AppColors.textOnLight,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );

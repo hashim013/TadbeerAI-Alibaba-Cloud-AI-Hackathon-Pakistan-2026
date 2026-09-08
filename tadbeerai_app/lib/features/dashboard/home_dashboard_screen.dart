@@ -14,7 +14,6 @@ import '../assistant/widgets/what_if_sheet.dart';
 import '../../domain/entities/finance_data.dart';
 import '../../domain/entities/financial_profile.dart';
 import '../../domain/entities/goal.dart';
-import '../../domain/entities/transaction.dart';
 import '../../domain/services/finance_calculations.dart';
 import '../../domain/services/financial_health_calculator.dart';
 import '../../domain/services/insight_generator.dart';
@@ -24,7 +23,6 @@ import '../../features/auth/auth_controller.dart';
 import '../../l10n/app_localizations.dart';
 import '../finance/finance_category_visuals.dart';
 import '../finance/widgets/finance_widgets.dart';
-import '../finance/widgets/transaction_form_sheet.dart';
 
 /// The Home tab: modern, executive personal financial command center.
 ///
@@ -34,7 +32,7 @@ import '../finance/widgets/transaction_form_sheet.dart';
 /// - Executive Financial Overview Hero Card: Net Savings, single-gauge Financial Health score,
 ///   and integrated duo-tone cashflow strip (zero duplicate data)
 /// - Intelligent contextual AI Insight card with direct exploration CTA
-/// - Clean budget pace utilization & recent activity streams
+/// - Clean budget pace utilization & active goal milestones
 /// - High-contrast legibility across both dark midnight navy & light teal-to-blue themes
 class HomeDashboardScreen extends ConsumerWidget {
   const HomeDashboardScreen({super.key});
@@ -269,98 +267,7 @@ class _DashboardContent extends ConsumerWidget {
           const SizedBox(height: 16),
         ],
 
-        // ── 7. Recent Transactions ──────────────────────────────────────────
-        SectionHeader(
-          l10n.recentTransactions,
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
-                color: isDark ? AppColors.teal : AppColors.tealDeep,
-                tooltip: l10n.addTransactionTitle,
-                visualDensity: VisualDensity.compact,
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                onPressed: () => _openTransactionForm(context, ref),
-              ),
-              TextButton(
-                onPressed: () => context.push('/finance/expenses'),
-                style: TextButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                ),
-                child: Text(l10n.viewAll),
-              ),
-            ],
-          ),
-        ),
-        if (_recentTransactions(data).isEmpty)
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.navyCard : AppColors.lightCard,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : AppColors.borderLight,
-              ),
-            ),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.receipt_long_outlined,
-                    size: 30,
-                    color: (isDark ? Colors.white : AppColors.textOnLight)
-                        .withValues(alpha: 0.35),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'No transactions recorded yet',
-                    style: GoogleFonts.inter(
-                      color: isDark
-                          ? AppColors.textOnDarkSecondary
-                          : AppColors.textOnLightSecondary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  FilledButton.tonalIcon(
-                    onPressed: () => _openTransactionForm(context, ref),
-                    icon: const Icon(Icons.add_rounded, size: 16),
-                    label: Text(
-                      l10n.addTransactionTitle,
-                      style: GoogleFonts.inter(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    style: FilledButton.styleFrom(
-                      backgroundColor:
-                          (isDark ? AppColors.teal : AppColors.tealDeep)
-                              .withValues(alpha: 0.14),
-                      foregroundColor:
-                          isDark ? AppColors.teal : AppColors.tealDeep,
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )
-        else
-          ..._recentTransactions(data).map(
-            (t) => _RecentTransactionRow(
-              transaction: t,
-              onTap: () => _openTransactionForm(context, ref, existing: t),
-            ),
-          ),
-        const SizedBox(height: 16),
-
-        // ── 8. Goal Progress ────────────────────────────────────────────────
+        // ── 7. Goal Progress ────────────────────────────────────────────────
         if (data.goals.isNotEmpty) ...[
           SectionHeader(
             l10n.goalProgressTitle,
@@ -373,45 +280,6 @@ class _DashboardContent extends ConsumerWidget {
         ],
       ],
     );
-  }
-
-  Future<void> _openTransactionForm(
-    BuildContext context,
-    WidgetRef ref, {
-    Transaction? existing,
-  }) async {
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (sheetContext) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
-        ),
-        child: TransactionFormSheet(
-          existing: existing,
-          onSubmit: (transaction) async {
-            final controller = ref.read(financeControllerProvider.notifier);
-            if (existing == null) {
-              await controller.addTransaction(transaction);
-            } else {
-              await controller.updateTransaction(transaction);
-            }
-          },
-          onDelete: existing == null
-              ? null
-              : () => ref
-                  .read(financeControllerProvider.notifier)
-                  .deleteTransaction(existing.id),
-        ),
-      ),
-    );
-  }
-
-  List<Transaction> _recentTransactions(FinanceData data) {
-    final sorted = [...data.transactions]
-      ..sort((a, b) => b.date.compareTo(a.date));
-    return sorted.take(4).toList();
   }
 
   String _greetingText(AppLocalizations l10n, String? fullName, int hour) {
@@ -1240,123 +1108,6 @@ class _BudgetMiniCard extends StatelessWidget {
                   ],
                 ),
               ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Recent Transaction Row ──────────────────────────────────────────────────
-
-class _RecentTransactionRow extends StatelessWidget {
-  const _RecentTransactionRow({
-    required this.transaction,
-    this.onTap,
-  });
-
-  final Transaction transaction;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isIncome = transaction.type == TransactionType.income;
-    final categoryColor = CategoryVisuals.of(transaction.category).color;
-    final icon = CategoryVisuals.of(transaction.category).icon;
-    final amountColor = isIncome
-        ? (isDark ? AppColors.mint : const Color(0xFF059669))
-        : (isDark ? Colors.white : AppColors.textOnLight);
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Container(
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.navyCard : AppColors.lightCard,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.08)
-                : AppColors.borderLight,
-            width: 1,
-          ),
-          boxShadow: isDark
-              ? null
-              : [
-                  const BoxShadow(
-                    color: AppColors.lightCardShadow,
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              if (onTap != null) {
-                onTap!();
-              } else {
-                context.push('/finance/expenses');
-              }
-            },
-            borderRadius: BorderRadius.circular(16),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: categoryColor.withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(icon, size: 20, color: categoryColor),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          transaction.title,
-                          style: GoogleFonts.inter(
-                            color:
-                                isDark ? Colors.white : AppColors.textOnLight,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          CategoryVisuals.nameOf(
-                              context.l10n, transaction.category),
-                          style: GoogleFonts.inter(
-                            color: isDark
-                                ? AppColors.textOnDarkSecondary
-                                : AppColors.textOnLightSecondary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text(
-                    '${isIncome ? '+' : '-'}${CurrencyFormat.pkr(transaction.amount)}',
-                    style: GoogleFonts.inter(
-                      color: amountColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
         ),

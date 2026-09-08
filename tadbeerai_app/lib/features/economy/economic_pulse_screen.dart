@@ -856,11 +856,15 @@ class _ImpactPreviewCard extends ConsumerWidget {
                           color: theme.colorScheme.primary,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          personaLabel,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.primary,
+                        Flexible(
+                          child: Text(
+                            personaLabel,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.primary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -886,11 +890,15 @@ class _ImpactPreviewCard extends ConsumerWidget {
                           color: AppColors.info,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          goalLabel,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.info,
+                        Flexible(
+                          child: Text(
+                            goalLabel,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.info,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],

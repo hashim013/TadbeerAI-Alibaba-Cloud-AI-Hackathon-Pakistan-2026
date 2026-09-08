@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/assistant/ask_tadbeer_screen.dart';
 import '../../features/auth/forgot_password_screen.dart';
-import '../../features/auth/google_auth_screen.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/auth/signup_screen.dart';
 import '../../features/dashboard/home_dashboard_screen.dart';
@@ -138,11 +137,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/auth/google',
-        pageBuilder: (context, state) => _buildSmoothTransitionPage(
-          state: state,
-          child: const GoogleAuthScreen(),
-          slideOffset: const Offset(0, 0.05),
-        ),
+        redirect: (context, state) => '/login',
       ),
       GoRoute(
         path: '/profile/financial',

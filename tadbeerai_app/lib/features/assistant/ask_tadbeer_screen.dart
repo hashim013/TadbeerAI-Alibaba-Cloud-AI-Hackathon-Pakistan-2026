@@ -527,14 +527,18 @@ class _AskEmptyState extends StatelessWidget {
                       color: Color(0xFF10B981),
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      'Tadbeer AI has full context of your income & budgets',
-                      style: GoogleFonts.inter(
-                        color: isDark
-                            ? const Color(0xFF34D399)
-                            : const Color(0xFF047857),
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Text(
+                        'Tadbeer AI has full context of your income & budgets',
+                        style: GoogleFonts.inter(
+                          color: isDark
+                              ? const Color(0xFF34D399)
+                              : const Color(0xFF047857),
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],

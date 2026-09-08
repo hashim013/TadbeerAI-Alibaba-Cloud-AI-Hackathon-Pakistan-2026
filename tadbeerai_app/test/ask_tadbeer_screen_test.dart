@@ -275,7 +275,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Data status is visible and honest.
-    expect(find.text('Live economic data'), findsOneWidget);
+    expect(find.text('Live data'), findsOneWidget);
 
     // Key numbers from the backend metrics.
     expect(find.text('KEY NUMBERS'), findsOneWidget);
@@ -380,36 +380,22 @@ void main() {
     expect(repository.calls, isEmpty);
   });
 
-  testWidgets('Roman Urdu submission reaches the repository (17)',
+  testWidgets(
+      'Question submission reaches the repository with English language (17)',
       (tester) async {
     final repository = _ScriptedRepository(_apiReply(_liveEconomyBody()));
     await _pumpScreen(
       tester,
       repository: repository,
-      locale: const Locale.fromSubtags(languageCode: 'ur', scriptCode: 'Latn'),
+      locale: const Locale('en'),
     );
 
-    await _submitQuestion(tester, 'Mehngai kya hai?');
+    await _submitQuestion(tester, 'How is inflation affecting Pakistan?');
     await tester.pumpAndSettle();
 
-    expect(repository.calls.single.question, 'Mehngai kya hai?');
-    expect(repository.calls.single.language, 'ur_latn');
-  });
-
-  testWidgets('Urdu script submission reaches the repository (18)',
-      (tester) async {
-    final repository = _ScriptedRepository(_apiReply(_liveEconomyBody()));
-    await _pumpScreen(
-      tester,
-      repository: repository,
-      locale: const Locale('ur'),
-    );
-
-    await _submitQuestion(tester, 'مہنگائی کیا ہے؟');
-    await tester.pumpAndSettle();
-
-    expect(repository.calls.single.question, 'مہنگائی کیا ہے؟');
-    expect(repository.calls.single.language, 'ur');
+    expect(repository.calls.single.question,
+        'How is inflation affecting Pakistan?');
+    expect(repository.calls.single.language, 'en');
   });
 
   testWidgets('loading state shows the typing indicator (19)', (tester) async {

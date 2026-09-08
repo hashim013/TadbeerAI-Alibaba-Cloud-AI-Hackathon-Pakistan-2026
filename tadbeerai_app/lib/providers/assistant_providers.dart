@@ -50,14 +50,8 @@ final assistantRepositoryProvider = Provider<AssistantRepository>((ref) {
   return ApiAssistantRepository(dio: ref.watch(apiDioProvider));
 });
 
-/// Maps the app locale to the backend language codes ("en", "ur", "ur_latn");
-/// anything unexpected falls back to English.
-String apiLanguageCode(Locale locale) {
-  if (locale.languageCode == 'ur') {
-    return locale.scriptCode == 'Latn' ? 'ur_latn' : 'ur';
-  }
-  return 'en';
-}
+/// Maps the app locale to the backend language code. Currently English only.
+String apiLanguageCode(Locale locale) => 'en';
 
 /// The financial + economic position the assistant answers from.
 ///

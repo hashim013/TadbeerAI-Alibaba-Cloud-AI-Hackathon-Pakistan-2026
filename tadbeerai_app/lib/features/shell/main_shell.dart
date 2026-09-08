@@ -81,13 +81,10 @@ class _MainShellState extends State<MainShell>
         selectedIcon: Icons.auto_awesome_rounded,
         label: l10n.tabAskTadbeer,
       ),
-      _NavDestination(
+      const _NavDestination(
         icon: Icons.person_outline_rounded,
         selectedIcon: Icons.person_rounded,
-        label: (Localizations.localeOf(context).languageCode == 'ur' &&
-                Localizations.localeOf(context).scriptCode != 'Latn')
-            ? 'پروفائل'
-            : 'Profile',
+        label: 'Profile',
       ),
     ];
 

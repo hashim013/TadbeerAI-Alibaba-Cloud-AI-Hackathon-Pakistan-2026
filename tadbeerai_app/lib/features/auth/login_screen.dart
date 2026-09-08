@@ -142,9 +142,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  Future<void> _continueWithGoogle() async {
+    if (_loading || _guestLoading || _googleLoading) return;
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() => _googleLoading = true);
+
+    final authNotifier = ref.read(authControllerProvider.notifier);
+    final success = await authNotifier.signInWithGoogle();
+    if (!mounted) return;
+
+    if (success) {
+      await _navigatePostAuth();
+    } else {
+      if (mounted) setState(() => _googleLoading = false);
+      final errorMsg = authNotifier.lastErrorMessage;
+      if (errorMsg != null && errorMsg.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
+    }
+  }
+
   void _socialAuth(String provider) {
     if (provider == 'Google') {
-      context.push('/auth/google');
+      _continueWithGoogle();
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(

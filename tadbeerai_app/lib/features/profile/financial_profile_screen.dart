@@ -60,15 +60,9 @@ class _FinancialProfileScreenState
   bool _submitted = false;
   bool _showExpenseWarning = false;
   bool _prefilled = false;
-  bool? _overrideStepped;
 
   bool get _isSteppedMode {
-    if (_overrideStepped != null) return _overrideStepped!;
     if (widget.isStepped != null) return widget.isStepped!;
-    final profile = ref.read(financialProfileControllerProvider).valueOrNull;
-    if (profile != null && profile.profileCompleted) {
-      return false;
-    }
     return true;
   }
 
@@ -419,14 +413,21 @@ class _FinancialProfileScreenState
                   children: [
                     for (int i = 1; i <= 4; i++) ...[
                       Expanded(
-                        child: Container(
-                          height: 4,
-                          margin: const EdgeInsets.symmetric(horizontal: 3),
-                          decoration: BoxDecoration(
-                            color: i <= _currentStep
-                                ? const Color(0xFF10B981)
-                                : const Color(0xFF1E293B),
-                            borderRadius: BorderRadius.circular(2),
+                        child: InkWell(
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            setState(() => _currentStep = i);
+                          },
+                          borderRadius: BorderRadius.circular(4),
+                          child: Container(
+                            height: 6,
+                            margin: const EdgeInsets.symmetric(horizontal: 3),
+                            decoration: BoxDecoration(
+                              color: i <= _currentStep
+                                  ? const Color(0xFF10B981)
+                                  : const Color(0xFF1E293B),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
                           ),
                         ),
                       ),
@@ -503,45 +504,6 @@ class _FinancialProfileScreenState
                             fontSize: 11.5,
                             fontWeight: FontWeight.w500,
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const Spacer(),
-              InkWell(
-                onTap: () => setState(() => _overrideStepped = false),
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: (isDark ? AppColors.teal : const Color(0xFF0D9488))
-                        .withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: (isDark ? AppColors.teal : const Color(0xFF0D9488))
-                          .withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.edit_note_rounded,
-                        size: 14,
-                        color:
-                            isDark ? AppColors.teal : const Color(0xFF0D9488),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Direct Edit Mode',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color:
-                              isDark ? AppColors.teal : const Color(0xFF0D9488),
                         ),
                       ),
                     ],
@@ -1133,6 +1095,7 @@ class _FinancialProfileScreenState
                         icon: Icons.badge_outlined,
                         label: 'Full Name',
                         value: _nameController.text.trim(),
+                        onTap: () => setState(() => _currentStep = 1),
                       ),
                       Divider(
                         color: isDark
@@ -1145,6 +1108,7 @@ class _FinancialProfileScreenState
                       icon: Icons.person_outline_rounded,
                       label: 'You are',
                       value: _personaLabel(_persona ?? Persona.student),
+                      onTap: () => setState(() => _currentStep = 1),
                     ),
                     Divider(
                       color: isDark
@@ -1156,6 +1120,7 @@ class _FinancialProfileScreenState
                       icon: Icons.account_balance_wallet_outlined,
                       label: 'Monthly Income',
                       value: incomeStr,
+                      onTap: () => setState(() => _currentStep = 2),
                     ),
                     Divider(
                       color: isDark
@@ -1167,6 +1132,7 @@ class _FinancialProfileScreenState
                       icon: Icons.shopping_bag_outlined,
                       label: 'Essential Monthly Spending',
                       value: expensesStr,
+                      onTap: () => setState(() => _currentStep = 2),
                     ),
                     Divider(
                       color: isDark
@@ -1178,6 +1144,7 @@ class _FinancialProfileScreenState
                       icon: Icons.savings_outlined,
                       label: 'Current Savings',
                       value: savingsStr,
+                      onTap: () => setState(() => _currentStep = 2),
                     ),
                     Divider(
                       color: isDark
@@ -1189,6 +1156,7 @@ class _FinancialProfileScreenState
                       icon: Icons.track_changes_rounded,
                       label: 'Primary Goal',
                       value: _goalLabel(_goal ?? PrimaryGoal.emergencyFund),
+                      onTap: () => setState(() => _currentStep = 3),
                     ),
                   ],
                 ),
@@ -1456,44 +1424,6 @@ class _FinancialProfileScreenState
                     color: isDark ? Colors.white : AppColors.textOnLight,
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () => setState(() => _overrideStepped = true),
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: (isDark ? AppColors.teal : const Color(0xFF0D9488))
-                        .withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: (isDark ? AppColors.teal : const Color(0xFF0D9488))
-                          .withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.auto_stories_outlined,
-                        size: 14,
-                        color:
-                            isDark ? AppColors.teal : const Color(0xFF0D9488),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Step Wizard',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color:
-                              isDark ? AppColors.teal : const Color(0xFF0D9488),
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ),
@@ -1769,7 +1699,10 @@ class _SteppedPersonaCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
-          onTap: onTap,
+          onTap: () {
+            HapticFeedback.selectionClick();
+            onTap();
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: Row(
@@ -2078,7 +2011,10 @@ class _GoalDetailedCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: onTap,
+          onTap: () {
+            HapticFeedback.selectionClick();
+            onTap();
+          },
           child: Stack(
             children: [
               Padding(
@@ -2174,7 +2110,10 @@ class _GoalOtherCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: onTap,
+          onTap: () {
+            HapticFeedback.selectionClick();
+            onTap();
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
@@ -2247,48 +2186,71 @@ class _SummaryRow extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.value,
+    this.onTap,
   });
 
   final IconData icon;
   final String label;
   final String value;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-      child: Row(
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: const Color(0xFF10B981).withValues(alpha: 0.14),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: const Color(0xFF10B981), size: 18),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              label,
-              style: GoogleFonts.inter(
-                color: isDark ? Colors.white : AppColors.textOnLight,
-                fontSize: 14.5,
-                fontWeight: FontWeight.w500,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap != null
+            ? () {
+                HapticFeedback.selectionClick();
+                onTap!();
+              }
+            : null,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+          child: Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.14),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: const Color(0xFF10B981), size: 18),
               ),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  label,
+                  style: GoogleFonts.inter(
+                    color: isDark ? Colors.white : AppColors.textOnLight,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Text(
+                value,
+                style: GoogleFonts.inter(
+                  color: isDark ? Colors.white : AppColors.textOnLight,
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              if (onTap != null) ...[
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.edit_outlined,
+                  size: 15,
+                  color:
+                      isDark ? const Color(0xFF10B981) : AppColors.tealOnLight,
+                ),
+              ],
+            ],
           ),
-          Text(
-            value,
-            style: GoogleFonts.inter(
-              color: isDark ? Colors.white : AppColors.textOnLight,
-              fontSize: 14.5,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
