@@ -56,7 +56,7 @@ config lives in the gitignored `lib/firebase_options.dart`.
 ```bash
 flutter pub get
 flutter analyze      # 0 issues
-flutter test         # 304 passed, 5 skipped (opt-in E2E)
+flutter test         # 334 passed, 5 skipped (opt-in E2E)
 flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
 ```
 
