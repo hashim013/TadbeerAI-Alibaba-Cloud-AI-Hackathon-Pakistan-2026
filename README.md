@@ -1,4 +1,4 @@
-﻿<p align="center">
+<p align="center">
   <img src="assets/banner.png" alt="Tadbeer AI 2.0 — Your AI Financial Intelligence Companion" width="100%">
 </p>
 
@@ -57,34 +57,67 @@ In Pakistan's dynamic macroeconomic climate—marked by shifting inflation, exch
 
 ## 📱 Screenshots
 
+### Onboarding & Authentication
+
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <img src="assets/screenshots/07_login.jpg" alt="Login" width="180"/><br/>
+      <sub><b>Sign In</b><br/>Email · Google · Guest access</sub>
+    </td>
+    <td align="center" width="25%">
+      <img src="assets/screenshots/09_onboarding_understand.jpg" alt="Onboarding Understand" width="180"/><br/>
+      <sub><b>Understand</b><br/>Pakistan economy &amp; financial trends</sub>
+    </td>
+    <td align="center" width="25%">
+      <img src="assets/screenshots/08_onboarding_manage.jpg" alt="Onboarding Manage" width="180"/><br/>
+      <sub><b>Manage</b><br/>Track income, expenses &amp; goals</sub>
+    </td>
+    <td align="center" width="25%">
+      <img src="assets/screenshots/10_onboarding_plan.jpg" alt="Onboarding Plan" width="180"/><br/>
+      <sub><b>Plan</b><br/>What-If simulator &amp; AI insights</sub>
+    </td>
+  </tr>
+</table>
+
+### Core Application
+
 <table>
   <tr>
     <td align="center" width="33%">
-      <img src="assets/screenshots/05_finance_hub.jpg" alt="Finance Hub" width="220"/><br/>
+      <img src="assets/screenshots/11_home.jpg" alt="Home Dashboard" width="200"/><br/>
+      <sub><b>Home Dashboard</b><br/>Financial health · Quick actions · AI insight</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="assets/screenshots/05_finance_hub.jpg" alt="Finance Hub" width="200"/><br/>
       <sub><b>Finance Hub</b><br/>Health score · Cash flow · Finance tools</sub>
     </td>
     <td align="center" width="33%">
-      <img src="assets/screenshots/04_essential_prices.jpg" alt="Essential Prices" width="220"/><br/>
-      <sub><b>Essential Prices</b><br/>Live PBS commodity prices with trend badges</sub>
-    </td>
-    <td align="center" width="33%">
-      <img src="assets/screenshots/03_ask_tadbeer_home.jpg" alt="Ask Tadbeer" width="220"/><br/>
-      <sub><b>Ask Tadbeer — Home</b><br/>Smart financial query suggestions</sub>
+      <img src="assets/screenshots/04_essential_prices.jpg" alt="Essential Prices" width="200"/><br/>
+      <sub><b>Essential Prices</b><br/>PBS commodity prices with trend badges</sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="33%">
-      <img src="assets/screenshots/06_ask_tadbeer_queries.jpg" alt="Ask Tadbeer Queries" width="220"/><br/>
-      <sub><b>Ask Tadbeer — Queries</b><br/>Full smart query list with deep links</sub>
+      <img src="assets/screenshots/03_ask_tadbeer_home.jpg" alt="Ask Tadbeer Home" width="200"/><br/>
+      <sub><b>Ask Tadbeer — Home</b><br/>Smart financial query suggestions</sub>
     </td>
     <td align="center" width="33%">
-      <img src="assets/screenshots/02_ask_tadbeer_reply.jpg" alt="Ask Tadbeer Reply" width="220"/><br/>
+      <img src="assets/screenshots/06_ask_tadbeer_queries.jpg" alt="Ask Tadbeer Queries" width="200"/><br/>
+      <sub><b>Ask Tadbeer — Queries</b><br/>Full query list with economy deep links</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="assets/screenshots/02_ask_tadbeer_reply.jpg" alt="Ask Tadbeer Reply" width="200"/><br/>
       <sub><b>Ask Tadbeer — AI Reply</b><br/>Context-aware AI financial advice</sub>
     </td>
+  </tr>
+  <tr>
     <td align="center" width="33%">
-      <img src="assets/screenshots/01_profile.png" alt="My Profile" width="220"/><br/>
+      <img src="assets/screenshots/01_profile.png" alt="My Profile" width="200"/><br/>
       <sub><b>My Profile</b><br/>Personal info · Theme · Language</sub>
     </td>
+    <td align="center" width="33%"></td>
+    <td align="center" width="33%"></td>
   </tr>
 </table>
 
@@ -352,3 +385,4 @@ TadbeerAI 2.0/
   Built with ❤️ for a resilient, financially empowered Pakistan.<br/>
   <strong>Tadbeer AI 2.0 Team</strong>
 </p>
+
