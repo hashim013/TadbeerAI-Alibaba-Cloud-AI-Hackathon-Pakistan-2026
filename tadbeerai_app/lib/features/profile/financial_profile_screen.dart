@@ -30,12 +30,14 @@ import '../auth/auth_controller.dart';
 class FinancialProfileScreen extends ConsumerStatefulWidget {
   const FinancialProfileScreen({
     super.key,
-    this.isStepped = true,
+    this.isStepped,
   });
 
-  /// When true (default in app), displays the modern 4-step wizard.
-  /// When false, displays the single-page form for quick profile edits.
-  final bool isStepped;
+  /// When true, displays the modern 4-step wizard.
+  /// When false, displays the single-page form for direct profile edits.
+  /// When null (default), displays direct edit mode if profile is already completed,
+  /// or multi-step wizard if starting from scratch.
+  final bool? isStepped;
 
   @override
   ConsumerState<FinancialProfileScreen> createState() =>
@@ -57,6 +59,17 @@ class _FinancialProfileScreenState
   bool _submitted = false;
   bool _showExpenseWarning = false;
   bool _prefilled = false;
+  bool? _overrideStepped;
+
+  bool get _isSteppedMode {
+    if (_overrideStepped != null) return _overrideStepped!;
+    if (widget.isStepped != null) return widget.isStepped!;
+    final profile = ref.read(financialProfileControllerProvider).valueOrNull;
+    if (profile != null && profile.profileCompleted) {
+      return false;
+    }
+    return true;
+  }
 
   bool get isDark => Theme.of(context).brightness == Brightness.dark;
 
@@ -172,7 +185,7 @@ class _FinancialProfileScreenState
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _submitted = true);
 
-    if (widget.isStepped) {
+    if (_isSteppedMode) {
       if (_persona == null || _goal == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -355,7 +368,7 @@ class _FinancialProfileScreenState
                 ),
               ),
             ),
-            data: (_) => widget.isStepped
+            data: (_) => _isSteppedMode
                 ? _buildSteppedWizard(l10n,
                     isGuest: isGuest, currentUser: currentUser)
                 : _buildSinglePageForm(l10n, theme, scheme),
@@ -484,6 +497,45 @@ class _FinancialProfileScreenState
                             fontSize: 11.5,
                             fontWeight: FontWeight.w500,
                           ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Spacer(),
+              InkWell(
+                onTap: () => setState(() => _overrideStepped = false),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: (isDark ? AppColors.teal : const Color(0xFF0D9488))
+                        .withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: (isDark ? AppColors.teal : const Color(0xFF0D9488))
+                          .withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.edit_note_rounded,
+                        size: 14,
+                        color:
+                            isDark ? AppColors.teal : const Color(0xFF0D9488),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Direct Edit Mode',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color:
+                              isDark ? AppColors.teal : const Color(0xFF0D9488),
                         ),
                       ),
                     ],
@@ -1372,6 +1424,8 @@ class _FinancialProfileScreenState
       key: _formKey,
       child: ListView(
         key: const ValueKey('profile_form_list'),
+        physics: const ClampingScrollPhysics(),
+        cacheExtent: 3000,
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
           Row(
@@ -1380,7 +1434,13 @@ class _FinancialProfileScreenState
                 IconButton(
                   icon: Icon(Icons.arrow_back,
                       color: isDark ? Colors.white : AppColors.textOnLight),
-                  onPressed: () => Navigator.of(context).maybePop(),
+                  onPressed: () {
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    } else {
+                      context.go('/home');
+                    }
+                  },
                 ),
               const SizedBox(width: 8),
               Expanded(
@@ -1573,6 +1633,14 @@ class _FinancialProfileScreenState
               onPressed:
                   _saving ? null : () => Navigator.of(context).maybePop(),
               child: Text(l10n.profileNotNow),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Center(
+            child: TextButton.icon(
+              onPressed: () => setState(() => _overrideStepped = true),
+              icon: const Icon(Icons.auto_stories_outlined, size: 16),
+              label: const Text('Switch to Guided 4-Step Wizard'),
             ),
           ),
         ],

@@ -168,3 +168,34 @@ def test_get_and_update_user_profile():
     assert light_res.json()["user"]["theme_mode"] == "light"
 
 
+def test_persona_with_financial_health_and_get_persona():
+    user_id = "test_fin_health_user_001"
+    payload = {
+        "user_id": user_id,
+        "persona": "salaried",
+        "primary_goal": "emergencyFund",
+        "monthly_income": 150000,
+        "monthly_essential_expenses": 60000,
+        "total_savings": 180000,
+        "financial_health_score": 85,
+        "is_guest": False,
+        "name": "Tariq Mahmood",
+        "email": "tariq@example.com",
+    }
+    response = client.post("/users/persona", json=payload)
+    assert response.status_code == 200
+    assert response.json()["financial_health_score"] == 85
+
+    # Check GET /users/{user_id} returns all financial fields
+    get_res = client.get(f"/users/{user_id}")
+    assert get_res.status_code == 200
+    user = get_res.json()
+    assert user["monthly_income"] == 150000
+    assert user["monthly_essential_expenses"] == 60000
+    assert user["total_savings"] == 180000
+    assert user["financial_health_score"] == 85
+    assert user["persona"] == "salaried"
+    assert user["primary_goal"] == "emergencyFund"
+
+
+

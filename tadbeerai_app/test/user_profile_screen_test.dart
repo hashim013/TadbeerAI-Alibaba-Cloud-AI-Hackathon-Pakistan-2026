@@ -235,7 +235,7 @@ void main() {
       expect(find.text('Assigned Persona'), findsOneWidget);
       expect(find.text('Business Owner'), findsWidgets);
       expect(find.text('Monthly Income'), findsOneWidget);
-      expect(find.text('Edit in Financial Wizard'), findsOneWidget);
+      expect(find.text('Edit Financial Information'), findsOneWidget);
     });
 
     testWidgets(

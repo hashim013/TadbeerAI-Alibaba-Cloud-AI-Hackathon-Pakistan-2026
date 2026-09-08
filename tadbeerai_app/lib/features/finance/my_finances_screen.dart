@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -9,8 +10,11 @@ import '../../../core/utils/l10n_context.dart';
 import '../../../core/widgets/app_canvas.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/entities/finance_data.dart';
+import '../../../domain/entities/financial_profile.dart';
 import '../../../domain/services/finance_calculations.dart';
+import '../../../domain/services/financial_health_calculator.dart';
 import '../../../providers/finance_providers.dart';
+import '../../../providers/profile_providers.dart';
 import 'finance_category_visuals.dart';
 import 'widgets/finance_widgets.dart';
 
@@ -38,24 +42,41 @@ class MyFinancesScreen extends ConsumerWidget {
   }
 }
 
-class _MyFinancesContent extends StatelessWidget {
+class _MyFinancesContent extends ConsumerWidget {
   const _MyFinancesContent({required this.data});
 
   final FinanceData data;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final now = DateTime.now();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final totalIncome = FinanceCalculations.totalIncome(data.transactions);
-    final totalExpenses = FinanceCalculations.totalExpenses(data.transactions);
-    final savings = FinanceCalculations.currentSavings(
+    final profile = ref.watch(financialProfileControllerProvider).valueOrNull;
+    final health = ref.watch(financialHealthProvider);
+
+    final txIncome = FinanceCalculations.totalIncome(data.transactions);
+    final txExpenses = FinanceCalculations.totalExpenses(data.transactions);
+    final txSavings = FinanceCalculations.currentSavings(
         data.openingSavingsBalance, data.transactions);
+
+    final baselineIncome = profile?.monthlyIncome ?? 0.0;
+    final baselineExpenses = profile?.monthlyEssentialExpenses ?? 0.0;
+    final baselineSavings = profile?.totalSavings ?? 0.0;
+
+    final totalIncome = txIncome > 0 ? txIncome : baselineIncome;
+    final totalExpenses = txExpenses > 0 ? txExpenses : baselineExpenses;
+    final savings = baselineSavings > 0 ? baselineSavings : txSavings;
+
     final monthIncome =
-        FinanceCalculations.monthlyIncome(data.transactions, now);
-    final monthExpenses =
-        FinanceCalculations.monthlyExpenses(data.transactions, now);
+        (profile?.monthlyIncome != null && profile!.monthlyIncome! > 0)
+            ? profile.monthlyIncome!
+            : FinanceCalculations.monthlyIncome(data.transactions, now);
+    final monthExpenses = (profile?.monthlyEssentialExpenses != null &&
+            profile!.monthlyEssentialExpenses! > 0)
+        ? profile.monthlyEssentialExpenses!
+        : FinanceCalculations.monthlyExpenses(data.transactions, now);
     final breakdown =
         FinanceCalculations.categoryBreakdown(data.transactions, now);
     final series = FinanceCalculations.monthlySeries(data.transactions,
@@ -64,6 +85,14 @@ class _MyFinancesContent extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       children: [
+        // ── Financial Health & Profile Integration ────────────────────────
+        _HealthAndProfileCard(
+          health: health,
+          profile: profile,
+          isDark: isDark,
+        ),
+        const SizedBox(height: 16),
+
         // ── All-time snapshot ──────────────────────────────────────────────
         Row(
           children: [
@@ -100,10 +129,12 @@ class _MyFinancesContent extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: StatTile(
-                label: l10n.availableBalance,
-                value: CurrencyFormat.pkr(savings),
+                label: 'Net Position',
+                value: CurrencyFormat.pkr(totalIncome - totalExpenses),
                 icon: Icons.account_balance_wallet_rounded,
-                color: AppColors.info,
+                color: totalIncome >= totalExpenses
+                    ? AppColors.teal
+                    : AppColors.danger,
               ),
             ),
           ],
@@ -560,6 +591,138 @@ class _LegendRow extends StatelessWidget {
             style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w600,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HealthAndProfileCard extends StatelessWidget {
+  const _HealthAndProfileCard({
+    required this.health,
+    required this.profile,
+    required this.isDark,
+  });
+
+  final FinancialHealthResult? health;
+  final FinancialProfile? profile;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final personaTitle = switch (profile?.persona) {
+      Persona.salaried => 'Salaried Professional',
+      Persona.student => 'Student',
+      Persona.businessOwner => 'Business Owner',
+      Persona.shopOwner => 'Shop Owner / Retailer',
+      null => 'General Profile',
+    };
+
+    final ratingLabel = switch (health?.rating) {
+      HealthRating.excellent => 'Excellent Resilience',
+      HealthRating.good => 'Good Resilience',
+      HealthRating.fair => 'Moderate Resilience',
+      HealthRating.needsAttention || null => 'Needs Attention',
+    };
+
+    final score = health?.score ?? 0;
+    final color = healthColor(context, score);
+
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              ScoreRing(score: score, size: 68, strokeWidth: 7),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      ratingLabel,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: color,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color:
+                            (isDark ? AppColors.teal : const Color(0xFF0D9488))
+                                .withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        personaTitle,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color:
+                              isDark ? AppColors.teal : const Color(0xFF0D9488),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Linked to your financial baseline & resilience pillars',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 11,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Divider(
+            height: 1,
+            color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            alignment: WrapAlignment.end,
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              TextButton.icon(
+                onPressed: () => context.push('/profile/financial'),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  foregroundColor: theme.colorScheme.primary,
+                ),
+                icon: const Icon(Icons.person_outline_rounded, size: 16),
+                label: const Text(
+                  'Profile Baseline',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
+              FilledButton.tonalIcon(
+                onPressed: () => context.push('/finance/health'),
+                style: FilledButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                ),
+                icon: const Icon(Icons.speed_rounded, size: 16),
+                label: const Text(
+                  'View Health Pillars',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
           ),
         ],
       ),

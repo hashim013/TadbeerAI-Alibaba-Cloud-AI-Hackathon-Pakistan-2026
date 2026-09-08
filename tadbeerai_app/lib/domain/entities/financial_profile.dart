@@ -55,6 +55,7 @@ class FinancialProfile {
     this.monthlyEssentialExpenses,
     this.totalSavings,
     this.primaryGoal,
+    this.financialHealthScore,
     this.profileCompleted = false,
   });
 
@@ -64,6 +65,7 @@ class FinancialProfile {
   final double? monthlyEssentialExpenses;
   final double? totalSavings;
   final PrimaryGoal? primaryGoal;
+  final int? financialHealthScore;
   final bool profileCompleted;
 
   FinancialProfile copyWith({
@@ -73,6 +75,7 @@ class FinancialProfile {
     double? monthlyEssentialExpenses,
     double? totalSavings,
     PrimaryGoal? primaryGoal,
+    int? financialHealthScore,
     bool? profileCompleted,
   }) =>
       FinancialProfile(
@@ -83,6 +86,7 @@ class FinancialProfile {
             monthlyEssentialExpenses ?? this.monthlyEssentialExpenses,
         totalSavings: totalSavings ?? this.totalSavings,
         primaryGoal: primaryGoal ?? this.primaryGoal,
+        financialHealthScore: financialHealthScore ?? this.financialHealthScore,
         profileCompleted: profileCompleted ?? this.profileCompleted,
       );
 
@@ -93,6 +97,7 @@ class FinancialProfile {
         'monthlyEssentialExpenses': monthlyEssentialExpenses,
         'totalSavings': totalSavings,
         'primaryGoal': primaryGoal?.storageKey,
+        'financialHealthScore': financialHealthScore,
         'profileCompleted': profileCompleted,
       };
 
@@ -100,12 +105,22 @@ class FinancialProfile {
       FinancialProfile(
         name: json['name'] as String?,
         persona: Persona.fromStorageKey(json['persona'] as String?),
-        monthlyIncome: (json['monthlyIncome'] as num?)?.toDouble(),
-        monthlyEssentialExpenses:
-            (json['monthlyEssentialExpenses'] as num?)?.toDouble(),
-        totalSavings: (json['totalSavings'] as num?)?.toDouble(),
-        primaryGoal: PrimaryGoal.fromStorageKey(json['primaryGoal'] as String?),
-        profileCompleted: (json['profileCompleted'] as bool?) ?? false,
+        monthlyIncome:
+            ((json['monthlyIncome'] ?? json['monthly_income']) as num?)
+                ?.toDouble(),
+        monthlyEssentialExpenses: ((json['monthlyEssentialExpenses'] ??
+                json['monthly_essential_expenses']) as num?)
+            ?.toDouble(),
+        totalSavings: ((json['totalSavings'] ?? json['total_savings']) as num?)
+            ?.toDouble(),
+        primaryGoal: PrimaryGoal.fromStorageKey(
+            (json['primaryGoal'] ?? json['primary_goal']) as String?),
+        financialHealthScore: ((json['financialHealthScore'] ??
+                json['financial_health_score']) as num?)
+            ?.toInt(),
+        profileCompleted:
+            (json['profileCompleted'] ?? json['profile_completed'] as bool?) ??
+                false,
       );
 
   @override
@@ -118,6 +133,7 @@ class FinancialProfile {
           other.monthlyEssentialExpenses == monthlyEssentialExpenses &&
           other.totalSavings == totalSavings &&
           other.primaryGoal == primaryGoal &&
+          other.financialHealthScore == financialHealthScore &&
           other.profileCompleted == profileCompleted;
 
   @override
@@ -128,6 +144,7 @@ class FinancialProfile {
         monthlyEssentialExpenses,
         totalSavings,
         primaryGoal,
+        financialHealthScore,
         profileCompleted,
       );
 
@@ -135,5 +152,6 @@ class FinancialProfile {
   String toString() => 'FinancialProfile($name, ${persona?.name}, '
       'income: $monthlyIncome, expenses: $monthlyEssentialExpenses, '
       'savings: $totalSavings, goal: ${primaryGoal?.name}, '
+      'healthScore: $financialHealthScore, '
       'completed: $profileCompleted)';
 }

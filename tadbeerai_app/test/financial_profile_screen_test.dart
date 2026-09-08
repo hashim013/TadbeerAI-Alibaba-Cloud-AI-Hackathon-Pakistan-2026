@@ -419,6 +419,10 @@ void main() {
       await _scrollAndTap(tester, find.text('Save Profile'));
       await tester.pumpAndSettle();
 
+      for (final widget in tester.widgetList<Text>(find.byType(Text))) {
+        debugPrint('DEBUG TEXT: ${widget.data}');
+      }
+
       expect(find.text('Income cannot be negative.'), findsOneWidget);
       expect(repo.saveCount, 0);
     });

@@ -92,6 +92,41 @@ class FinancialHealthResult {
     if (score >= 45) return HealthRating.fair;
     return HealthRating.needsAttention;
   }
+
+  HealthComponent? get savingsComponent {
+    for (final c in components) {
+      if (c.key == 'savings') return c;
+    }
+    return null;
+  }
+
+  HealthComponent? get budgetComponent {
+    for (final c in components) {
+      if (c.key == 'budget') return c;
+    }
+    return null;
+  }
+
+  HealthComponent? get emergencyComponent {
+    for (final c in components) {
+      if (c.key == 'emergency') return c;
+    }
+    return null;
+  }
+
+  HealthComponent? get goalsComponent {
+    for (final c in components) {
+      if (c.key == 'goals') return c;
+    }
+    return null;
+  }
+
+  HealthComponent? get spendingComponent {
+    for (final c in components) {
+      if (c.key == 'spending') return c;
+    }
+    return null;
+  }
 }
 
 /// Deterministic, explainable Financial Health Score.
@@ -148,7 +183,8 @@ abstract final class FinancialHealthCalculator {
 
     final savings = _savingsComponent(input, idealRate: idealSavingsRate);
     final budget = _budgetComponent(input);
-    final emergency = _emergencyComponent(input, idealMonths: idealEmergencyMonths);
+    final emergency =
+        _emergencyComponent(input, idealMonths: idealEmergencyMonths);
     final goals = _goalsComponent(input);
     final spending = _spendingComponent(input);
 

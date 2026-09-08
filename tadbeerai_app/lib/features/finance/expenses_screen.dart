@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_format.dart';
@@ -7,8 +8,12 @@ import '../../../core/utils/l10n_context.dart';
 import '../../../core/widgets/app_canvas.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/entities/finance_data.dart';
+import '../../../domain/entities/financial_profile.dart';
 import '../../../domain/entities/transaction.dart';
+import '../../../domain/services/finance_calculations.dart';
+import '../../../domain/services/financial_health_calculator.dart';
 import '../../../providers/finance_providers.dart';
+import '../../../providers/profile_providers.dart';
 import 'finance_category_visuals.dart';
 import 'widgets/finance_widgets.dart';
 import 'widgets/transaction_form_sheet.dart';
@@ -37,6 +42,8 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
   @override
   Widget build(BuildContext context) {
     final asyncData = ref.watch(financeControllerProvider);
+    final profile = ref.watch(financialProfileControllerProvider).valueOrNull;
+    final health = ref.watch(financialHealthProvider);
     final l10n = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -55,6 +62,15 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+                child: _SpendingPaceBanner(
+                  data: data,
+                  profile: profile,
+                  health: health,
+                  isDark: isDark,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
                 child: _SearchAndFilters(
                   controller: _searchController,
                   onChanged: (value) => setState(() => _query = value),
@@ -310,5 +326,150 @@ class _TransactionListTile extends StatelessWidget {
       return l10n.yesterday;
     }
     return '${date.day}/${date.month}/${date.year}';
+  }
+}
+
+class _SpendingPaceBanner extends StatelessWidget {
+  const _SpendingPaceBanner({
+    required this.data,
+    required this.profile,
+    required this.health,
+    required this.isDark,
+  });
+
+  final FinanceData data;
+  final FinancialProfile? profile;
+  final FinancialHealthResult? health;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final now = DateTime.now();
+    final monthExpenses =
+        FinanceCalculations.monthlyExpenses(data.transactions, now);
+    final baseline = profile?.monthlyEssentialExpenses ?? 0.0;
+    final spendingComp = health?.spendingComponent;
+
+    final ratio =
+        baseline > 0 ? (monthExpenses / baseline).clamp(0.0, 2.0) : 0.0;
+    final isPaceHigh = ratio > 1.0;
+    final paceColor = isPaceHigh
+        ? (isDark ? AppColors.danger : const Color(0xFFDC2626))
+        : (ratio > 0.8
+            ? const Color(0xFFF59E0B)
+            : (isDark ? AppColors.mint : const Color(0xFF047857)));
+
+    return AppCard(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: paceColor.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Icon(
+                  Icons.speed_rounded,
+                  size: 18,
+                  color: paceColor,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Spending Pace & Discipline',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: paceColor.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Text(
+                            spendingComp != null
+                                ? '${spendingComp.score}/100 Pillar'
+                                : '15% Weight',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: paceColor,
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      baseline > 0
+                          ? '${CurrencyFormat.pkr(monthExpenses)} spent of ${CurrencyFormat.pkr(baseline)} monthly baseline'
+                          : '${CurrencyFormat.pkr(monthExpenses)} recorded this month',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontSize: 11.5,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              InkWell(
+                onTap: () => context.push('/finance/health'),
+                borderRadius: BorderRadius.circular(6),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Health',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color:
+                              isDark ? AppColors.teal : const Color(0xFF0D9488),
+                        ),
+                      ),
+                      const SizedBox(width: 2),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        size: 16,
+                        color:
+                            isDark ? AppColors.teal : const Color(0xFF0D9488),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (baseline > 0) ...[
+            const SizedBox(height: 8),
+            ProgressBar(
+                value: ratio.clamp(0.0, 1.0), color: paceColor, height: 6),
+          ],
+        ],
+      ),
+    );
   }
 }

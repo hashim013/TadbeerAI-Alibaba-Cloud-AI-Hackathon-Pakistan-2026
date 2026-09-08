@@ -186,6 +186,7 @@ def save_user_persona(request: UserPersonaRequest, authorization: Optional[str] 
             "monthly_income": request.monthly_income,
             "monthly_essential_expenses": request.monthly_essential_expenses,
             "total_savings": request.total_savings,
+            "financial_health_score": request.financial_health_score,
             "name": request.name or ("Guest User" if is_guest else "User"),
             "email": request.email or "",
             "phone": request.phone or "",
@@ -209,6 +210,7 @@ def save_user_persona(request: UserPersonaRequest, authorization: Optional[str] 
             "is_guest": is_guest,
             "eligible_for_alerts": eligible_for_alerts,
             "persona": request.persona,
+            "financial_health_score": request.financial_health_score,
             "message": (
                 "Preferences saved locally on device. Alerts are reserved for registered users."
                 if is_guest
@@ -217,6 +219,37 @@ def save_user_persona(request: UserPersonaRequest, authorization: Optional[str] 
         }
     except Exception as e:
         print(f"[Persona] Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/users/persona")
+def get_user_persona(authorization: Optional[str] = Header(None)):
+    """GET /users/persona — Retrieve current user's financial profile and persona."""
+    user_id = get_authenticated_user_id(authorization)
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    try:
+        registry = get_user_registry()
+        user = registry.get_user(user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+        return {
+            "status": "success",
+            "user_id": user_id,
+            "persona": user.get("persona"),
+            "primary_goal": user.get("primary_goal"),
+            "monthly_income": user.get("monthly_income"),
+            "monthly_essential_expenses": user.get("monthly_essential_expenses"),
+            "total_savings": user.get("total_savings"),
+            "financial_health_score": user.get("financial_health_score"),
+            "name": user.get("name"),
+            "email": user.get("email"),
+            "is_guest": user.get("is_guest", False),
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"[GetPersona] Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

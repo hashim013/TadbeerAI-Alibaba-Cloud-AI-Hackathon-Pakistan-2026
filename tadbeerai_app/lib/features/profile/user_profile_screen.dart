@@ -78,460 +78,464 @@ class UserProfileScreen extends ConsumerWidget {
       },
       child: Scaffold(
         backgroundColor: isDark ? AppColors.navyBg : Colors.transparent,
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.navyBg : null,
-          gradient: isDark ? null : AppColors.lightThemeGradient,
-        ),
-        child: SafeArea(
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              // ── Top Navigation Bar ─────────────────────────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  child: Row(
-                    children: [
-                      _NavBackButton(
-                        onTap: () {
-                          if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            context.go('/home');
-                          }
-                        },
-                      ),
-                      const SizedBox(width: 14),
-                      Text(
-                        'My Profile',
-                        style: GoogleFonts.inter(
-                          color: isDark ? Colors.white : AppColors.textOnLight,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.3,
+        body: DecoratedBox(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.navyBg : null,
+            gradient: isDark ? null : AppColors.lightThemeGradient,
+          ),
+          child: SafeArea(
+            child: CustomScrollView(
+              physics: const ClampingScrollPhysics(),
+              slivers: [
+                // ── Top Navigation Bar ─────────────────────────────────────────
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                    child: Row(
+                      children: [
+                        _NavBackButton(
+                          onTap: () {
+                            if (context.canPop()) {
+                              context.pop();
+                            } else {
+                              context.go('/home');
+                            }
+                          },
                         ),
-                      ),
-                      const Spacer(),
-                      // Quick edit shortcut
-                      IconButton(
-                        icon: Icon(
-                          Icons.mode_edit_outline_rounded,
-                          color:
-                              isDark ? AppColors.teal : const Color(0xFF0D9488),
-                          size: 20,
+                        const SizedBox(width: 14),
+                        Text(
+                          'My Profile',
+                          style: GoogleFonts.inter(
+                            color:
+                                isDark ? Colors.white : AppColors.textOnLight,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
                         ),
-                        tooltip: 'Edit Personal Details',
-                        onPressed: () {
-                          HapticFeedback.lightImpact();
-                          _showPersonalInfoSheet(context, ref, user, profile);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // ── Hero Identity Card ────────────────────────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isDark ? AppColors.navyCard : AppColors.lightCard,
-                      borderRadius: BorderRadius.circular(22),
-                      border: Border.all(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : AppColors.borderLight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: isDark
-                              ? Colors.black.withValues(alpha: 0.28)
-                              : AppColors.lightCardShadow
-                                  .withValues(alpha: 0.8),
-                          blurRadius: 18,
-                          offset: const Offset(0, 6),
+                        const Spacer(),
+                        // Quick edit shortcut
+                        IconButton(
+                          icon: Icon(
+                            Icons.mode_edit_outline_rounded,
+                            color: isDark
+                                ? AppColors.teal
+                                : const Color(0xFF0D9488),
+                            size: 20,
+                          ),
+                          tooltip: 'Edit Personal Details',
+                          onPressed: () {
+                            HapticFeedback.lightImpact();
+                            _showPersonalInfoSheet(context, ref, user, profile);
+                          },
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.all(18),
-                    child: Row(
-                      children: [
-                        // Avatar with gradient border
-                        Container(
-                          width: 68,
-                          height: 68,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: const LinearGradient(
-                              colors: [AppColors.teal, AppColors.emerald],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.teal.withValues(alpha: 0.25),
-                                blurRadius: 10,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
+                  ),
+                ),
+
+                // ── Hero Identity Card ────────────────────────────────────────
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color:
+                            isDark ? AppColors.navyCard : AppColors.lightCard,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : AppColors.borderLight,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDark
+                                ? Colors.black.withValues(alpha: 0.28)
+                                : AppColors.lightCardShadow
+                                    .withValues(alpha: 0.8),
+                            blurRadius: 18,
+                            offset: const Offset(0, 6),
                           ),
-                          padding: const EdgeInsets.all(2.5),
-                          child: Container(
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(18),
+                      child: Row(
+                        children: [
+                          // Avatar with gradient border
+                          Container(
+                            width: 68,
+                            height: 68,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: isDark
-                                  ? AppColors.navyElevated
-                                  : AppColors.lightSurface,
+                              gradient: const LinearGradient(
+                                colors: [AppColors.teal, AppColors.emerald],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.teal.withValues(alpha: 0.25),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
                             ),
-                            child: Center(
-                              child: Text(
-                                displayName.isNotEmpty
-                                    ? displayName[0].toUpperCase()
-                                    : 'U',
-                                style: GoogleFonts.inter(
-                                  color: isDark
-                                      ? Colors.white
-                                      : AppColors.textOnLight,
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w700,
+                            padding: const EdgeInsets.all(2.5),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isDark
+                                    ? AppColors.navyElevated
+                                    : AppColors.lightSurface,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  displayName.isNotEmpty
+                                      ? displayName[0].toUpperCase()
+                                      : 'U',
+                                  style: GoogleFonts.inter(
+                                    color: isDark
+                                        ? Colors.white
+                                        : AppColors.textOnLight,
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 16),
+                          const SizedBox(width: 16),
 
-                        // User name, persona, and account badge
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                displayName,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.inter(
-                                  color: isDark
-                                      ? Colors.white
-                                      : AppColors.textOnLight,
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: -0.2,
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                personaTitle,
-                                style: GoogleFonts.inter(
-                                  color: isDark
-                                      ? AppColors.textOnDarkSecondary
-                                      : AppColors.textOnLightSecondary,
-                                  fontSize: 13.5,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              // Status Pill
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isGuest
-                                      ? const Color(0xFFF59E0B)
-                                          .withValues(alpha: 0.12)
-                                      : AppColors.teal.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: isGuest
-                                        ? const Color(0xFFF59E0B)
-                                            .withValues(alpha: 0.35)
-                                        : AppColors.teal
-                                            .withValues(alpha: 0.35),
-                                    width: 1,
+                          // User name, persona, and account badge
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  displayName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.inter(
+                                    color: isDark
+                                        ? Colors.white
+                                        : AppColors.textOnLight,
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.2,
                                   ),
                                 ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      isGuest
-                                          ? Icons.lock_clock_rounded
-                                          : Icons.verified_rounded,
-                                      size: 13,
+                                const SizedBox(height: 3),
+                                Text(
+                                  personaTitle,
+                                  style: GoogleFonts.inter(
+                                    color: isDark
+                                        ? AppColors.textOnDarkSecondary
+                                        : AppColors.textOnLightSecondary,
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                // Status Pill
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isGuest
+                                        ? const Color(0xFFF59E0B)
+                                            .withValues(alpha: 0.12)
+                                        : AppColors.teal
+                                            .withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
                                       color: isGuest
                                           ? const Color(0xFFF59E0B)
-                                          : AppColors.teal,
+                                              .withValues(alpha: 0.35)
+                                          : AppColors.teal
+                                              .withValues(alpha: 0.35),
+                                      width: 1,
                                     ),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      isGuest
-                                          ? 'Guest Session • Local'
-                                          : 'Verified • Alerts Active',
-                                      style: GoogleFonts.inter(
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        isGuest
+                                            ? Icons.lock_clock_rounded
+                                            : Icons.verified_rounded,
+                                        size: 13,
                                         color: isGuest
                                             ? const Color(0xFFF59E0B)
                                             : AppColors.teal,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 0.2,
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        isGuest
+                                            ? 'Guest Session • Local'
+                                            : 'Verified • Alerts Active',
+                                        style: GoogleFonts.inter(
+                                          color: isGuest
+                                              ? const Color(0xFFF59E0B)
+                                              : AppColors.teal,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: 0.2,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // ── Group 1: Account & Finances ───────────────────────────────
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
+                    child: Text(
+                      'ACCOUNT & FINANCES',
+                      style: GoogleFonts.inter(
+                        color: isDark
+                            ? AppColors.textOnDarkTertiary
+                            : AppColors.textOnLightSecondary,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: _MenuGroupCard(
+                      items: [
+                        _ProfileMenuItem(
+                          icon: Icons.person_outline_rounded,
+                          iconBgColor: AppColors.emerald,
+                          title: 'Personal Information',
+                          subtitle: displayEmail,
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            _showPersonalInfoSheet(context, ref, user, profile);
+                          },
+                        ),
+                        _ProfileMenuItem(
+                          icon: Icons.account_balance_wallet_outlined,
+                          iconBgColor: AppColors.teal,
+                          title: 'Financial Information',
+                          subtitle:
+                              '$personaTitle • ${_formatCurrency(profile?.monthlyIncome)}/mo',
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            _showFinancialInfoSheet(context, profile);
+                          },
                         ),
                       ],
                     ),
                   ),
                 ),
-              ),
 
-              // ── Group 1: Account & Finances ───────────────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
-                  child: Text(
-                    'ACCOUNT & FINANCES',
-                    style: GoogleFonts.inter(
-                      color: isDark
-                          ? AppColors.textOnDarkTertiary
-                          : AppColors.textOnLightSecondary,
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.0,
+                // ── Group 2: Preferences & Settings ───────────────────────────
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
+                    child: Text(
+                      'PREFERENCES & SYSTEM',
+                      style: GoogleFonts.inter(
+                        color: isDark
+                            ? AppColors.textOnDarkTertiary
+                            : AppColors.textOnLightSecondary,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.0,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: _MenuGroupCard(
-                    items: [
-                      _ProfileMenuItem(
-                        icon: Icons.person_outline_rounded,
-                        iconBgColor: AppColors.emerald,
-                        title: 'Personal Information',
-                        subtitle: displayEmail,
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          _showPersonalInfoSheet(context, ref, user, profile);
-                        },
-                      ),
-                      _ProfileMenuItem(
-                        icon: Icons.account_balance_wallet_outlined,
-                        iconBgColor: AppColors.teal,
-                        title: 'Financial Information',
-                        subtitle:
-                            '$personaTitle • ${_formatCurrency(profile?.monthlyIncome)}/mo',
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          _showFinancialInfoSheet(context, profile);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // ── Group 2: Preferences & Settings ───────────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
-                  child: Text(
-                    'PREFERENCES & SYSTEM',
-                    style: GoogleFonts.inter(
-                      color: isDark
-                          ? AppColors.textOnDarkTertiary
-                          : AppColors.textOnLightSecondary,
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: _MenuGroupCard(
-                    items: [
-                      _ProfileMenuItem(
-                        icon: isDark
-                            ? Icons.dark_mode_rounded
-                            : Icons.light_mode_rounded,
-                        iconBgColor:
-                            isDark ? AppColors.teal : const Color(0xFF0284C7),
-                        title: 'Theme Appearance',
-                        subtitle: themeMode == ThemeMode.dark
-                            ? 'Dark • Midnight Navy'
-                            : (themeMode == ThemeMode.light
-                                ? 'Light • Teal & Blue'
-                                : 'System Default'),
-                        trailingWidget: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: (isDark
-                                    ? AppColors.teal
-                                    : const Color(0xFF0284C7))
-                                .withValues(alpha: 0.14),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: _MenuGroupCard(
+                      items: [
+                        _ProfileMenuItem(
+                          icon: isDark
+                              ? Icons.dark_mode_rounded
+                              : Icons.light_mode_rounded,
+                          iconBgColor:
+                              isDark ? AppColors.teal : const Color(0xFF0284C7),
+                          title: 'Theme Appearance',
+                          subtitle: themeMode == ThemeMode.dark
+                              ? 'Dark • Midnight Navy'
+                              : (themeMode == ThemeMode.light
+                                  ? 'Light • Teal & Blue'
+                                  : 'System Default'),
+                          trailingWidget: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
                               color: (isDark
                                       ? AppColors.teal
                                       : const Color(0xFF0284C7))
-                                  .withValues(alpha: 0.35),
+                                  .withValues(alpha: 0.14),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: (isDark
+                                        ? AppColors.teal
+                                        : const Color(0xFF0284C7))
+                                    .withValues(alpha: 0.35),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            themeMode == ThemeMode.dark
-                                ? 'Dark'
-                                : (themeMode == ThemeMode.light
-                                    ? 'Light'
-                                    : 'System'),
-                            style: GoogleFonts.inter(
-                              color: isDark
-                                  ? AppColors.teal
-                                  : const Color(0xFF0284C7),
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          _showThemeSelectorSheet(context, ref);
-                        },
-                      ),
-                      _ProfileMenuItem(
-                        icon: Icons.language_rounded,
-                        iconBgColor: const Color(0xFF3B82F6),
-                        title: 'Language',
-                        subtitle: currentLanguage.displayName,
-                        trailingWidget: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                const Color(0xFF3B82F6).withValues(alpha: 0.14),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(0xFF3B82F6)
-                                  .withValues(alpha: 0.35),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.public_rounded,
-                                size: 13,
+                            child: Text(
+                              themeMode == ThemeMode.dark
+                                  ? 'Dark'
+                                  : (themeMode == ThemeMode.light
+                                      ? 'Light'
+                                      : 'System'),
+                              style: GoogleFonts.inter(
                                 color: isDark
-                                    ? const Color(0xFF60A5FA)
-                                    : const Color(0xFF2563EB),
+                                    ? AppColors.teal
+                                    : const Color(0xFF0284C7),
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
                               ),
-                              const SizedBox(width: 5),
-                              Text(
-                                currentLanguage.displayName,
-                                style: GoogleFonts.inter(
-                                  color: isDark
-                                      ? const Color(0xFF93C5FD)
-                                      : const Color(0xFF1D4ED8),
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            _showThemeSelectorSheet(context, ref);
+                          },
                         ),
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          _showLanguageSelectorSheet(context, ref);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // ── Group 3: Support & Information ────────────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
-                  child: Text(
-                    'SUPPORT & INFORMATION',
-                    style: GoogleFonts.inter(
-                      color: isDark
-                          ? AppColors.textOnDarkTertiary
-                          : AppColors.textOnLightSecondary,
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.0,
+                        _ProfileMenuItem(
+                          icon: Icons.language_rounded,
+                          iconBgColor: const Color(0xFF3B82F6),
+                          title: 'Language',
+                          subtitle: currentLanguage.displayName,
+                          trailingWidget: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF3B82F6)
+                                  .withValues(alpha: 0.14),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xFF3B82F6)
+                                    .withValues(alpha: 0.35),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.public_rounded,
+                                  size: 13,
+                                  color: isDark
+                                      ? const Color(0xFF60A5FA)
+                                      : const Color(0xFF2563EB),
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  currentLanguage.displayName,
+                                  style: GoogleFonts.inter(
+                                    color: isDark
+                                        ? const Color(0xFF93C5FD)
+                                        : const Color(0xFF1D4ED8),
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            _showLanguageSelectorSheet(context, ref);
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: _MenuGroupCard(
-                    items: [
-                      _ProfileMenuItem(
-                        icon: Icons.help_outline_rounded,
-                        iconBgColor: const Color(0xFFF59E0B),
-                        title: 'Help & Support',
-                        subtitle: 'FAQs, Guidelines & Contact',
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          _showHelpSupportSheet(context);
-                        },
-                      ),
-                      _ProfileMenuItem(
-                        icon: Icons.info_outline_rounded,
-                        iconBgColor: const Color(0xFF6366F1),
-                        title: 'About Tadbeer AI',
-                        subtitle: 'v2.0.0 • Alibaba Cloud AI 2026',
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          _showAboutSheet(context);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
 
-              // ── Sign Out Action ───────────────────────────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 28, 20, 36),
-                  child: _SignOutButton(
-                    onPressed: () {
-                      HapticFeedback.mediumImpact();
-                      _showSignOutDialog(context, ref);
-                    },
+                // ── Group 3: Support & Information ────────────────────────────
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
+                    child: Text(
+                      'SUPPORT & INFORMATION',
+                      style: GoogleFonts.inter(
+                        color: isDark
+                            ? AppColors.textOnDarkTertiary
+                            : AppColors.textOnLightSecondary,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: _MenuGroupCard(
+                      items: [
+                        _ProfileMenuItem(
+                          icon: Icons.help_outline_rounded,
+                          iconBgColor: const Color(0xFFF59E0B),
+                          title: 'Help & Support',
+                          subtitle: 'FAQs, Guidelines & Contact',
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            _showHelpSupportSheet(context);
+                          },
+                        ),
+                        _ProfileMenuItem(
+                          icon: Icons.info_outline_rounded,
+                          iconBgColor: const Color(0xFF6366F1),
+                          title: 'About Tadbeer AI',
+                          subtitle: 'v2.0.0 • Alibaba Cloud AI 2026',
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            _showAboutSheet(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // ── Sign Out Action ───────────────────────────────────────────
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 28, 20, 36),
+                    child: _SignOutButton(
+                      onPressed: () {
+                        HapticFeedback.mediumImpact();
+                        _showSignOutDialog(context, ref);
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 
@@ -818,7 +822,7 @@ class UserProfileScreen extends ConsumerWidget {
                   ),
                 ),
                 child: Text(
-                  'Edit in Financial Wizard',
+                  'Edit Financial Information',
                   style: GoogleFonts.inter(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -1762,7 +1766,7 @@ class _ModalContainer extends StatelessWidget {
           const SizedBox(height: 16),
           Flexible(
             child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               child: child,
             ),
           ),

@@ -75,6 +75,8 @@ class SyncFinancialProfileRepository implements FinancialProfileRepository {
         if (profile.monthlyEssentialExpenses != null)
           'monthly_essential_expenses': profile.monthlyEssentialExpenses,
         if (profile.totalSavings != null) 'total_savings': profile.totalSavings,
+        if (profile.financialHealthScore != null)
+          'financial_health_score': profile.financialHealthScore,
         if (profile.name != null) 'name': profile.name,
         'is_guest': false,
       }).catchError((_) => Response(requestOptions: RequestOptions(path: '')));

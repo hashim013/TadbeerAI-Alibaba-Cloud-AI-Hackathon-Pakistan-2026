@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_format.dart';
@@ -8,8 +9,11 @@ import '../../../core/widgets/app_canvas.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/entities/budget.dart';
 import '../../../domain/entities/finance_data.dart';
+import '../../../domain/entities/financial_profile.dart';
 import '../../../domain/services/finance_calculations.dart';
+import '../../../domain/services/financial_health_calculator.dart';
 import '../../../providers/finance_providers.dart';
+import '../../../providers/profile_providers.dart';
 import 'finance_category_visuals.dart';
 import 'widgets/budget_form_sheet.dart';
 import 'widgets/finance_widgets.dart';
@@ -82,24 +86,42 @@ class BudgetScreen extends ConsumerWidget {
   }
 }
 
-class _BudgetContent extends StatelessWidget {
+class _BudgetContent extends ConsumerWidget {
   const _BudgetContent({required this.data, required this.onEdit});
 
   final FinanceData data;
   final void Function(Budget budget) onEdit;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final now = DateTime.now();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final health = ref.watch(financialHealthProvider);
+    final profile = ref.watch(financialProfileControllerProvider).valueOrNull;
+
+    final budgetComp = health?.budgetComponent;
+
     final spentByCategory =
         FinanceCalculations.spentByCategory(data.transactions, now);
 
     if (data.budgets.isEmpty) {
-      return FinanceEmptyState(
-        icon: Icons.data_usage_rounded,
-        title: l10n.noBudgetsTitle,
-        body: l10n.noBudgetsBody,
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
+        children: [
+          _BudgetDisciplinePillarCard(
+            budgetComp: budgetComp,
+            profile: profile,
+            isDark: isDark,
+          ),
+          const SizedBox(height: 24),
+          FinanceEmptyState(
+            icon: Icons.data_usage_rounded,
+            title: l10n.noBudgetsTitle,
+            body: l10n.noBudgetsBody,
+          ),
+        ],
       );
     }
 
@@ -118,6 +140,14 @@ class _BudgetContent extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
       children: [
+        // ── Budget Discipline & Resilience Pillar ─────────────────────────
+        _BudgetDisciplinePillarCard(
+          budgetComp: budgetComp,
+          profile: profile,
+          isDark: isDark,
+        ),
+        const SizedBox(height: 16),
+
         // ── Monthly overview ─────────────────────────────────────────────
         AppCard(
           padding: const EdgeInsets.all(16),
@@ -291,6 +321,190 @@ class _BudgetRow extends StatelessWidget {
             style: theme.textTheme.labelSmall?.copyWith(
               color: scheme.onSurfaceVariant,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BudgetDisciplinePillarCard extends StatelessWidget {
+  const _BudgetDisciplinePillarCard({
+    required this.budgetComp,
+    required this.profile,
+    required this.isDark,
+  });
+
+  final HealthComponent? budgetComp;
+  final FinancialProfile? profile;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final score = budgetComp?.score ?? 0;
+    final onTrack = budgetComp?.detailParams['onTrack'] ?? '0';
+    final total = budgetComp?.detailParams['total'] ?? '0';
+    final baseline = profile?.monthlyEssentialExpenses;
+
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0EA5E9).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: const Icon(
+                  Icons.shield_rounded,
+                  size: 20,
+                  color: Color(0xFF0EA5E9),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Budget Discipline Pillar',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '$onTrack of $total categories within target limits',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '$score/100',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: const Color(0xFF0EA5E9),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 6, vertical: 1.5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0EA5E9).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Text(
+                      '25% Weight',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: const Color(0xFF0EA5E9),
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          if (baseline != null && baseline > 0) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.navyElevated.withValues(alpha: 0.5)
+                    : const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                  width: 0.8,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 14,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Profile Essential Expenses Baseline: ${CurrencyFormat.pkr(baseline)}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontSize: 11,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          const SizedBox(height: 10),
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              TextButton(
+                onPressed: () => context.push('/profile/financial'),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                ),
+                child: const Text('Update Profile Baseline',
+                    style: TextStyle(fontSize: 12)),
+              ),
+              InkWell(
+                onTap: () => context.push('/finance/health'),
+                borderRadius: BorderRadius.circular(6),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'View Health Impact',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color:
+                              isDark ? AppColors.teal : const Color(0xFF0D9488),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 14,
+                        color:
+                            isDark ? AppColors.teal : const Color(0xFF0D9488),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

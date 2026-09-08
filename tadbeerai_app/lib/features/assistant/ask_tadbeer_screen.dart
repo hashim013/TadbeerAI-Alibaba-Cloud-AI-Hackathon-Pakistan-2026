@@ -439,7 +439,7 @@ class _AskEmptyState extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ListView(
-      physics: const BouncingScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       children: [
         // ── Copilot Welcome Card ───────────────────────────────────────────

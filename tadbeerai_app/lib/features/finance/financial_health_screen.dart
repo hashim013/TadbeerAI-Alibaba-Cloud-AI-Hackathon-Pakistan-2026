@@ -1153,6 +1153,64 @@ class _PillarCardState extends State<_PillarCard> {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  // Direct Link to Feature / Profile Tool
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        HapticFeedback.lightImpact();
+                        final route = switch (component.key) {
+                          'savings' => '/finance/finances',
+                          'budget' => '/finance/budget',
+                          'emergency' => '/profile/financial',
+                          'goals' => '/finance/goals',
+                          'spending' => '/finance/expenses',
+                          _ => '/finance/finances',
+                        };
+                        context.push(route);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        side: BorderSide(
+                          color: config.color.withValues(alpha: 0.4),
+                          width: 1,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                      ),
+                      icon: Icon(
+                        switch (component.key) {
+                          'savings' => Icons.account_balance_wallet_rounded,
+                          'budget' => Icons.data_usage_rounded,
+                          'emergency' => Icons.shield_rounded,
+                          'goals' => Icons.flag_rounded,
+                          'spending' => Icons.receipt_long_rounded,
+                          _ => Icons.arrow_forward_rounded,
+                        },
+                        size: 15,
+                        color: config.color,
+                      ),
+                      label: Text(
+                        switch (component.key) {
+                          'savings' => 'Open My Finances',
+                          'budget' => 'Open Budget Planner',
+                          'emergency' => 'Manage Reserves in Profile',
+                          'goals' => 'Open Savings Goals',
+                          'spending' => 'Track Expenses',
+                          _ => 'View Tool',
+                        },
+                        style: GoogleFonts.inter(
+                          color: isDark ? Colors.white : AppColors.textOnLight,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ],
             ),

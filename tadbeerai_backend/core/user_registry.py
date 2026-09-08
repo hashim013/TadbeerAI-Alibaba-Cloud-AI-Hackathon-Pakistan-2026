@@ -230,6 +230,10 @@ class UserRegistry:
                         "eligible_for_alerts": eligible,
                         "persona": d.get("persona") or (d.get("profile_data", {}).get("persona") if isinstance(d.get("profile_data"), dict) else None),
                         "primary_goal": d.get("primary_goal") or (d.get("profile_data", {}).get("primary_goal") if isinstance(d.get("profile_data"), dict) else None),
+                        "monthly_income": d.get("monthly_income") or (d.get("profile_data", {}).get("monthly_income") if isinstance(d.get("profile_data"), dict) else None),
+                        "monthly_essential_expenses": d.get("monthly_essential_expenses") or (d.get("profile_data", {}).get("monthly_essential_expenses") if isinstance(d.get("profile_data"), dict) else None),
+                        "total_savings": d.get("total_savings") or (d.get("profile_data", {}).get("total_savings") if isinstance(d.get("profile_data"), dict) else None),
+                        "financial_health_score": d.get("financial_health_score") or (d.get("profile_data", {}).get("financial_health_score") if isinstance(d.get("profile_data"), dict) else None),
                         "preferred_language": d.get("preferred_language") or "en",
                         "theme_mode": d.get("theme_mode") or "dark",
                     }
@@ -256,6 +260,10 @@ class UserRegistry:
                         "eligible_for_alerts": eligible,
                         "persona": d.get("persona") or (d.get("profile_data", {}).get("persona") if isinstance(d.get("profile_data"), dict) else None),
                         "primary_goal": d.get("primary_goal") or (d.get("profile_data", {}).get("primary_goal") if isinstance(d.get("profile_data"), dict) else None),
+                        "monthly_income": d.get("monthly_income") or (d.get("profile_data", {}).get("monthly_income") if isinstance(d.get("profile_data"), dict) else None),
+                        "monthly_essential_expenses": d.get("monthly_essential_expenses") or (d.get("profile_data", {}).get("monthly_essential_expenses") if isinstance(d.get("profile_data"), dict) else None),
+                        "total_savings": d.get("total_savings") or (d.get("profile_data", {}).get("total_savings") if isinstance(d.get("profile_data"), dict) else None),
+                        "financial_health_score": d.get("financial_health_score") or (d.get("profile_data", {}).get("financial_health_score") if isinstance(d.get("profile_data"), dict) else None),
                         "preferred_language": d.get("preferred_language") or "en",
                         "theme_mode": d.get("theme_mode") or "dark",
                     }
