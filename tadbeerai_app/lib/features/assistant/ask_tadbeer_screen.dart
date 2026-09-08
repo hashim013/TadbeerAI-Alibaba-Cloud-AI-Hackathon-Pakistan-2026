@@ -78,7 +78,6 @@ class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              // ── Header Bar ───────────────────────────────────────────────
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 14, 16, 14),
                 decoration: BoxDecoration(
@@ -94,7 +93,6 @@ class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
                 ),
                 child: Row(
                   children: [
-                    // AI Intelligence Avatar with Dual-Gradient Glow
                     Container(
                       width: 40,
                       height: 40,
@@ -153,7 +151,6 @@ class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    // Honest Engine Badge
                     ApiConfig.useMockAssistant
                         ? const DemoAiBadge()
                         : const LiveAiBadge(),
@@ -181,15 +178,11 @@ class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
                   ],
                 ),
               ),
-
-              // ── Conversation or Smart Empty State ────────────────────────
               Expanded(
                 child: state.messages.isEmpty
                     ? _AskEmptyState(onPrompt: _send)
                     : _MessageList(state: state, onPrompt: _send),
               ),
-
-              // ── Last error alert ─────────────────────────────────────────
               if (state.lastError)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
@@ -225,8 +218,6 @@ class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
                     ),
                   ),
                 ),
-
-              // ── Modern Floating Input Dock ──────────────────────────────
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 6, 16, 12),
                 child: Container(
@@ -260,7 +251,6 @@ class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      // What-If Guided Scenario Tool Button
                       IconButton(
                         tooltip: l10n.whatIfButton,
                         icon: Icon(
@@ -312,7 +302,6 @@ class _AskTadbeerScreenState extends ConsumerState<AskTadbeerScreen> {
                           ),
                         ),
                       ),
-                      // Send Action Button
                       ListenableBuilder(
                         listenable: _inputController,
                         builder: (context, _) {
@@ -442,7 +431,6 @@ class _AskEmptyState extends StatelessWidget {
       physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       children: [
-        // ── Modern Minimal Hero ─────────────────────────────────────────────
         Center(
           child: Column(
             children: [
@@ -498,7 +486,6 @@ class _AskEmptyState extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              // Live context status pill
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -539,8 +526,6 @@ class _AskEmptyState extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 22),
-
-        // ── 2x2 Curated Quick Questions ─────────────────────────────────────
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -624,8 +609,6 @@ class _AskEmptyState extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-
-        // ── Horizontal Topics Carousel ──────────────────────────────────────
         Text(
           'EXPLORE MORE',
           style: GoogleFonts.inter(

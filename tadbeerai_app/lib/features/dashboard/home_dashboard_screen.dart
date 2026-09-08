@@ -106,7 +106,6 @@ class _DashboardContent extends ConsumerWidget {
       physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
       children: [
-        // ── 1. Greeting Header & Profile Navigation ────────────────────────
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -148,7 +147,6 @@ class _DashboardContent extends ConsumerWidget {
                 ],
               ),
             ),
-            // Notification Bell
             Material(
               color: Colors.transparent,
               child: InkWell(
@@ -192,7 +190,6 @@ class _DashboardContent extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 10),
-            // User Profile Avatar Button
             Material(
               color: Colors.transparent,
               child: InkWell(
@@ -236,14 +233,10 @@ class _DashboardContent extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 16),
-
-        // ── 2. Financial Profile CTA (hidden once completed) ────────────────
         if (profileAsync.valueOrNull?.profileCompleted != true) ...[
           _ProfileCard(profileAsync: profileAsync),
           const SizedBox(height: 16),
         ],
-
-        // ── 3. Executive Financial Overview Hero Card ───────────────────────
         _FinancialOverviewHeroCard(
           health: health,
           income: income,
@@ -251,23 +244,15 @@ class _DashboardContent extends ConsumerWidget {
           savings: savings,
         ),
         const SizedBox(height: 16),
-
-        // ── 4. Quick Actions (Finance, Economy, Ask Tadbeer, What-If) ───────
         SectionHeader(l10n.quickActions),
         const _QuickActions(),
         const SizedBox(height: 16),
-
-        // ── 5. Today's AI Insight (Executive Brief) ────────────────────────
         _TodayInsightCard(insight: insight),
         const SizedBox(height: 16),
-
-        // ── 6. Active Budget Utilization ────────────────────────────────────
         if (data.budgets.isNotEmpty) ...[
           _BudgetMiniCard(data: data, now: now),
           const SizedBox(height: 16),
         ],
-
-        // ── 7. Goal Progress ────────────────────────────────────────────────
         if (data.goals.isNotEmpty) ...[
           SectionHeader(
             l10n.goalProgressTitle,
@@ -397,7 +382,6 @@ class _FinancialOverviewHeroCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ── Top Header Row: Category Badge & Health Status ──────────
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -440,7 +424,6 @@ class _FinancialOverviewHeroCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    // Rating Pill with Arrow to show tapability
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 9, vertical: 3.5),
@@ -484,8 +467,6 @@ class _FinancialOverviewHeroCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 14),
-
-                // ── Main Row: Net Savings Highlight & Single Circular Gauge ─
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -568,13 +549,10 @@ class _FinancialOverviewHeroCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    // Circular Gauge showing score exactly ONCE
                     ScoreCircularGauge(score: score, size: 72),
                   ],
                 ),
                 const SizedBox(height: 14),
-
-                // ── Integrated Cashflow Strip (Income & Expenses) ───────────
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -594,7 +572,6 @@ class _FinancialOverviewHeroCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          // Income
                           Expanded(
                             child: Row(
                               children: [
@@ -654,7 +631,6 @@ class _FinancialOverviewHeroCard extends StatelessWidget {
                                 : const Color(0xFFCBD5E1),
                           ),
                           const SizedBox(width: 10),
-                          // Expenses
                           Expanded(
                             child: Row(
                               children: [

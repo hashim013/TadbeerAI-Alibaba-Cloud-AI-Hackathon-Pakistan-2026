@@ -82,7 +82,6 @@ class _EconomicPulseContentState extends ConsumerState<_EconomicPulseContent> {
       physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
       children: [
-        // ── Executive Header ───────────────────────────────────────────────
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -148,13 +147,9 @@ class _EconomicPulseContentState extends ConsumerState<_EconomicPulseContent> {
           ],
         ),
         const SizedBox(height: 18),
-
-        // ── Macroeconomic Intelligence: KPI Matrix (No Duplication) ─────────
         SectionHeader(l10n.economyKeyIndicatorsTitle),
         _buildKpiMatrix(context, economy),
         const SizedBox(height: 14),
-
-        // ── Unified Interactive Trend Explorer ──────────────────────────────
         if (selectedIndicator != null) ...[
           _InteractiveTrendCard(
             indicator: selectedIndicator,
@@ -168,12 +163,8 @@ class _EconomicPulseContentState extends ConsumerState<_EconomicPulseContent> {
           ),
           const SizedBox(height: 24),
         ],
-
-        // ── Essential Prices — Pakistan (PBS SPI Module) ────────────────────
         const _EssentialPricesSection(),
         const SizedBox(height: 24),
-
-        // ── Personalized Household Impact (Only if finance data exists) ─────
         if (input != null) ...[
           SectionHeader(l10n.economyImpactTitle),
           _ImpactPreviewCard(input: input),
@@ -187,8 +178,6 @@ class _EconomicPulseContentState extends ConsumerState<_EconomicPulseContent> {
           ),
           const SizedBox(height: 20),
         ],
-
-        // ── Institutional Trust & Attribution Footer ────────────────────────
         SourceFooter(
           source:
               economy.indicators.isEmpty ? '' : economy.indicators.first.source,
@@ -426,7 +415,6 @@ class _InteractiveTrendCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header & Deep Dive Action ────────────────────────────────────
           Row(
             children: [
               Container(
@@ -480,8 +468,6 @@ class _InteractiveTrendCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-
-          // ── Segmented Indicator Selector Pills ───────────────────────────
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -528,8 +514,6 @@ class _InteractiveTrendCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-
-          // ── The Trend Chart ──────────────────────────────────────────────
           IndicatorTrendChart(indicator: indicator),
         ],
       ),
@@ -599,7 +583,6 @@ class _EssentialPricesSectionState
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Section Title & Status ────────────────────────────────────
             Row(
               children: [
                 Expanded(
@@ -631,8 +614,6 @@ class _EssentialPricesSectionState
               ],
             ),
             const SizedBox(height: 12),
-
-            // ── Category Filter Pills ─────────────────────────────────────
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               physics: const ClampingScrollPhysics(),
@@ -688,8 +669,6 @@ class _EssentialPricesSectionState
               ),
             ),
             const SizedBox(height: 12),
-
-            // ── Items List ────────────────────────────────────────────────
             if (visibleItems.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -714,8 +693,6 @@ class _EssentialPricesSectionState
                   ),
                 ),
               ),
-
-            // ── View All Toggle ───────────────────────────────────────────
             if (items.length > 6)
               Padding(
                 padding: const EdgeInsets.only(top: 4, bottom: 8),
@@ -747,8 +724,6 @@ class _EssentialPricesSectionState
                 ),
               ),
             const SizedBox(height: 8),
-
-            // ── Household Budget Impact Card (No Duplication) ─────────────
             AppCard(
               padding: const EdgeInsets.all(16),
               child: Column(

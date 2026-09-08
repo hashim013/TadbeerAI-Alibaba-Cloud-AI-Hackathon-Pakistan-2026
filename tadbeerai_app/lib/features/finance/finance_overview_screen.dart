@@ -116,19 +116,14 @@ class _FinanceOverviewContent extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
       children: [
-        // ── 1. Modern Header & Quick Action ───────────────────────────────
         _FinanceHeader(profile: profile),
         const SizedBox(height: 14),
-
-        // ── 2. Financial Resilience Scorecard ─────────────────────────────
         _HealthScorecard(
           health: health,
           profile: profile,
           isDark: isDark,
         ),
         const SizedBox(height: 12),
-
-        // ── 3. Monthly Cash Flow Snapshot ─────────────────────────────────
         _MonthlyCashFlowCard(
           monthIncome: monthIncome,
           monthExpenses: monthExpenses,
@@ -137,8 +132,6 @@ class _FinanceOverviewContent extends ConsumerWidget {
           isDark: isDark,
         ),
         const SizedBox(height: 18),
-
-        // ── 4. Operational Hub Modules (2x2 Grid) ─────────────────────────
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -233,8 +226,6 @@ class _FinanceOverviewContent extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 24),
-
-        // ── 5. Recent Financial Activity ──────────────────────────────────
         _RecentTransactionsSection(
           transactions: data.transactions,
           onAddTransaction: () => _openTransactionForm(context, ref),
@@ -280,7 +271,6 @@ class _FinanceOverviewContent extends ConsumerWidget {
   }
 }
 
-// ── Header Widget ──────────────────────────────────────────────────────────
 class _FinanceHeader extends ConsumerWidget {
   const _FinanceHeader({required this.profile});
 
@@ -369,7 +359,6 @@ class _FinanceHeader extends ConsumerWidget {
   }
 }
 
-// ── Financial Resilience Scorecard ─────────────────────────────────────────
 class _HealthScorecard extends StatelessWidget {
   const _HealthScorecard({
     required this.health,
@@ -570,7 +559,6 @@ class _PillarMetricPill extends StatelessWidget {
   }
 }
 
-// ── Monthly Cash Flow Snapshot Card ────────────────────────────────────────
 class _MonthlyCashFlowCard extends StatelessWidget {
   const _MonthlyCashFlowCard({
     required this.monthIncome,
@@ -603,7 +591,6 @@ class _MonthlyCashFlowCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row
           Row(
             children: [
               Container(
@@ -664,8 +651,6 @@ class _MonthlyCashFlowCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-
-          // Hero Net Position Figure
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
@@ -698,8 +683,6 @@ class _MonthlyCashFlowCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-
-          // Inflow vs Outflow Row
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
@@ -833,7 +816,6 @@ class _MonthlyCashFlowCard extends StatelessWidget {
   }
 }
 
-// ── Operational Hub Module Card (Live dynamic statistics) ───────────────────
 class _HubModuleCard extends StatelessWidget {
   const _HubModuleCard({
     required this.icon,
@@ -946,7 +928,6 @@ class _HubModuleCard extends StatelessWidget {
   }
 }
 
-// ── Recent Financial Activity Section ──────────────────────────────────────
 class _RecentTransactionsSection extends StatelessWidget {
   const _RecentTransactionsSection({
     required this.transactions,
