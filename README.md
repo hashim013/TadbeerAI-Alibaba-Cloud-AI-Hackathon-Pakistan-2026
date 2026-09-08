@@ -80,6 +80,29 @@ In Pakistan's dynamic macroeconomic climate—marked by shifting inflation, exch
   </tr>
 </table>
 
+### Financial Profile Setup Wizard
+
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <img src="assets/screenshots/12_wizard_finances.jpg" alt="Wizard Step 2 – Finances" width="180"/><br/>
+      <sub><b>Step 2 — Your Finances</b><br/>Monthly income &amp; essential spending</sub>
+    </td>
+    <td align="center" width="25%">
+      <img src="assets/screenshots/13_wizard_goals.jpg" alt="Wizard Step 3 – Goals" width="180"/><br/>
+      <sub><b>Step 3 — Financial Goals</b><br/>Emergency fund, savings &amp; more</sub>
+    </td>
+    <td align="center" width="25%">
+      <img src="assets/screenshots/14_wizard_review.jpg" alt="Wizard Step 4 – Review" width="180"/><br/>
+      <sub><b>Step 4 — Review &amp; Confirm</b><br/>Profile summary before completion</sub>
+    </td>
+    <td align="center" width="25%">
+      <img src="assets/screenshots/15_profile.jpg" alt="My Profile" width="180"/><br/>
+      <sub><b>My Profile</b><br/>Personal info · Theme · Language</sub>
+    </td>
+  </tr>
+</table>
+
 ### Core Application
 
 <table>
@@ -110,14 +133,6 @@ In Pakistan's dynamic macroeconomic climate—marked by shifting inflation, exch
       <img src="assets/screenshots/02_ask_tadbeer_reply.jpg" alt="Ask Tadbeer Reply" width="200"/><br/>
       <sub><b>Ask Tadbeer — AI Reply</b><br/>Context-aware AI financial advice</sub>
     </td>
-  </tr>
-  <tr>
-    <td align="center" width="33%">
-      <img src="assets/screenshots/01_profile.png" alt="My Profile" width="200"/><br/>
-      <sub><b>My Profile</b><br/>Personal info · Theme · Language</sub>
-    </td>
-    <td align="center" width="33%"></td>
-    <td align="center" width="33%"></td>
   </tr>
 </table>
 
