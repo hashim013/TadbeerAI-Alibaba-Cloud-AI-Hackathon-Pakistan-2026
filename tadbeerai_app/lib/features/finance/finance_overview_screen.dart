@@ -118,7 +118,7 @@ class _FinanceOverviewContent extends ConsumerWidget {
       children: [
         // ── 1. Modern Header & Quick Action ───────────────────────────────
         _FinanceHeader(profile: profile),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
 
         // ── 2. Financial Resilience Scorecard ─────────────────────────────
         _HealthScorecard(
@@ -126,7 +126,7 @@ class _FinanceOverviewContent extends ConsumerWidget {
           profile: profile,
           isDark: isDark,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
 
         // ── 3. Monthly Cash Flow Snapshot ─────────────────────────────────
         _MonthlyCashFlowCard(
@@ -136,7 +136,7 @@ class _FinanceOverviewContent extends ConsumerWidget {
           now: now,
           isDark: isDark,
         ),
-        const SizedBox(height: 22),
+        const SizedBox(height: 18),
 
         // ── 4. Operational Hub Modules (2x2 Grid) ─────────────────────────
         Row(

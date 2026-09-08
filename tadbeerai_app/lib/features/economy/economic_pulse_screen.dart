@@ -83,37 +83,43 @@ class _EconomicPulseContentState extends ConsumerState<_EconomicPulseContent> {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
       children: [
         // ── Executive Header ───────────────────────────────────────────────
-        Wrap(
-          alignment: WrapAlignment.spaceBetween,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 8,
-          runSpacing: 6,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.economyPulseTitle,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.5,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.economyPulseTitle,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.economyPulseSubtitle,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: isDark
+                          ? AppColors.textOnDarkSecondary
+                          : AppColors.textOnLightSecondary,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
               ),
             ),
+            const SizedBox(width: 12),
             DataStatusBadge(status: economy.status),
           ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          l10n.economyPulseSubtitle,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: isDark
-                ? AppColors.textOnDarkSecondary
-                : AppColors.textOnLightSecondary,
-          ),
-        ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 8),
         Row(
           children: [
             Container(
-              width: 6,
-              height: 6,
+              width: 7,
+              height: 7,
               decoration: const BoxDecoration(
                 color: AppColors.mint,
                 shape: BoxShape.circle,
@@ -133,6 +139,7 @@ class _EconomicPulseContentState extends ConsumerState<_EconomicPulseContent> {
                   color: isDark
                       ? AppColors.textOnDarkTertiary
                       : AppColors.textOnLightSecondary,
+                  fontWeight: FontWeight.w500,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -140,12 +147,12 @@ class _EconomicPulseContentState extends ConsumerState<_EconomicPulseContent> {
             ),
           ],
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 18),
 
         // ── Macroeconomic Intelligence: KPI Matrix (No Duplication) ─────────
         SectionHeader(l10n.economyKeyIndicatorsTitle),
         _buildKpiMatrix(context, economy),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
 
         // ── Unified Interactive Trend Explorer ──────────────────────────────
         if (selectedIndicator != null) ...[
@@ -268,20 +275,24 @@ class _MacroKpiTile extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.navyCard : AppColors.lightCard,
+          color: isSelected
+              ? (isDark
+                  ? theme.colorScheme.primary.withValues(alpha: 0.12)
+                  : theme.colorScheme.primary.withValues(alpha: 0.05))
+              : (isDark ? AppColors.navyCard : AppColors.lightCard),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected
                 ? theme.colorScheme.primary
                 : (isDark ? AppColors.borderDark : AppColors.borderLight),
-            width: isSelected ? 1.8 : 1.0,
+            width: isSelected ? 1.6 : 1.0,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                    blurRadius: 10,
-                    offset: const Offset(0, 3),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.14),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
                 ]
               : null,
@@ -292,16 +303,27 @@ class _MacroKpiTile extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  economyIndicatorIcon(indicator),
-                  size: 15,
-                  color: isSelected
-                      ? theme.colorScheme.primary
-                      : (isDark
-                          ? AppColors.textOnDarkSecondary
-                          : AppColors.textOnLightSecondary),
+                Container(
+                  width: 26,
+                  height: 26,
+                  decoration: BoxDecoration(
+                    color: (isSelected
+                            ? theme.colorScheme.primary
+                            : (isDark ? Colors.white : AppColors.navyBg))
+                        .withValues(alpha: isDark ? 0.12 : 0.06),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    economyIndicatorIcon(indicator),
+                    size: 14,
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : (isDark
+                            ? AppColors.textOnDarkSecondary
+                            : AppColors.textOnLightSecondary),
+                  ),
                 ),
-                const SizedBox(width: 5),
+                const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     economyIndicatorName(l10n, indicator),
@@ -318,7 +340,7 @@ class _MacroKpiTile extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
@@ -327,30 +349,46 @@ class _MacroKpiTile extends StatelessWidget {
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.3,
+                  fontSize: 18,
                 ),
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Row(
               children: [
-                Text(
-                  economyChangeLabel(indicator),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: trendColor,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 11,
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: trendColor.withValues(alpha: isDark ? 0.15 : 0.10),
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  child: Text(
+                    economyChangeLabel(indicator),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: trendColor,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 10.5,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 const Spacer(),
                 if (isSelected)
                   Container(
-                    width: 5,
-                    height: 5,
+                    width: 6,
+                    height: 6,
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary,
                       shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              theme.colorScheme.primary.withValues(alpha: 0.5),
+                          blurRadius: 4,
+                        ),
+                      ],
                     ),
                   ),
               ],
@@ -384,19 +422,28 @@ class _InteractiveTrendCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return AppCard(
-      padding: const EdgeInsets.fromLTRB(14, 16, 16, 14),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Header & Deep Dive Action ────────────────────────────────────
           Row(
             children: [
-              Icon(
-                economyIndicatorIcon(indicator),
-                size: 18,
-                color: theme.colorScheme.primary,
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary
+                      .withValues(alpha: isDark ? 0.16 : 0.10),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  economyIndicatorIcon(indicator),
+                  size: 16,
+                  color: theme.colorScheme.primary,
+                ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,6 +452,7 @@ class _InteractiveTrendCard extends StatelessWidget {
                       '${economyIndicatorName(l10n, indicator)} 6-Month Trend',
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -431,7 +479,7 @@ class _InteractiveTrendCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
           // ── Segmented Indicator Selector Pills ───────────────────────────
           SingleChildScrollView(
@@ -448,7 +496,7 @@ class _InteractiveTrendCard extends StatelessWidget {
                       if (selected) onSelectIndicator(item.id);
                     },
                     labelStyle: TextStyle(
-                      fontSize: 11,
+                      fontSize: 11.5,
                       fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.w500,
                       color: isSelected
@@ -669,38 +717,66 @@ class _EssentialPricesSectionState
 
             // ── View All Toggle ───────────────────────────────────────────
             if (items.length > 6)
-              Center(
-                child: TextButton.icon(
-                  icon: Icon(
-                    _expanded
-                        ? Icons.keyboard_arrow_up_rounded
-                        : Icons.keyboard_arrow_down_rounded,
-                    size: 18,
+              Padding(
+                padding: const EdgeInsets.only(top: 4, bottom: 8),
+                child: Center(
+                  child: TextButton.icon(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(
+                          color: isDark
+                              ? AppColors.borderDark
+                              : AppColors.borderLight,
+                        ),
+                      ),
+                    ),
+                    icon: Icon(
+                      _expanded
+                          ? Icons.keyboard_arrow_up_rounded
+                          : Icons.keyboard_arrow_down_rounded,
+                      size: 18,
+                    ),
+                    label: Text(_expanded
+                        ? l10n.essentialPricesShowLess
+                        : '${l10n.essentialPricesViewAll} (${items.length})'),
+                    onPressed: () => setState(() => _expanded = !_expanded),
                   ),
-                  label: Text(_expanded
-                      ? l10n.essentialPricesShowLess
-                      : '${l10n.essentialPricesViewAll} (${items.length})'),
-                  onPressed: () => setState(() => _expanded = !_expanded),
                 ),
               ),
             const SizedBox(height: 8),
 
             // ── Household Budget Impact Card (No Duplication) ─────────────
             AppCard(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.info_outline_rounded,
-                          size: 18, color: theme.colorScheme.primary),
-                      const SizedBox(width: 8),
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary
+                              .withValues(alpha: isDark ? 0.16 : 0.10),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.lightbulb_outline_rounded,
+                          size: 18,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           l10n.essentialPricesWhyTitle,
                           style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -708,16 +784,33 @@ class _EssentialPricesSectionState
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   Text(
                     l10n.essentialPricesWhyBody,
-                    style: theme.textTheme.bodySmall?.copyWith(height: 1.4),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      height: 1.45,
+                      color: isDark
+                          ? AppColors.textOnDarkSecondary
+                          : AppColors.textOnLightSecondary,
+                    ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   Row(
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            side: BorderSide(
+                              color: isDark
+                                  ? AppColors.borderDark
+                                  : AppColors.borderLight,
+                            ),
+                          ),
                           icon: const Icon(Icons.chat_bubble_outline_rounded,
                               size: 16),
                           label: Text(
@@ -734,9 +827,16 @@ class _EssentialPricesSectionState
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: FilledButton.tonalIcon(
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                           icon: const Icon(Icons.calculate_outlined, size: 16),
                           label: Text(
                             l10n.essentialPricesTryWhatIf,
@@ -839,7 +939,7 @@ class _ImpactPreviewCard extends ConsumerWidget {
                 if (personaLabel != null)
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
@@ -855,17 +955,15 @@ class _ImpactPreviewCard extends ConsumerWidget {
                           size: 14,
                           color: theme.colorScheme.primary,
                         ),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(
-                            personaLabel,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.primary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                        const SizedBox(width: 5),
+                        Text(
+                          personaLabel,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.primary,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -873,7 +971,7 @@ class _ImpactPreviewCard extends ConsumerWidget {
                 if (goalLabel != null)
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: AppColors.info.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
@@ -889,31 +987,29 @@ class _ImpactPreviewCard extends ConsumerWidget {
                           size: 14,
                           color: AppColors.info,
                         ),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(
-                            goalLabel,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.info,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                        const SizedBox(width: 5),
+                        Text(
+                          goalLabel,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.info,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
           ],
           ImpactFinanceRows(
             income: input.monthlyIncome,
             expenses: input.monthlyExpenses,
             savings: input.monthlySavings,
           ),
-          const Divider(height: 20),
+          const Divider(height: 22),
           Text(
             l10n.economyImpactInflationBody(
               delta,
@@ -923,16 +1019,16 @@ class _ImpactPreviewCard extends ConsumerWidget {
             ),
             style: theme.textTheme.bodySmall?.copyWith(height: 1.45),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: isDeficit
                   ? AppColors.danger.withValues(alpha: 0.08)
                   : (isDark
                       ? AppColors.navySurface
                       : AppColors.lightSurfaceVariant.withValues(alpha: 0.35)),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isDeficit
                     ? AppColors.danger.withValues(alpha: 0.3)
@@ -982,7 +1078,7 @@ class _ImpactPreviewCard extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             l10n.economyImpactDisclaimer,
             style: theme.textTheme.labelSmall?.copyWith(
