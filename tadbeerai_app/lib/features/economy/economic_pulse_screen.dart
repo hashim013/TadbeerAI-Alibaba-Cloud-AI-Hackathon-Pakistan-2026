@@ -83,20 +83,19 @@ class _EconomicPulseContentState extends ConsumerState<_EconomicPulseContent> {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
       children: [
         // ── Executive Header ───────────────────────────────────────────────
-        Row(
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 8,
+          runSpacing: 6,
           children: [
-            Expanded(
-              child: Text(
-                l10n.economyPulseTitle,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.5,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            Text(
+              l10n.economyPulseTitle,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(width: 8),
             DataStatusBadge(status: economy.status),
           ],
         ),

@@ -15,6 +15,7 @@ import '../../core/widgets/app_text_field.dart';
 import '../../domain/entities/app_user.dart';
 import '../../domain/entities/financial_profile.dart';
 import '../../l10n/app_localizations.dart';
+import '../../providers/finance_providers.dart';
 import '../../providers/profile_providers.dart';
 import '../auth/auth_controller.dart';
 
@@ -226,6 +227,11 @@ class _FinancialProfileScreenState
       await ref
           .read(financialProfileControllerProvider.notifier)
           .saveProfile(profile);
+      if (profile.totalSavings != null && profile.totalSavings! >= 0) {
+        await ref
+            .read(financeControllerProvider.notifier)
+            .updateOpeningSavingsBalance(profile.totalSavings!);
+      }
       if (!mounted) return;
 
       if (nameText.isNotEmpty) {

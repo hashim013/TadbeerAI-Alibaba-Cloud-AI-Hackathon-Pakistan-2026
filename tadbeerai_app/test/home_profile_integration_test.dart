@@ -50,6 +50,8 @@ class _EmptyFinanceRepo implements FinanceRepository {
   @override
   Future<void> deleteGoal(String id) async {}
   @override
+  Future<void> updateOpeningSavingsBalance(double b) async {}
+  @override
   Future<void> resetDemoData() async {}
 }
 

@@ -106,7 +106,27 @@ class ApiFinanceRepository implements FinanceRepository {
 
     // No cache at all. Cache-only guests start empty; signed-in users await the
     // cloud snapshot (bounded) so a fresh device pulls the real ledger.
-    final data = _cacheOnly ? _empty : (await _fetchFromCloud() ?? _empty);
+    final cloudData = _cacheOnly ? null : await _fetchFromCloud();
+
+    // If cloud has existing data, use and cache it
+    if (cloudData != null && cloudData.isNotEmpty) {
+      _cache = cloudData;
+      await _writePrefs(cloudData);
+      return cloudData;
+    }
+
+    // If signed-in and cloud has no data, check if guest ledger has data to migrate
+    if (!_cacheOnly) {
+      final guestData = _readPrefsFor(_guestBucket);
+      if (guestData != null && guestData.isNotEmpty) {
+        _cache = guestData;
+        await _writePrefs(guestData);
+        _scheduleSync(); // Push migrated guest data to the user's cloud ledger
+        return guestData;
+      }
+    }
+
+    final data = cloudData ?? _empty;
     _cache = data;
     await _writePrefs(data);
     return data;
@@ -178,6 +198,14 @@ class ApiFinanceRepository implements FinanceRepository {
         data.copyWith(goals: data.goals.where((g) => g.id != id).toList()));
   }
 
+  // ── Opening Savings ──────────────────────────────────────────────────────
+
+  @override
+  Future<void> updateOpeningSavingsBalance(double balance) async {
+    final data = await _current();
+    await _commit(data.copyWith(openingSavingsBalance: balance));
+  }
+
   // ── Clear (repurposed from resetDemoData — no demo re-seed) ────────────────
 
   @override
@@ -236,8 +264,14 @@ class ApiFinanceRepository implements FinanceRepository {
     try {
       final fresh = await _fetchFromCloud();
       if (fresh != null) {
-        _cache = fresh;
-        await _writePrefs(fresh);
+        // If fresh is empty but local cache already has data, do NOT overwrite with empty!
+        // Push local cache to cloud instead.
+        if (fresh.isEmpty && (_cache != null && _cache!.isNotEmpty)) {
+          unawaited(_pushToCloud());
+        } else {
+          _cache = fresh;
+          await _writePrefs(fresh);
+        }
       }
     } finally {
       _refreshInFlight = false;
@@ -264,8 +298,8 @@ class ApiFinanceRepository implements FinanceRepository {
     return null;
   }
 
-  FinanceData? _readPrefs() {
-    final raw = _prefs.getString(_cacheKey);
+  FinanceData? _readPrefsFor(String bucket) {
+    final raw = _prefs.getString('$_cachePrefix$bucket');
     if (raw == null || raw.isEmpty) return null;
     try {
       return FinanceData.fromJson(jsonDecode(raw) as Map<String, dynamic>);
@@ -273,6 +307,8 @@ class ApiFinanceRepository implements FinanceRepository {
       return null; // corrupt cache — treated as absent, refetched/rebuilt
     }
   }
+
+  FinanceData? _readPrefs() => _readPrefsFor(_bucket);
 
   Future<void> _writePrefs(FinanceData data) async {
     try {

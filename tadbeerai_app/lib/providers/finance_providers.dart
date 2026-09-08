@@ -151,6 +151,15 @@ class FinanceController extends AsyncNotifier<FinanceData> {
     });
   }
 
+  // ── Opening Savings ──────────────────────────────────────────────────────
+
+  Future<void> updateOpeningSavingsBalance(double balance) async {
+    await _guarded(() async {
+      await _repo.updateOpeningSavingsBalance(balance);
+      _apply((data) => data.copyWith(openingSavingsBalance: balance));
+    });
+  }
+
   // ── Demo data ────────────────────────────────────────────────────────────
 
   Future<void> resetDemoData() async {

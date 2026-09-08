@@ -109,6 +109,13 @@ class MockFinanceRepository implements FinanceRepository {
   }
 
   @override
+  Future<void> updateOpeningSavingsBalance(double balance) async {
+    final data = await _current();
+    final updated = data.copyWith(openingSavingsBalance: balance);
+    await _persist(updated);
+  }
+
+  @override
   Future<void> resetDemoData() async {
     await _prefs.remove(AppConstants.prefFinanceData);
     await _seedAndPersist();

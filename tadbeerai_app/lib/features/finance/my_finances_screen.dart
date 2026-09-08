@@ -79,8 +79,22 @@ class _MyFinancesContent extends ConsumerWidget {
         : FinanceCalculations.monthlyExpenses(data.transactions, now);
     final breakdown =
         FinanceCalculations.categoryBreakdown(data.transactions, now);
-    final series = FinanceCalculations.monthlySeries(data.transactions,
+    final rawSeries = FinanceCalculations.monthlySeries(data.transactions,
         from: now, monthCount: 3);
+    final series = rawSeries.map((p) {
+      final isCurrent = p.month.year == now.year && p.month.month == now.month;
+      if (isCurrent &&
+          p.income == 0 &&
+          p.expenses == 0 &&
+          (monthIncome > 0 || monthExpenses > 0)) {
+        return MonthlyPoint(
+          month: p.month,
+          income: monthIncome,
+          expenses: monthExpenses,
+        );
+      }
+      return p;
+    }).toList();
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
@@ -336,8 +350,10 @@ class _IncomeExpenseChart extends StatelessWidget {
   }
 
   double _niceMax() {
-    final peak =
-        series.fold<double>(0, (max, p) => p.income > max ? p.income : max);
+    final peak = series.fold<double>(
+      0,
+      (max, p) => [max, p.income, p.expenses].reduce((a, b) => a > b ? a : b),
+    );
     return peak <= 0 ? 100 : peak * 1.15;
   }
 }

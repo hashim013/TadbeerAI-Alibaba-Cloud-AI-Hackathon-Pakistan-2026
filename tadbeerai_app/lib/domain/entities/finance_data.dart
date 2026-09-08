@@ -25,6 +25,16 @@ class FinanceData {
   /// Current savings = openingSavingsBalance + sum(income) − sum(expenses).
   final double openingSavingsBalance;
 
+  /// True when no financial activity or balances have been recorded.
+  bool get isEmpty =>
+      transactions.isEmpty &&
+      budgets.isEmpty &&
+      goals.isEmpty &&
+      openingSavingsBalance == 0;
+
+  /// True when at least one transaction, budget, goal, or opening balance exists.
+  bool get isNotEmpty => !isEmpty;
+
   FinanceData copyWith({
     List<Transaction>? transactions,
     List<Budget>? budgets,

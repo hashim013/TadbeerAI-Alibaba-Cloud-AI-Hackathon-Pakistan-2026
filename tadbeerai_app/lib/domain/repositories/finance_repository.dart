@@ -30,6 +30,9 @@ abstract interface class FinanceRepository {
 
   Future<void> deleteGoal(String id);
 
+  // ── Opening Savings ──────────────────────────────────────────────────────
+  Future<void> updateOpeningSavingsBalance(double balance);
+
   /// Restores the bundled demo dataset (useful while mock mode is active).
   Future<void> resetDemoData();
 }

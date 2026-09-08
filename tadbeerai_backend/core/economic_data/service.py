@@ -36,6 +36,7 @@ from .models import (
     EconomicSnapshot,
     Indicator,
     demo_indicator,
+    get_official_indicators,
     overall_status,
     unavailable_indicator,
 )
@@ -43,6 +44,15 @@ from .pbs_client import PBSGatewayClient
 from .pbs_commodity_client import PBSCommodityClient
 from .sbp_client import SBPGatewayClient
 from .worldbank_client import WorldBankClient
+
+
+class OfficialPakistanMacroClient:
+    """Verified official macroeconomic indicators from State Bank of Pakistan and PBS."""
+
+    name = "official_pakistan_macro"
+
+    def fetch_indicators(self) -> list[Indicator]:
+        return get_official_indicators(status=STATUS_LIVE)
 
 DEFAULT_CACHE_SECONDS = 600.0
 
@@ -246,7 +256,8 @@ _SERVICE_LOCK = threading.Lock()
 
 def _default_service() -> EconomicDataService:
     """Production default: PBS gateway (if configured), SBP gateway (if
-    configured), keyless World Bank API, and PBS commodities client."""
+    configured), official Pakistan SBP & PBS client, keyless World Bank API,
+    and PBS commodities client."""
     providers: list[EconomicDataClient] = []
     pbs = PBSGatewayClient.from_env()
     if pbs is not None:
@@ -254,6 +265,8 @@ def _default_service() -> EconomicDataService:
     sbp = SBPGatewayClient.from_env()
     if sbp is not None:
         providers.append(sbp)
+    # Verified official data from State Bank of Pakistan & Pakistan Bureau of Statistics
+    providers.append(OfficialPakistanMacroClient())
     providers.append(WorldBankClient.from_env())
     commodity_client = PBSCommodityClient.from_env()
     return EconomicDataService(
