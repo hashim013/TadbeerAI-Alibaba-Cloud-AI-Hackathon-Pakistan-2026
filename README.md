@@ -63,18 +63,18 @@ In Pakistan's dynamic macroeconomic climate—marked by shifting inflation, exch
   <tr>
     <td align="center" width="25%">
       <img src="assets/screenshots/07_login.jpg" alt="Login" width="180"/><br/>
-      <sub><b>Sign In</b><br/>Email · Google · Guest access</sub>
+      <sub><b>Welcome Back</b><br/>Sign in &#183; Google &#183; Continue as Guest</sub>
     </td>
     <td align="center" width="25%">
-      <img src="assets/screenshots/09_onboarding_understand.jpg" alt="Onboarding Understand" width="180"/><br/>
+      <img src="assets/screenshots/09_onboarding_understand.jpg" alt="Understand" width="180"/><br/>
       <sub><b>Understand</b><br/>Pakistan economy &amp; financial trends</sub>
     </td>
     <td align="center" width="25%">
-      <img src="assets/screenshots/08_onboarding_manage.jpg" alt="Onboarding Manage" width="180"/><br/>
+      <img src="assets/screenshots/08_onboarding_manage.jpg" alt="Manage" width="180"/><br/>
       <sub><b>Manage</b><br/>Track income, expenses &amp; goals</sub>
     </td>
     <td align="center" width="25%">
-      <img src="assets/screenshots/10_onboarding_plan.jpg" alt="Onboarding Plan" width="180"/><br/>
+      <img src="assets/screenshots/10_onboarding_plan.jpg" alt="Plan" width="180"/><br/>
       <sub><b>Plan</b><br/>What-If simulator &amp; AI insights</sub>
     </td>
   </tr>
@@ -85,20 +85,20 @@ In Pakistan's dynamic macroeconomic climate—marked by shifting inflation, exch
 <table>
   <tr>
     <td align="center" width="25%">
-      <img src="assets/screenshots/12_wizard_finances.jpg" alt="Wizard Step 2 – Finances" width="180"/><br/>
-      <sub><b>Step 2 — Your Finances</b><br/>Monthly income &amp; essential spending</sub>
+      <img src="assets/screenshots/12_wizard_finances.jpg" alt="Tell Us About Your Finances" width="180"/><br/>
+      <sub><b>Tell Us About Your Finances</b><br/>Step 2 of 4 &#183; Monthly income &amp; essential spending</sub>
     </td>
     <td align="center" width="25%">
-      <img src="assets/screenshots/13_wizard_goals.jpg" alt="Wizard Step 3 – Goals" width="180"/><br/>
-      <sub><b>Step 3 — Financial Goals</b><br/>Emergency fund, savings &amp; more</sub>
+      <img src="assets/screenshots/13_wizard_goals.jpg" alt="What Are Your Financial Goals" width="180"/><br/>
+      <sub><b>What Are Your Financial Goals?</b><br/>Step 3 of 4 &#183; Select goals that matter most</sub>
     </td>
     <td align="center" width="25%">
-      <img src="assets/screenshots/14_wizard_review.jpg" alt="Wizard Step 4 – Review" width="180"/><br/>
-      <sub><b>Step 4 — Review &amp; Confirm</b><br/>Profile summary before completion</sub>
+      <img src="assets/screenshots/14_wizard_review.jpg" alt="Review and Confirm" width="180"/><br/>
+      <sub><b>Review &amp; Confirm Your Information</b><br/>Step 4 of 4 &#183; Complete your profile</sub>
     </td>
     <td align="center" width="25%">
       <img src="assets/screenshots/15_profile.jpg" alt="My Profile" width="180"/><br/>
-      <sub><b>My Profile</b><br/>Personal info · Theme · Language</sub>
+      <sub><b>My Profile</b><br/>Personal info &#183; Theme &#183; Language</sub>
     </td>
   </tr>
 </table>
@@ -108,12 +108,12 @@ In Pakistan's dynamic macroeconomic climate—marked by shifting inflation, exch
 <table>
   <tr>
     <td align="center" width="33%">
-      <img src="assets/screenshots/11_home.jpg" alt="Home Dashboard" width="200"/><br/>
-      <sub><b>Home Dashboard</b><br/>Financial health · Quick actions · AI insight</sub>
+      <img src="assets/screenshots/11_home.jpg" alt="Home" width="200"/><br/>
+      <sub><b>Home</b><br/>Financial health &#183; Quick actions &#183; AI insight</sub>
     </td>
     <td align="center" width="33%">
       <img src="assets/screenshots/05_finance_hub.jpg" alt="Finance Hub" width="200"/><br/>
-      <sub><b>Finance Hub</b><br/>Health score · Cash flow · Finance tools</sub>
+      <sub><b>Finance Hub</b><br/>Health score &#183; Cash flow &#183; Finance tools</sub>
     </td>
     <td align="center" width="33%">
       <img src="assets/screenshots/04_essential_prices.jpg" alt="Essential Prices" width="200"/><br/>
@@ -122,19 +122,20 @@ In Pakistan's dynamic macroeconomic climate—marked by shifting inflation, exch
   </tr>
   <tr>
     <td align="center" width="33%">
-      <img src="assets/screenshots/03_ask_tadbeer_home.jpg" alt="Ask Tadbeer Home" width="200"/><br/>
-      <sub><b>Ask Tadbeer — Home</b><br/>Smart financial query suggestions</sub>
+      <img src="assets/screenshots/03_ask_tadbeer_home.jpg" alt="Ask Tadbeer" width="200"/><br/>
+      <sub><b>Ask Tadbeer</b><br/>Your financial intelligence companion</sub>
     </td>
     <td align="center" width="33%">
-      <img src="assets/screenshots/06_ask_tadbeer_queries.jpg" alt="Ask Tadbeer Queries" width="200"/><br/>
-      <sub><b>Ask Tadbeer — Queries</b><br/>Full query list with economy deep links</sub>
+      <img src="assets/screenshots/06_ask_tadbeer_queries.jpg" alt="Ask Tadbeer Smart Queries" width="200"/><br/>
+      <sub><b>Ask Tadbeer &#8212; Smart Queries</b><br/>Tap any query for instant AI answers</sub>
     </td>
     <td align="center" width="33%">
-      <img src="assets/screenshots/02_ask_tadbeer_reply.jpg" alt="Ask Tadbeer Reply" width="200"/><br/>
-      <sub><b>Ask Tadbeer — AI Reply</b><br/>Context-aware AI financial advice</sub>
+      <img src="assets/screenshots/02_ask_tadbeer_reply.jpg" alt="Ask Tadbeer AI Answer" width="200"/><br/>
+      <sub><b>Ask Tadbeer &#8212; AI Answer</b><br/>Personalised, context-aware financial advice</sub>
     </td>
   </tr>
 </table>
+
 
 ---
 
