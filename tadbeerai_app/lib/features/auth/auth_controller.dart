@@ -1,10 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/constants/app_constants.dart';
 import '../../domain/entities/app_user.dart';
 import '../../providers/repository_providers.dart';
 
 /// Holds the current session user (null = signed out) and exposes
-/// repository-backed auth actions.
+/// repository-backed auth actions with bulletproof local persistence.
 class AuthController extends Notifier<AppUser?> {
   String? _lastErrorMessage;
 
@@ -12,14 +15,61 @@ class AuthController extends Notifier<AppUser?> {
   String? get lastErrorMessage => _lastErrorMessage;
 
   @override
-  AppUser? build() => null;
+  AppUser? build() {
+    try {
+      final prefs = ref.watch(sharedPrefsProvider);
+      final raw = prefs.getString(AppConstants.prefSessionUser);
+      if (raw != null && raw.isNotEmpty) {
+        return AppUser.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+      }
+    } catch (_) {}
+    return null;
+  }
 
-  /// Restores a persisted session, if any. Returns whether a user is
-  /// signed in after the attempt.
+  Future<void> _persistSession(AppUser user) async {
+    try {
+      final prefs = ref.read(sharedPrefsProvider);
+      await prefs.setString(
+        AppConstants.prefSessionUser,
+        jsonEncode(user.toJson()),
+      );
+      await ref.read(settingsRepositoryProvider).completeOnboarding();
+    } catch (_) {}
+  }
+
+  Future<void> _clearSession() async {
+    try {
+      final prefs = ref.read(sharedPrefsProvider);
+      await prefs.remove(AppConstants.prefSessionUser);
+    } catch (_) {}
+  }
+
+  /// Restores a persisted session, checking repository and local preferences.
+  /// Returns whether a user is authenticated after the attempt.
   Future<bool> restoreSession() async {
     _lastErrorMessage = null;
-    state = await ref.read(authRepositoryProvider).currentUser();
-    return state != null;
+    try {
+      final repoUser = await ref.read(authRepositoryProvider).currentUser();
+      if (repoUser != null) {
+        state = repoUser;
+        await _persistSession(repoUser);
+        return true;
+      }
+    } catch (_) {}
+
+    try {
+      final prefs = ref.read(sharedPrefsProvider);
+      final raw = prefs.getString(AppConstants.prefSessionUser);
+      if (raw != null && raw.isNotEmpty) {
+        final cached =
+            AppUser.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+        state = cached;
+        return true;
+      }
+    } catch (_) {}
+
+    state = null;
+    return false;
   }
 
   /// Returns true on success; sets [lastErrorMessage] on failure.
@@ -29,9 +79,11 @@ class AuthController extends Notifier<AppUser?> {
   }) async {
     _lastErrorMessage = null;
     try {
-      state = await ref
+      final user = await ref
           .read(authRepositoryProvider)
           .signIn(email: email, password: password);
+      state = user;
+      await _persistSession(user);
       return true;
     } catch (e) {
       _lastErrorMessage = e.toString();
@@ -46,11 +98,13 @@ class AuthController extends Notifier<AppUser?> {
   }) async {
     _lastErrorMessage = null;
     try {
-      state = await ref.read(authRepositoryProvider).signUp(
+      final user = await ref.read(authRepositoryProvider).signUp(
             name: name,
             email: email,
             password: password,
           );
+      state = user;
+      await _persistSession(user);
       return true;
     } catch (e) {
       _lastErrorMessage = e.toString();
@@ -61,7 +115,9 @@ class AuthController extends Notifier<AppUser?> {
   Future<bool> signInAsGuest() async {
     _lastErrorMessage = null;
     try {
-      state = await ref.read(authRepositoryProvider).signInAsGuest();
+      final user = await ref.read(authRepositoryProvider).signInAsGuest();
+      state = user;
+      await _persistSession(user);
       return true;
     } catch (e) {
       _lastErrorMessage = e.toString();
@@ -81,6 +137,7 @@ class AuthController extends Notifier<AppUser?> {
         return false;
       }
       state = user;
+      await _persistSession(user);
       return true;
     } catch (e) {
       _lastErrorMessage = e.toString();
@@ -127,6 +184,7 @@ class AuthController extends Notifier<AppUser?> {
   void updateUserName(String newName) {
     if (state != null && newName.trim().isNotEmpty) {
       state = state!.copyWith(name: newName.trim());
+      _persistSession(state!);
     }
   }
 
@@ -139,11 +197,13 @@ class AuthController extends Notifier<AppUser?> {
         phone: phone != null ? phone.trim() : state!.phone,
         photoUrl: photoUrl != null ? photoUrl.trim() : state!.photoUrl,
       );
+      _persistSession(state!);
     }
   }
 
   Future<void> signOut() async {
     _lastErrorMessage = null;
+    await _clearSession();
     await ref.read(authRepositoryProvider).signOut();
     state = null;
   }

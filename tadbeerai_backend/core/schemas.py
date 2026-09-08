@@ -78,6 +78,7 @@ class UserPersonaRequest(BaseModel):
     monthly_income: Optional[float] = None
     monthly_essential_expenses: Optional[float] = None
     total_savings: Optional[float] = None
+    financial_health_score: Optional[int] = None
     is_guest: bool = False
     name: Optional[str] = None
     email: Optional[str] = None

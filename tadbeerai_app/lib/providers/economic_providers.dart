@@ -11,6 +11,7 @@ import '../domain/services/economic_impact_service.dart';
 import '../domain/services/finance_calculations.dart';
 import 'assistant_providers.dart';
 import 'finance_providers.dart';
+import 'profile_providers.dart';
 
 final economicRepositoryProvider = Provider<EconomicRepository>((ref) {
   if (ApiConfig.useMockEconomy) {
@@ -41,20 +42,44 @@ final commodityDetailProvider = FutureProvider.family<CommodityPrice?, String>(
 );
 
 /// The user's current-month financial position the impact scenarios run
-/// against — the same Phase-2 numbers every finance screen shows.
+/// against — the same numbers every finance screen shows.
 ///
-/// Null while the finance data is loading or has failed, so the economy UI
-/// hides personalization instead of computing it from invented values.
+/// Falls back to the user's Persona / Financial Profile if transactions
+/// have not been recorded yet.
 final economicImpactInputProvider = Provider<EconomicImpactInput?>((ref) {
-  final finance = ref.watch(financeControllerProvider).value;
-  if (finance == null) return null;
+  final finance = ref.watch(financeControllerProvider).valueOrNull;
+  final profile = ref.watch(financialProfileControllerProvider).valueOrNull;
+
+  if (finance == null && profile == null) return null;
 
   final now = DateTime.now();
+  final txIncome = finance != null
+      ? FinanceCalculations.monthlyIncome(finance.transactions, now)
+      : 0.0;
+  final txExpenses = finance != null
+      ? FinanceCalculations.monthlyExpenses(finance.transactions, now)
+      : 0.0;
+  final txDiscretionary = finance != null
+      ? FinanceCalculations.discretionarySpending(
+          finance.transactions, now, FinanceCategories.discretionaryExpenseIds)
+      : 0.0;
+
+  final effectiveIncome =
+      txIncome > 0 ? txIncome : (profile?.monthlyIncome ?? 0.0);
+  final effectiveExpenses =
+      txExpenses > 0 ? txExpenses : (profile?.monthlyEssentialExpenses ?? 0.0);
+  final effectiveDiscretionary = txDiscretionary > 0
+      ? txDiscretionary
+      : (effectiveIncome > effectiveExpenses
+          ? (effectiveIncome - effectiveExpenses) * 0.2
+          : 0.0);
+
+  if (effectiveIncome <= 0 && effectiveExpenses <= 0) return null;
+
   return EconomicImpactInput(
-    monthlyIncome: FinanceCalculations.monthlyIncome(finance.transactions, now),
-    monthlyExpenses:
-        FinanceCalculations.monthlyExpenses(finance.transactions, now),
-    discretionarySpending: FinanceCalculations.discretionarySpending(
-        finance.transactions, now, FinanceCategories.discretionaryExpenseIds),
+    monthlyIncome: effectiveIncome,
+    monthlyExpenses: effectiveExpenses,
+    discretionarySpending: effectiveDiscretionary,
   );
 });
+

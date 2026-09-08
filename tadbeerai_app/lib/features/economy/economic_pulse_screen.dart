@@ -11,8 +11,10 @@ import '../../../core/widgets/data_status_badge.dart';
 import '../../../domain/entities/assistant_api_models.dart';
 import '../../../domain/entities/economic_indicator.dart';
 import '../../../domain/entities/economic_overview.dart';
+import '../../../domain/entities/financial_profile.dart';
 import '../../../domain/services/economic_impact_service.dart';
 import '../../../providers/economic_providers.dart';
+import '../../../providers/profile_providers.dart';
 import '../finance/widgets/finance_widgets.dart';
 import 'widgets/economy_widgets.dart';
 
@@ -765,25 +767,142 @@ class _EssentialPricesSectionState
   }
 }
 
-/// The inflation scenario preview derived from the user's current finances.
-class _ImpactPreviewCard extends StatelessWidget {
+/// The inflation scenario preview derived from the user's current finances and persona.
+class _ImpactPreviewCard extends ConsumerWidget {
   const _ImpactPreviewCard({required this.input});
 
   final EconomicImpactInput input;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final profile = ref.watch(financialProfileControllerProvider).valueOrNull;
     final impact = EconomicImpactService.inflationImpact(input);
     final delta = (EconomicImpactService.demoInflationDelta * 100).round();
+
+    final persona = profile?.persona;
+    final personaLabel = switch (persona) {
+      Persona.student => 'Student / Learner',
+      Persona.salaried => 'Salaried Professional',
+      Persona.businessOwner => 'Business Owner',
+      Persona.shopOwner => 'Retailer / Shopkeeper',
+      null => null,
+    };
+
+    final goalLabel = switch (profile?.primaryGoal) {
+      PrimaryGoal.emergencyFund => 'Emergency Fund',
+      PrimaryGoal.saveMore => 'Save More',
+      PrimaryGoal.education => 'Education',
+      PrimaryGoal.newDevice => 'New Device / Equipment',
+      PrimaryGoal.businessGrowth => 'Business Growth',
+      PrimaryGoal.reduceSpending => 'Reduce Spending',
+      PrimaryGoal.other => 'Financial Security',
+      null => null,
+    };
+
+    final isDeficit = impact.estimatedSavingsCapacity < 0;
+    final decisionTitle = isDeficit
+        ? 'Strategic Alert: Inflation Pressure Exceeds Buffer'
+        : switch (persona) {
+            Persona.student =>
+              'Strategic Guidance: Student Liquidity & Discretionary Control',
+            Persona.businessOwner ||
+            Persona.shopOwner =>
+              'Strategic Advisory: Commercial Margin & Inventory Buffer',
+            Persona.salaried => 'Strategic Decision: Systematic Goal Funding',
+            null => 'Strategic Decision: Inflation Absorption Plan',
+          };
+
+    final decisionBody = isDeficit
+        ? 'Under this +$delta% essential shock, your monthly expenses will exceed your income by ${CurrencyFormat.pkr(impact.estimatedSavingsCapacity.abs())}. Consider curtailing non-essential spends and securing bulk essentials at wholesale prices before projected SPI increases.'
+        : switch (persona) {
+            Persona.student =>
+              'Your low-fixed essential overhead insulates you against macro swings. Preserve your ${CurrencyFormat.pkr(impact.estimatedSavingsCapacity)} monthly margin in liquid savings for upcoming academic milestones.',
+            Persona.businessOwner ||
+            Persona.shopOwner =>
+              'With fuel & transport volatility impacting supply chains, maintain at least 45 days of operating buffer. Re-evaluate supplier contracts and factor an inflation cushion into your retail markup.',
+            Persona.salaried =>
+              'Your cash flow safely absorbs this shock with ${CurrencyFormat.pkr(impact.estimatedSavingsCapacity)} remaining. Direct this surplus toward your goal${goalLabel != null ? ' ($goalLabel)' : ''} before discretionary drift.',
+            null =>
+              'Your monthly margin of ${CurrencyFormat.pkr(impact.estimatedSavingsCapacity)} provides resilience against current price fluctuations. Continue routing surplus into emergency reserves.',
+          };
 
     return AppCard(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (personaLabel != null || goalLabel != null) ...[
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: [
+                if (personaLabel != null)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.person_outline_rounded,
+                          size: 14,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          personaLabel,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                if (goalLabel != null)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.info.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.info.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.flag_outlined,
+                          size: 14,
+                          color: AppColors.info,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          goalLabel,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.info,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
           ImpactFinanceRows(
             income: input.monthlyIncome,
             expenses: input.monthlyExpenses,
@@ -798,6 +917,65 @@ class _ImpactPreviewCard extends StatelessWidget {
               CurrencyFormat.pkr(input.monthlySavings),
             ),
             style: theme.textTheme.bodySmall?.copyWith(height: 1.45),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDeficit
+                  ? AppColors.danger.withValues(alpha: 0.08)
+                  : (isDark
+                      ? AppColors.navySurface
+                      : AppColors.lightSurfaceVariant.withValues(alpha: 0.35)),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isDeficit
+                    ? AppColors.danger.withValues(alpha: 0.3)
+                    : (isDark ? AppColors.borderDark : AppColors.borderLight),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      isDeficit
+                          ? Icons.warning_amber_rounded
+                          : Icons.lightbulb_outline_rounded,
+                      size: 16,
+                      color: isDeficit
+                          ? AppColors.danger
+                          : theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        decisionTitle,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: isDeficit
+                              ? AppColors.danger
+                              : (isDark
+                                  ? AppColors.textOnDark
+                                  : AppColors.textOnLight),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  decisionBody,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    height: 1.4,
+                    color: isDark
+                        ? AppColors.textOnDarkSecondary
+                        : AppColors.textOnLightSecondary,
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 8),
           Text(

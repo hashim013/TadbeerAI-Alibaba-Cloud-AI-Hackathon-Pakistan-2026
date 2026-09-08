@@ -24,6 +24,7 @@ import '../../features/auth/auth_controller.dart';
 import '../../l10n/app_localizations.dart';
 import '../finance/finance_category_visuals.dart';
 import '../finance/widgets/finance_widgets.dart';
+import '../finance/widgets/transaction_form_sheet.dart';
 
 /// The Home tab: modern, executive personal financial command center.
 ///
@@ -89,9 +90,18 @@ class _DashboardContent extends ConsumerWidget {
     final profileAsync = ref.watch(financialProfileControllerProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final income = FinanceCalculations.monthlyIncome(data.transactions, now);
-    final expenses =
+    final profile = profileAsync.valueOrNull;
+    final txIncome = FinanceCalculations.monthlyIncome(data.transactions, now);
+    final txExpenses =
         FinanceCalculations.monthlyExpenses(data.transactions, now);
+    final income =
+        (profile?.monthlyIncome != null && profile!.monthlyIncome! > 0)
+            ? profile.monthlyIncome!
+            : txIncome;
+    final expenses = (profile?.monthlyEssentialExpenses != null &&
+            profile!.monthlyEssentialExpenses! > 0)
+        ? profile.monthlyEssentialExpenses!
+        : txExpenses;
     final savings = income - expenses;
 
     return ListView(
@@ -112,7 +122,8 @@ class _DashboardContent extends ConsumerWidget {
                         child: Text(
                           _greetingText(l10n, user?.name, now.hour),
                           style: GoogleFonts.inter(
-                            color: isDark ? Colors.white : AppColors.textOnLight,
+                            color:
+                                isDark ? Colors.white : AppColors.textOnLight,
                             fontSize: 25,
                             fontWeight: FontWeight.w700,
                             letterSpacing: -0.3,
@@ -261,12 +272,92 @@ class _DashboardContent extends ConsumerWidget {
         // ── 7. Recent Transactions ──────────────────────────────────────────
         SectionHeader(
           l10n.recentTransactions,
-          actionLabel: l10n.viewAll,
-          onAction: () => context.push('/finance/expenses'),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
+                color: isDark ? AppColors.teal : AppColors.tealDeep,
+                tooltip: l10n.addTransactionTitle,
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                onPressed: () => _openTransactionForm(context, ref),
+              ),
+              TextButton(
+                onPressed: () => context.push('/finance/expenses'),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                ),
+                child: Text(l10n.viewAll),
+              ),
+            ],
+          ),
         ),
-        ..._recentTransactions(data).map(
-          (t) => _RecentTransactionRow(transaction: t),
-        ),
+        if (_recentTransactions(data).isEmpty)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.navyCard : AppColors.lightCard,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : AppColors.borderLight,
+              ),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.receipt_long_outlined,
+                    size: 30,
+                    color: (isDark ? Colors.white : AppColors.textOnLight)
+                        .withValues(alpha: 0.35),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'No transactions recorded yet',
+                    style: GoogleFonts.inter(
+                      color: isDark
+                          ? AppColors.textOnDarkSecondary
+                          : AppColors.textOnLightSecondary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  FilledButton.tonalIcon(
+                    onPressed: () => _openTransactionForm(context, ref),
+                    icon: const Icon(Icons.add_rounded, size: 16),
+                    label: Text(
+                      l10n.addTransactionTitle,
+                      style: GoogleFonts.inter(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor:
+                          (isDark ? AppColors.teal : AppColors.tealDeep)
+                              .withValues(alpha: 0.14),
+                      foregroundColor:
+                          isDark ? AppColors.teal : AppColors.tealDeep,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          ..._recentTransactions(data).map(
+            (t) => _RecentTransactionRow(
+              transaction: t,
+              onTap: () => _openTransactionForm(context, ref, existing: t),
+            ),
+          ),
         const SizedBox(height: 16),
 
         // ── 8. Goal Progress ────────────────────────────────────────────────
@@ -281,6 +372,39 @@ class _DashboardContent extends ConsumerWidget {
           const SizedBox(height: 16),
         ],
       ],
+    );
+  }
+
+  Future<void> _openTransactionForm(
+    BuildContext context,
+    WidgetRef ref, {
+    Transaction? existing,
+  }) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (sheetContext) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
+        ),
+        child: TransactionFormSheet(
+          existing: existing,
+          onSubmit: (transaction) async {
+            final controller = ref.read(financeControllerProvider.notifier);
+            if (existing == null) {
+              await controller.addTransaction(transaction);
+            } else {
+              await controller.updateTransaction(transaction);
+            }
+          },
+          onDelete: existing == null
+              ? null
+              : () => ref
+                  .read(financeControllerProvider.notifier)
+                  .deleteTransaction(existing.id),
+        ),
+      ),
     );
   }
 
@@ -1127,9 +1251,13 @@ class _BudgetMiniCard extends StatelessWidget {
 // ── Recent Transaction Row ──────────────────────────────────────────────────
 
 class _RecentTransactionRow extends StatelessWidget {
-  const _RecentTransactionRow({required this.transaction});
+  const _RecentTransactionRow({
+    required this.transaction,
+    this.onTap,
+  });
 
   final Transaction transaction;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1168,7 +1296,11 @@ class _RecentTransactionRow extends StatelessWidget {
           child: InkWell(
             onTap: () {
               HapticFeedback.lightImpact();
-              context.push('/finance/expenses');
+              if (onTap != null) {
+                onTap!();
+              } else {
+                context.push('/finance/expenses');
+              }
             },
             borderRadius: BorderRadius.circular(16),
             child: Padding(

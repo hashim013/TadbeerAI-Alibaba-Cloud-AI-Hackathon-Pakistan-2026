@@ -3,6 +3,7 @@ import 'package:tadbeerai/data/mock/mock_finance_data.dart';
 import 'package:tadbeerai/domain/entities/budget.dart';
 import 'package:tadbeerai/domain/entities/finance_category.dart';
 import 'package:tadbeerai/domain/entities/goal.dart';
+import 'package:tadbeerai/domain/entities/financial_profile.dart';
 import 'package:tadbeerai/domain/services/finance_calculations.dart';
 import 'package:tadbeerai/domain/services/financial_health_calculator.dart';
 import 'package:tadbeerai/domain/services/insight_generator.dart';
@@ -167,6 +168,51 @@ void main() {
       expect(resultAt(45).rating, HealthRating.fair);
       expect(resultAt(44).rating, HealthRating.needsAttention);
       expect(resultAt(0).rating, HealthRating.needsAttention);
+    });
+
+    test(
+        'persona-tailored benchmarks adjust savings and emergency fund expectations',
+        () {
+      // Income = 50,000, Expenses = 45,000 (saving 5,000 = 10% savings rate)
+      // Savings balance = 135,000 (exactly 3 months of expenses)
+      final input = FinancialHealthInput.fromValues(
+        monthlyIncome: 50000,
+        monthlyExpenses: 45000,
+        savingsBalance: 135000,
+        discretionarySpending: 5000,
+        budgets: const [],
+        spentByCategory: const {},
+        goals: const [],
+      );
+
+      // Under student persona: benchmark savings is 10% (gets 100), benchmark emergency is 3 mo (gets 100)
+      final studentResult =
+          FinancialHealthCalculator.calculate(input, persona: Persona.student);
+      final studentSavings =
+          studentResult.components.firstWhere((c) => c.key == 'savings').score;
+      final studentEmergency = studentResult.components
+          .firstWhere((c) => c.key == 'emergency')
+          .score;
+      expect(studentSavings, 100);
+      expect(studentEmergency, 100);
+
+      // Under salaried persona: benchmark savings is 20% (10% gets 50), benchmark emergency is 6 mo (3 mo gets 50)
+      final salariedResult =
+          FinancialHealthCalculator.calculate(input, persona: Persona.salaried);
+      final salariedSavings =
+          salariedResult.components.firstWhere((c) => c.key == 'savings').score;
+      final salariedEmergency = salariedResult.components
+          .firstWhere((c) => c.key == 'emergency')
+          .score;
+      expect(salariedSavings, 50);
+      expect(salariedEmergency, 50);
+
+      // Under business owner persona: benchmark savings is 25% (10% gets 40)
+      final businessResult = FinancialHealthCalculator.calculate(input,
+          persona: Persona.businessOwner);
+      final businessSavings =
+          businessResult.components.firstWhere((c) => c.key == 'savings').score;
+      expect(businessSavings, 40);
     });
   });
 

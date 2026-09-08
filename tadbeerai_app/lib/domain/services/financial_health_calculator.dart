@@ -1,4 +1,5 @@
 import '../entities/budget.dart';
+import '../entities/financial_profile.dart';
 import '../entities/goal.dart';
 
 /// Input for the health score — derived from [FinanceData] or built directly
@@ -129,10 +130,25 @@ abstract final class FinancialHealthCalculator {
 
   static double _clampScore(double value) => value.clamp(0.0, 100.0);
 
-  static FinancialHealthResult calculate(FinancialHealthInput input) {
-    final savings = _savingsComponent(input);
+  static FinancialHealthResult calculate(
+    FinancialHealthInput input, {
+    Persona? persona,
+  }) {
+    final idealSavingsRate = switch (persona) {
+      Persona.student => 0.10,
+      Persona.businessOwner || Persona.shopOwner => 0.25,
+      _ => _idealSavingsRate,
+    };
+
+    final idealEmergencyMonths = switch (persona) {
+      Persona.student => 3.0,
+      Persona.businessOwner || Persona.shopOwner => 6.0,
+      _ => _idealEmergencyMonths,
+    };
+
+    final savings = _savingsComponent(input, idealRate: idealSavingsRate);
     final budget = _budgetComponent(input);
-    final emergency = _emergencyComponent(input);
+    final emergency = _emergencyComponent(input, idealMonths: idealEmergencyMonths);
     final goals = _goalsComponent(input);
     final spending = _spendingComponent(input);
 
@@ -150,13 +166,16 @@ abstract final class FinancialHealthCalculator {
 
   // ── Components ───────────────────────────────────────────────────────────
 
-  static HealthComponent _savingsComponent(FinancialHealthInput input) {
+  static HealthComponent _savingsComponent(
+    FinancialHealthInput input, {
+    double idealRate = _idealSavingsRate,
+  }) {
     double score = 0;
     var rate = 0.0;
     if (input.monthlyIncome > 0) {
       rate =
           (input.monthlyIncome - input.monthlyExpenses) / input.monthlyIncome;
-      score = _clampScore(rate / _idealSavingsRate * 100);
+      score = _clampScore(rate / idealRate * 100);
     }
     return HealthComponent(
       key: 'savings',
@@ -200,16 +219,19 @@ abstract final class FinancialHealthCalculator {
     );
   }
 
-  static HealthComponent _emergencyComponent(FinancialHealthInput input) {
+  static HealthComponent _emergencyComponent(
+    FinancialHealthInput input, {
+    double idealMonths = _idealEmergencyMonths,
+  }) {
     double score;
     var months = 0.0;
     if (input.monthlyExpenses <= 0) {
       // Nothing being spent — the fund trivially covers everything.
       score = 100;
-      months = _idealEmergencyMonths;
+      months = idealMonths;
     } else {
       months = input.savingsBalance / input.monthlyExpenses;
-      score = _clampScore(months / _idealEmergencyMonths * 100);
+      score = _clampScore(months / idealMonths * 100);
     }
     return HealthComponent(
       key: 'emergency',

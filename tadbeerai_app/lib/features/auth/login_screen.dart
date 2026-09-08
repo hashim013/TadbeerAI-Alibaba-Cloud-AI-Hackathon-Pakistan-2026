@@ -51,7 +51,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (success) {
       await _navigatePostAuth();
     } else {
-      setState(() => _guestLoading = false);
+      if (mounted) setState(() => _guestLoading = false);
       final errorMsg =
           authNotifier.lastErrorMessage ?? context.l10n.errorGeneric;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -78,32 +78,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return null;
   }
 
-  Future<void> _signInWithGoogle() async {
-    if (_loading || _guestLoading || _googleLoading) return;
-    FocusManager.instance.primaryFocus?.unfocus();
-    setState(() => _googleLoading = true);
-
-    final authNotifier = ref.read(authControllerProvider.notifier);
-    final success = await authNotifier.signInWithGoogle();
-    if (!mounted) return;
-
-    if (success) {
-      await _navigatePostAuth();
-    } else {
-      setState(() => _googleLoading = false);
-      final errorMsg = authNotifier.lastErrorMessage;
-      if (errorMsg != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMsg),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.danger,
-          ),
-        );
-      }
-    }
-  }
-
   Future<void> _submit() async {
     final form = _formKey.currentState;
     if (form == null || !form.validate()) return;
@@ -123,7 +97,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (success) {
       await _navigatePostAuth();
     } else {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
       final errorMsg =
           authNotifier.lastErrorMessage ?? context.l10n.errorGeneric;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -136,13 +110,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _navigatePostAuth() async {
-    final profile =
-        await ref.read(financialProfileRepositoryProvider).loadProfile();
-    if (!mounted) return;
-    if (profile == null || !profile.profileCompleted) {
-      context.go('/profile/financial');
-    } else {
+    try {
+      final profile =
+          await ref.read(financialProfileRepositoryProvider).loadProfile();
+      if (!mounted) return;
+      if (profile == null || !profile.profileCompleted) {
+        context.go('/profile/financial');
+      } else {
+        context.go('/home');
+      }
+    } catch (_) {
+      if (!mounted) return;
       context.go('/home');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _guestLoading = false;
+          _googleLoading = false;
+        });
+      }
     }
   }
 
@@ -157,7 +144,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _socialAuth(String provider) {
     if (provider == 'Google') {
-      _signInWithGoogle();
+      context.push('/auth/google');
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
@@ -258,10 +245,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                       const SizedBox(height: 38),
 
-                      // Email or Phone Field
+                      // Email Field
                       AppTextField(
                         label: l10n.fieldEmail,
-                        hintText: 'Email or Phone',
+                        hintText: 'name@example.com',
                         controller: _emailController,
                         validator: _validateEmail,
                         keyboardType: TextInputType.emailAddress,

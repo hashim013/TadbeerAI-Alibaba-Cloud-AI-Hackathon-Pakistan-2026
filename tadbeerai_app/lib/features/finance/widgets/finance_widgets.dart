@@ -41,13 +41,20 @@ class DemoDataBadge extends StatelessWidget {
   }
 }
 
-/// Section title row with an optional trailing action.
+/// Section title row with an optional trailing action or custom trailing widget.
 class SectionHeader extends StatelessWidget {
-  const SectionHeader(this.title, {super.key, this.actionLabel, this.onAction});
+  const SectionHeader(
+    this.title, {
+    super.key,
+    this.actionLabel,
+    this.onAction,
+    this.trailing,
+  });
 
   final String title;
   final String? actionLabel;
   final VoidCallback? onAction;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +71,9 @@ class SectionHeader extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          if (actionLabel != null)
+          if (trailing != null)
+            trailing!
+          else if (actionLabel != null)
             TextButton(
               onPressed: onAction,
               style: TextButton.styleFrom(

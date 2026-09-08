@@ -148,10 +148,10 @@ void main() {
     expect(find.text('Spending Discipline'), findsOneWidget);
 
     // 6. Verify Executive Copilot Dock
-    expect(find.text('Improve My Score with AI Copilot'), findsOneWidget);
+    expect(find.text('Improve My Score with AI'), findsOneWidget);
 
     // 7. Tap Copilot Dock and verify navigation to /ask
-    await tester.tap(find.text('Improve My Score with AI Copilot'));
+    await tester.tap(find.text('Improve My Score with AI'));
     await tester.pumpAndSettle();
     expect(find.text('Ask Tadbeer Screen'), findsOneWidget);
   });

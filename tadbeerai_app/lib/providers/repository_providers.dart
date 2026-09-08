@@ -34,10 +34,14 @@ final firebaseAuthProvider = Provider<fb.FirebaseAuth?>((ref) {
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final firebaseAuth = ref.watch(firebaseAuthProvider);
+  final prefs = ref.watch(sharedPrefsProvider);
   if (ApiConfig.useMockAuth || firebaseAuth == null) {
-    return MockAuthRepository(ref.watch(sharedPrefsProvider));
+    return MockAuthRepository(prefs);
   }
-  return FirebaseAuthRepository(firebaseAuth: firebaseAuth);
+  return FirebaseAuthRepository(
+    firebaseAuth: firebaseAuth,
+    prefs: prefs,
+  );
 });
 
 final settingsRepositoryProvider = Provider<SettingsRepository>(

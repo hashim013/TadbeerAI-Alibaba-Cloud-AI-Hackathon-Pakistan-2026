@@ -35,7 +35,16 @@ class _AppButtonState extends State<AppButton> {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(widget.label),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      widget.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
                 if (widget.trailingIcon != null) ...[
                   const SizedBox(width: 8),
                   widget.trailingIcon!,

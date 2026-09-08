@@ -5,10 +5,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tadbeerai/core/theme/app_theme.dart';
 import 'package:tadbeerai/data/mock/mock_commodity_data.dart';
 import 'package:tadbeerai/data/repositories/mock_economic_repository.dart';
+import 'package:tadbeerai/domain/entities/financial_profile.dart';
+import 'package:tadbeerai/domain/repositories/financial_profile_repository.dart';
+import 'package:tadbeerai/domain/services/economic_impact_service.dart';
 import 'package:tadbeerai/features/economy/economic_pulse_screen.dart';
 import 'package:tadbeerai/features/economy/widgets/economy_widgets.dart';
 import 'package:tadbeerai/l10n/app_localizations.dart';
 import 'package:tadbeerai/providers/economic_providers.dart';
+import 'package:tadbeerai/providers/repository_providers.dart';
 
 Widget _buildPulseApp({
   required Widget child,
@@ -166,5 +170,67 @@ void main() {
       // Verify Wheat Flour 10kg and 20kg are visible
       expect(find.text('Wheat Flour (Atta 10 kg)'), findsOneWidget);
     });
+
+    testWidgets(
+        'renders personalized economic decision and persona badge when impact input is present',
+        (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      final profileRepo = _TestProfileRepo(
+        const FinancialProfile(
+          persona: Persona.student,
+          monthlyIncome: 60000,
+          monthlyEssentialExpenses: 35000,
+          primaryGoal: PrimaryGoal.education,
+          profileCompleted: true,
+        ),
+      );
+
+      await tester.pumpWidget(_buildPulseApp(
+        child: const EconomicPulseScreen(),
+        overrides: [
+          financialProfileRepositoryProvider.overrideWithValue(profileRepo),
+          economicImpactInputProvider.overrideWithValue(
+            const EconomicImpactInput(
+              monthlyIncome: 60000,
+              monthlyExpenses: 35000,
+              discretionarySpending: 5000,
+            ),
+          ),
+        ],
+      ));
+      await tester.pump();
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      // Persona badge and primary goal chip are rendered
+      expect(find.text('Student / Learner'), findsOneWidget);
+      expect(find.text('Education'), findsOneWidget);
+
+      // Strategic Guidance decision box is rendered
+      expect(find.textContaining('Strategic Guidance'), findsOneWidget);
+      expect(find.textContaining('academic milestones'), findsOneWidget);
+    });
   });
 }
+
+class _TestProfileRepo implements FinancialProfileRepository {
+  _TestProfileRepo(this._profile);
+  FinancialProfile? _profile;
+
+  @override
+  Future<FinancialProfile?> loadProfile() async => _profile;
+
+  @override
+  Future<void> saveProfile(FinancialProfile profile) async {
+    _profile = profile;
+  }
+
+  @override
+  Future<void> clearProfile() async {
+    _profile = null;
+  }
+}
+

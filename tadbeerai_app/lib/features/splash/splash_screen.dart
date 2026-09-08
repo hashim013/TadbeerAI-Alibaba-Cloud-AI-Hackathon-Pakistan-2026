@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../providers/repository_providers.dart';
+import '../auth/auth_controller.dart';
 
 /// Redesigned brand splash screen for Tadbeer AI 2.0.
 ///
@@ -53,17 +54,22 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   Future<void> _proceedNext() async {
     if (!mounted || _hasNavigated) return;
     _hasNavigated = true;
+
+    // 1. If an active or persisted session exists, navigate straight to /home
+    final hasSession =
+        await ref.read(authControllerProvider.notifier).restoreSession();
+    if (!mounted) return;
+    if (hasSession) {
+      context.go('/home');
+      return;
+    }
+
+    // 2. If no session, route to /login if onboarding was completed, else /onboarding
     final isComplete =
         await ref.read(settingsRepositoryProvider).isOnboardingComplete();
     if (!mounted) return;
     if (isComplete) {
-      final user = await ref.read(authRepositoryProvider).currentUser();
-      if (!mounted) return;
-      if (user != null) {
-        context.go('/home');
-      } else {
-        context.go('/login');
-      }
+      context.go('/login');
     } else {
       context.go('/onboarding');
     }

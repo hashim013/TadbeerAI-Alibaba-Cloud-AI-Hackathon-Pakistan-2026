@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/constants/app_constants.dart';
 import '../../domain/entities/app_user.dart';
 import '../../domain/exceptions/auth_exception.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -14,17 +18,37 @@ class FirebaseAuthRepository implements AuthRepository {
   FirebaseAuthRepository({
     fb.FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
+    SharedPreferences? prefs,
   })  : _firebaseAuth = firebaseAuth ?? fb.FirebaseAuth.instance,
-        _googleSignIn = googleSignIn;
+        _googleSignIn = googleSignIn,
+        _prefs = prefs;
 
   final fb.FirebaseAuth _firebaseAuth;
   final GoogleSignIn? _googleSignIn;
+  final SharedPreferences? _prefs;
+
+  Future<void> _persist(AppUser user) async {
+    await _prefs?.setString(
+      AppConstants.prefSessionUser,
+      jsonEncode(user.toJson()),
+    );
+  }
 
   @override
   Future<AppUser?> currentUser() async {
     final user = _firebaseAuth.currentUser;
-    if (user == null) return null;
-    return _toAppUser(user);
+    if (user != null) {
+      final appUser = _toAppUser(user);
+      await _persist(appUser);
+      return appUser;
+    }
+    final raw = _prefs?.getString(AppConstants.prefSessionUser);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      return AppUser.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    } catch (_) {
+      return null;
+    }
   }
 
   @override
@@ -44,7 +68,9 @@ class FirebaseAuthRepository implements AuthRepository {
           code: 'invalid_credentials',
         );
       }
-      return _toAppUser(user);
+      final appUser = _toAppUser(user);
+      await _persist(appUser);
+      return appUser;
     } on fb.FirebaseAuthException catch (e) {
       throw AuthException.fromFirebaseCode(e.code);
     } on AuthException {
@@ -80,11 +106,13 @@ class FirebaseAuthRepository implements AuthRepository {
       } catch (_) {
         // Non-critical: continue if display name update fails
       }
-      return AppUser(
+      final appUser = AppUser(
         id: user.uid,
         name: name.trim().isNotEmpty ? name.trim() : _nameFromEmail(email),
         email: user.email ?? email.trim(),
       );
+      await _persist(appUser);
+      return appUser;
     } on fb.FirebaseAuthException catch (e) {
       throw AuthException.fromFirebaseCode(e.code);
     } on AuthException {
@@ -103,20 +131,24 @@ class FirebaseAuthRepository implements AuthRepository {
       final credential = await _firebaseAuth.signInAnonymously();
       final user = credential.user;
       if (user != null) {
-        return AppUser(
+        final guest = AppUser(
           id: user.uid,
           name: 'Guest User',
           email: 'guest@tadbeer.ai',
         );
+        await _persist(guest);
+        return guest;
       }
     } catch (_) {
       // Degrade gracefully to offline guest session if anonymous auth is unavailable
     }
-    return const AppUser(
+    const fallbackGuest = AppUser(
       id: 'guest_user',
       name: 'Guest User',
       email: 'guest@tadbeer.ai',
     );
+    await _persist(fallbackGuest);
+    return fallbackGuest;
   }
 
   @override
@@ -149,7 +181,9 @@ class FirebaseAuthRepository implements AuthRepository {
           code: 'google_signin_failed',
         );
       }
-      return _toAppUser(user);
+      final appUser = _toAppUser(user);
+      await _persist(appUser);
+      return appUser;
     } on fb.FirebaseAuthException catch (e) {
       throw AuthException.fromFirebaseCode(e.code);
     } on AuthException {
@@ -168,11 +202,13 @@ class FirebaseAuthRepository implements AuthRepository {
         final resolvedName = (name != null && name.trim().isNotEmpty)
             ? name.trim()
             : _nameFromEmail(resolvedEmail);
-        return AppUser(
+        final appUser = AppUser(
           id: _localId(resolvedEmail),
           name: resolvedName,
           email: resolvedEmail,
         );
+        await _persist(appUser);
+        return appUser;
       }
 
       throw const AuthException(
@@ -219,6 +255,7 @@ class FirebaseAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async {
+    await _prefs?.remove(AppConstants.prefSessionUser);
     try {
       await _firebaseAuth.signOut();
     } catch (_) {}

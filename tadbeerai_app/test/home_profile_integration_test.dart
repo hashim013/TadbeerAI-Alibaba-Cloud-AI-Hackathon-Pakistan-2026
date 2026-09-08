@@ -206,7 +206,7 @@ void main() {
 
     // ── 3. Profile card hidden on home once completed ────────────────────
     testWidgets(
-        'does not show financial profile or edit button on homescreen once profile is completed',
+        'does not show financial profile or edit button on homescreen once profile is completed and displays profile metrics in hero card',
         (tester) async {
       await _pumpHome(
         tester,
@@ -224,6 +224,11 @@ void main() {
       expect(find.text('Edit'), findsNothing);
       expect(find.text('Personalize Tadbeer'), findsNothing);
       expect(find.text('Complete Profile'), findsNothing);
+
+      // Hero card reflects profile income, expenses, and net savings even with empty transactions
+      expect(find.textContaining('80,000'), findsOneWidget);
+      expect(find.textContaining('55,000'), findsOneWidget);
+      expect(find.textContaining('25,000'), findsOneWidget);
     });
 
     // ── 4. CTA navigates to /profile/financial ──────────────────────────

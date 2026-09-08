@@ -20,6 +20,9 @@ class AuthException implements Exception {
       case 'user-not-found':
       case 'wrong-password':
       case 'invalid-credential':
+      case 'invalid-login-credentials':
+      case 'invalid_login_credentials':
+      case 'channel-error':
         return const AuthException(
           message: 'Email or password is incorrect.',
           code: 'invalid_credentials',

@@ -8,9 +8,11 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/l10n_context.dart';
+import '../../../domain/entities/financial_profile.dart';
 import '../../../domain/services/financial_health_calculator.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/finance_providers.dart';
+import '../../../providers/profile_providers.dart';
 import 'widgets/finance_widgets.dart';
 
 /// The Financial Health Score screen with a modern, human-crafted fintech design:
@@ -29,6 +31,8 @@ class FinancialHealthScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(financeControllerProvider);
     final health = ref.watch(financialHealthProvider);
+    final profile = ref.watch(financialProfileControllerProvider).valueOrNull;
+    final persona = profile?.persona;
     final l10n = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -154,6 +158,7 @@ class FinancialHealthScreen extends ConsumerWidget {
                         emergencyComp: emergencyComp,
                         budgetComp: budgetComp,
                         isDark: isDark,
+                        persona: persona,
                       ),
                       const SizedBox(height: 24),
 
@@ -177,9 +182,9 @@ class FinancialHealthScreen extends ConsumerWidget {
                               color: isDark
                                   ? AppColors.textOnDarkSecondary
                                   : AppColors.textOnLightSecondary,
-                              fontSize: 12,
+                              fontSize: 12.5,
                               fontWeight: FontWeight.w700,
-                              letterSpacing: 1.0,
+                              letterSpacing: 0.8,
                             ),
                           ),
                           Text(
@@ -202,18 +207,35 @@ class FinancialHealthScreen extends ConsumerWidget {
                           child: _PillarCard(
                             component: component,
                             isDark: isDark,
+                            persona: persona,
                           ),
                         ),
                       ),
                       const SizedBox(height: 12),
 
-                      // ── 5. How It Works Transparency Card ──────────────────
-                      _MethodologyCard(
-                        title: l10n.howScoreWorks,
-                        body: l10n.howScoreWorksBody,
-                        isDark: isDark,
-                        onViewDetails: () =>
-                            _showMethodologySheet(context, l10n, isDark),
+                      // ── 5. Transparent Scoring Methodology Link ───────────
+                      Center(
+                        child: TextButton.icon(
+                          onPressed: () =>
+                              _showMethodologySheet(context, l10n, isDark),
+                          icon: Icon(
+                            Icons.verified_outlined,
+                            size: 16,
+                            color: isDark
+                                ? AppColors.teal
+                                : const Color(0xFF0D9488),
+                          ),
+                          label: Text(
+                            'View Scoring Methodology & Weights',
+                            style: GoogleFonts.inter(
+                              color: isDark
+                                  ? AppColors.teal
+                                  : const Color(0xFF0D9488),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 16),
                     ],
@@ -483,19 +505,32 @@ class _HeroMetricStrip extends StatelessWidget {
     required this.emergencyComp,
     required this.budgetComp,
     required this.isDark,
+    this.persona,
   });
 
   final HealthComponent? savingsComp;
   final HealthComponent? emergencyComp;
   final HealthComponent? budgetComp;
   final bool isDark;
+  final Persona? persona;
 
   @override
   Widget build(BuildContext context) {
-    final savingsRate = savingsComp?.detailParams['rate'] ?? '0%';
+    final rawRate = savingsComp?.detailParams['rate'] ?? '0';
+    final savingsRate = rawRate.endsWith('%') ? rawRate : '$rawRate%';
     final emergencyMonths = emergencyComp?.detailParams['months'] ?? '0.0';
     final onTrack = budgetComp?.detailParams['onTrack'] ?? '0';
     final totalBudgets = budgetComp?.detailParams['total'] ?? '0';
+
+    final idealSavings = switch (persona) {
+      Persona.student => 'Ideal ≥ 10%',
+      Persona.businessOwner || Persona.shopOwner => 'Ideal ≥ 25%',
+      _ => 'Ideal ≥ 20%',
+    };
+    final idealEmergency = switch (persona) {
+      Persona.student => 'Target 3.0 mo',
+      _ => 'Target 6.0 mo',
+    };
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -525,7 +560,7 @@ class _HeroMetricStrip extends StatelessWidget {
             child: _MetricItem(
               label: 'Savings Rate',
               value: savingsRate,
-              benchmark: 'Ideal ≥ 20%',
+              benchmark: idealSavings,
               color: const Color(0xFF10B981),
               isDark: isDark,
             ),
@@ -537,7 +572,7 @@ class _HeroMetricStrip extends StatelessWidget {
             child: _MetricItem(
               label: 'Emergency',
               value: '$emergencyMonths mo',
-              benchmark: 'Target 6.0 mo',
+              benchmark: idealEmergency,
               color: const Color(0xFF0EA5E9),
               isDark: isDark,
             ),
@@ -882,10 +917,12 @@ class _PillarCard extends StatefulWidget {
   const _PillarCard({
     required this.component,
     required this.isDark,
+    this.persona,
   });
 
   final HealthComponent component;
   final bool isDark;
+  final Persona? persona;
 
   @override
   State<_PillarCard> createState() => _PillarCardState();
@@ -899,7 +936,7 @@ class _PillarCardState extends State<_PillarCard> {
     final l10n = context.l10n;
     final isDark = widget.isDark;
     final component = widget.component;
-    final config = _getConfig(component.key, component.score);
+    final config = _getConfig(component.key, component.score, widget.persona);
     final (ratingText, ratingColor) = _ratingInfo(component.score);
 
     return Container(
@@ -979,7 +1016,7 @@ class _PillarCardState extends State<_PillarCard> {
                               fontSize: 12.5,
                               fontWeight: FontWeight.w400,
                             ),
-                            maxLines: 1,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -1141,14 +1178,27 @@ class _PillarCardState extends State<_PillarCard> {
     Color color,
     String Function(HealthComponent) metricText,
     String tipText,
-  }) _getConfig(String key, int score) {
+  }) _getConfig(String key, int score, Persona? persona) {
+    final idealSavings = switch (persona) {
+      Persona.student => 10,
+      Persona.businessOwner || Persona.shopOwner => 25,
+      _ => 20,
+    };
+    final idealEmergency = switch (persona) {
+      Persona.student => '3.0',
+      _ => '6.0',
+    };
+
     return switch (key) {
       'savings' => (
           title: 'Savings Behavior',
           icon: Icons.savings_rounded,
           color: const Color(0xFF10B981),
-          metricText: (c) =>
-              '${c.detailParams['rate'] ?? '0%'} of income saved (Ideal ≥ 20%)',
+          metricText: (c) {
+            final rate = c.detailParams['rate'] ?? '0';
+            final rateFormatted = rate.endsWith('%') ? rate : '$rate%';
+            return '$rateFormatted of income saved • Ideal ≥ $idealSavings%';
+          },
           tipText:
               'Automating a transfer into savings on payday ensures disciplined accumulation.',
         ),
@@ -1167,16 +1217,20 @@ class _PillarCardState extends State<_PillarCard> {
           color:
               score >= 65 ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
           metricText: (c) =>
-              '${c.detailParams['months'] ?? '0'} months covered (Target 6 mo)',
-          tipText:
-              'Keep emergency savings in liquid, low-risk accounts easily accessible during shocks.',
+              '${c.detailParams['months'] ?? '0'} months covered • Target $idealEmergency mo',
+          tipText: persona == Persona.student
+              ? 'Maintaining at least a 3-month buffer covers student essentials during unforeseen disruptions.'
+              : 'Keep emergency savings in liquid, low-risk accounts easily accessible during shocks.',
         ),
       'goals' => (
           title: 'Goal Progress',
           icon: Icons.flag_rounded,
           color: const Color(0xFF8B5CF6),
-          metricText: (c) =>
-              '${c.detailParams['percent'] ?? '0'}% average milestone completion',
+          metricText: (c) {
+            final pct = c.detailParams['percent'] ?? '0';
+            final pctFormatted = pct.endsWith('%') ? pct : '$pct%';
+            return '$pctFormatted average milestone completion';
+          },
           tipText:
               'Consistent monthly progress towards active targets turns ambitions into reality.',
         ),
@@ -1184,8 +1238,11 @@ class _PillarCardState extends State<_PillarCard> {
           title: 'Spending Discipline',
           icon: Icons.pie_chart_rounded,
           color: const Color(0xFFF59E0B),
-          metricText: (c) =>
-              '${c.detailParams['percent'] ?? '0'}% spent on wants (Ideal 10–30%)',
+          metricText: (c) {
+            final pct = c.detailParams['percent'] ?? '0';
+            final pctFormatted = pct.endsWith('%') ? pct : '$pct%';
+            return '$pctFormatted spent on wants • Ideal 10–30%';
+          },
           tipText:
               'Balancing lifestyle desires with essential priorities prevents budget creep.',
         ),
@@ -1210,104 +1267,6 @@ class _PillarCardState extends State<_PillarCard> {
       'goals' => l10n.healthDetailGoals(params['percent'] ?? '0'),
       _ => l10n.healthDetailSpending(params['percent'] ?? '0'),
     };
-  }
-}
-
-// ── Methodology Card ────────────────────────────────────────────────────────
-
-class _MethodologyCard extends StatelessWidget {
-  const _MethodologyCard({
-    required this.title,
-    required this.body,
-    required this.isDark,
-    required this.onViewDetails,
-  });
-
-  final String title;
-  final String body;
-  final bool isDark;
-  final VoidCallback onViewDetails;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.navyCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : AppColors.borderLight,
-          width: 1.2,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.verified_rounded,
-                size: 18,
-                color: isDark ? AppColors.teal : const Color(0xFF0D9488),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  title,
-                  style: GoogleFonts.inter(
-                    color: isDark ? Colors.white : AppColors.textOnLight,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: onViewDetails,
-                borderRadius: BorderRadius.circular(6),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Details',
-                        style: GoogleFonts.inter(
-                          color:
-                              isDark ? AppColors.teal : const Color(0xFF0D9488),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 2),
-                      Icon(
-                        Icons.chevron_right_rounded,
-                        size: 16,
-                        color:
-                            isDark ? AppColors.teal : const Color(0xFF0D9488),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            body,
-            style: GoogleFonts.inter(
-              color: isDark
-                  ? AppColors.textOnDarkSecondary
-                  : AppColors.textOnLightSecondary,
-              fontSize: 13,
-              height: 1.45,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 
@@ -1484,10 +1443,10 @@ class _ExecutiveCopilotDock extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        20,
-        12,
-        20,
-        math.max(MediaQuery.of(context).padding.bottom, 16),
+        16,
+        10,
+        16,
+        math.max(MediaQuery.of(context).padding.bottom, 14),
       ),
       decoration: BoxDecoration(
         color: isDark ? AppColors.navyElevated : Colors.white,
@@ -1529,36 +1488,37 @@ class _ExecutiveCopilotDock extends StatelessWidget {
               context.push('/ask');
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       Icons.auto_awesome_rounded,
                       color: isDark ? AppColors.navyBg : Colors.white,
-                      size: 18,
+                      size: 19,
                     ),
                     const SizedBox(width: 8),
                     Flexible(
-                      child: Text(
-                        'Improve My Score with AI Copilot',
-                        style: GoogleFonts.inter(
-                          color: isDark ? AppColors.navyBg : Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.2,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'Improve My Score with AI',
+                          style: GoogleFonts.inter(
+                            color: isDark ? AppColors.navyBg : Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.1,
+                          ),
+                          maxLines: 1,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 8),
                     Icon(
                       Icons.arrow_forward_rounded,
                       color: isDark ? AppColors.navyBg : Colors.white,
-                      size: 17,
+                      size: 18,
                     ),
                   ],
                 ),

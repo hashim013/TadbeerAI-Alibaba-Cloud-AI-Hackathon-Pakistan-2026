@@ -25,6 +25,11 @@ Future<void> _pumpLogin(WidgetTester tester) async {
         path: '/home',
         builder: (context, state) => const Scaffold(body: SizedBox()),
       ),
+      GoRoute(
+        path: '/auth/google',
+        builder: (context, state) =>
+            const Scaffold(body: Text('Google Auth Screen')),
+      ),
     ],
   );
 
@@ -115,5 +120,19 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(LoginScreen), findsNothing);
+  });
+
+  testWidgets('tapping Continue with Google navigates to /auth/google',
+      (tester) async {
+    await _pumpLogin(tester);
+
+    final googleButton = find.text('Continue with Google');
+    expect(googleButton, findsOneWidget);
+
+    await tester.ensureVisible(googleButton);
+    await tester.tap(googleButton);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Google Auth Screen'), findsOneWidget);
   });
 }
