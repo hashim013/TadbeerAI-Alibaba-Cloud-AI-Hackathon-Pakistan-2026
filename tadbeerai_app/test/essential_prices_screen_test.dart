@@ -101,7 +101,8 @@ void main() {
       expect(find.text('Mill-gate prices adjusted upward.'), findsOneWidget);
       expect(find.text('Why It Matters'), findsOneWidget);
       expect(
-        find.text('Essential caloric staple for everyday Pakistani households.'),
+        find.text(
+            'Essential caloric staple for everyday Pakistani households.'),
         findsOneWidget,
       );
       expect(find.text('Household Budget Impact'), findsOneWidget);
@@ -137,21 +138,25 @@ void main() {
 
       // Verify category filter chips are present
       expect(find.text('All'), findsOneWidget);
-      expect(find.text('Vegetables'), findsOneWidget);
+      expect(find.text('Food & Staples'), findsOneWidget);
 
       // Verify commodity cards are rendered
       expect(find.byType(CommodityCard), findsWidgets);
 
-      // Verify tapping 'View all 16 items' expands the list
-      final viewAllButton = find.text('View all 16 items');
-      if (viewAllButton.evaluate().isNotEmpty) {
-        await tester.tap(viewAllButton);
+      // Verify tapping 'View all 13 items' expands the list if present
+      final viewAllFinder = find.byWidgetPredicate(
+        (widget) =>
+            widget is Text && (widget.data?.contains('View all') ?? false),
+      );
+      if (viewAllFinder.evaluate().isNotEmpty) {
+        await tester.tap(viewAllFinder);
         await tester.pumpAndSettle();
         expect(find.text('Show less'), findsOneWidget);
       }
     });
 
-    testWidgets('filtering by Vegetables category updates the commodity list',
+    testWidgets(
+        'filtering by Food & Staples category updates the commodity list',
         (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 1.0;
@@ -164,14 +169,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tap on the Vegetables category chip
-      final vegChip = find.text('Vegetables');
-      expect(vegChip, findsOneWidget);
-      await tester.tap(vegChip);
+      // Tap on the Food & Staples category chip
+      final staplesChip = find.text('Food & Staples');
+      expect(staplesChip, findsOneWidget);
+      await tester.tap(staplesChip);
       await tester.pumpAndSettle();
 
-      // Vegetables should include Tomatoes or Onions or Potatoes
-      expect(find.text('Tomatoes'), findsOneWidget);
+      // Food & Staples includes Wheat Flour (Atta 10 kg)
+      expect(find.text('Wheat Flour (Atta 10 kg)'), findsOneWidget);
     });
   });
 }

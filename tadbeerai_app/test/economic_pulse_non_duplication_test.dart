@@ -44,7 +44,7 @@ void main() {
   group('Essential Commodities Dataset (Zero Duplication & Full Staples)', () {
     test('seedItems contains all essential staples with unique IDs', () {
       final items = MockCommodityData.seedItems(DateTime.now());
-      expect(items.length, greaterThanOrEqualTo(20));
+      expect(items.length, greaterThanOrEqualTo(12));
 
       // Verify no duplicate IDs
       final idSet = <String>{};
@@ -119,7 +119,8 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(_buildPulseApp(child: const EconomicPulseScreen()));
+      await tester
+          .pumpWidget(_buildPulseApp(child: const EconomicPulseScreen()));
       await tester.pumpAndSettle();
 
       // Exactly ONE IndicatorTrendChart is rendered in the interactive explorer
@@ -138,7 +139,8 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(_buildPulseApp(child: const EconomicPulseScreen()));
+      await tester
+          .pumpWidget(_buildPulseApp(child: const EconomicPulseScreen()));
       await tester.pumpAndSettle();
 
       // Tap on Cooking & Fuel chip
@@ -158,7 +160,8 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(_buildPulseApp(child: const EconomicPulseScreen()));
+      await tester
+          .pumpWidget(_buildPulseApp(child: const EconomicPulseScreen()));
       await tester.pumpAndSettle();
 
       // Tap on Food & Staples chip
@@ -233,4 +236,3 @@ class _TestProfileRepo implements FinancialProfileRepository {
     _profile = null;
   }
 }
-

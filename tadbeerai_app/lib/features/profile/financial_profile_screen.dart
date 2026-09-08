@@ -1453,6 +1453,44 @@ class _FinancialProfileScreenState
                   ),
                 ),
               ),
+              InkWell(
+                onTap: () => setState(() => _overrideStepped = true),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: (isDark ? AppColors.teal : const Color(0xFF0D9488))
+                        .withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: (isDark ? AppColors.teal : const Color(0xFF0D9488))
+                          .withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.auto_stories_outlined,
+                        size: 14,
+                        color:
+                            isDark ? AppColors.teal : const Color(0xFF0D9488),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Step Wizard',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color:
+                              isDark ? AppColors.teal : const Color(0xFF0D9488),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -1633,14 +1671,6 @@ class _FinancialProfileScreenState
               onPressed:
                   _saving ? null : () => Navigator.of(context).maybePop(),
               child: Text(l10n.profileNotNow),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Center(
-            child: TextButton.icon(
-              onPressed: () => setState(() => _overrideStepped = true),
-              icon: const Icon(Icons.auto_stories_outlined, size: 16),
-              label: const Text('Switch to Guided 4-Step Wizard'),
             ),
           ),
         ],

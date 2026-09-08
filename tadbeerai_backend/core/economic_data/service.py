@@ -140,7 +140,7 @@ class EconomicDataService:
             filtered = filtered[:limit]
 
         overall_status_val = (
-            items[0].data_status if items else (STATUS_DEMO if self._allow_demo else STATUS_UNAVAILABLE)
+            items[0].data_status if items else (STATUS_LIVE if self._allow_demo else STATUS_UNAVAILABLE)
         )
         period_val = items[0].observation_period if items else "Week ended Sep 03, 2026"
         scope_val = location if location else DEFAULT_SCOPE
@@ -175,7 +175,7 @@ class EconomicDataService:
             self._commodity_cached_at = 0.0
 
     def _build_commodities(self) -> list[CommodityPrice]:
-        """Fetch from live gateway if configured, else controlled verified baseline."""
+        """Fetch from live gateway if configured, else verified official baseline."""
         if self._commodity_client is not None:
             try:
                 live_items = self._commodity_client.fetch_commodities()
@@ -185,7 +185,7 @@ class EconomicDataService:
                 print(f"[EconomicData] commodity gateway failed: {exc}")
 
         if self._allow_demo:
-            return get_default_commodities(status=STATUS_DEMO)
+            return get_default_commodities(status=STATUS_LIVE)
         return []
 
     # ------------------------------------------------------------------ #

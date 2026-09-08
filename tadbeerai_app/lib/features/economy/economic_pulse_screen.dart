@@ -79,6 +79,7 @@ class _EconomicPulseContentState extends ConsumerState<_EconomicPulseContent> {
         (economy.indicators.isNotEmpty ? economy.indicators.first : null);
 
     return ListView(
+      physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
       children: [
         // ── Executive Header ───────────────────────────────────────────────
@@ -504,11 +505,9 @@ class _EssentialPricesSectionState
 
   static const _categories = [
     'All',
-    'Cooking & Fuel',
     'Food & Staples',
     'Dairy & Poultry',
-    'Vegetables',
-    'Pulses',
+    'Cooking & Fuel',
   ];
 
   @override
@@ -547,7 +546,7 @@ class _EssentialPricesSectionState
       ),
       data: (overview) {
         final items = overview.items;
-        // Show initial 6 primary staple items; expand to show all 20
+        // Show initial 6 primary staple items; expand to show all 12
         final visibleItems = _expanded ? items : items.take(6).toList();
 
         return Column(
@@ -589,15 +588,14 @@ class _EssentialPricesSectionState
             // ── Category Filter Pills ─────────────────────────────────────
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
+              physics: const ClampingScrollPhysics(),
               child: Row(
                 children: _categories.map((category) {
                   final isSelected = selectedCategory == category;
                   final label = switch (category) {
                     'All' => l10n.essentialPricesCategoryAll,
-                    'Vegetables' => l10n.essentialPricesCategoryVegetables,
                     'Dairy & Poultry' => l10n.essentialPricesCategoryDairy,
                     'Food & Staples' => l10n.essentialPricesCategoryStaples,
-                    'Pulses' => l10n.essentialPricesCategoryPulses,
                     'Cooking & Fuel' => l10n.essentialPricesCategoryCookingFuel,
                     _ => category,
                   };

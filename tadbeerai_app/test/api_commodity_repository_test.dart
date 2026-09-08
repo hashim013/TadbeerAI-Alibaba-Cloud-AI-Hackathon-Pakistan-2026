@@ -183,10 +183,11 @@ void main() {
       final allOverview = await repo.getEssentialPrices();
       expect(allOverview.items, isNotEmpty);
 
-      final vegOverview = await repo.getEssentialPrices(category: 'Vegetables');
-      expect(vegOverview.items, isNotEmpty);
-      for (final item in vegOverview.items) {
-        expect(item.category.toLowerCase(), 'vegetables');
+      final staplesOverview =
+          await repo.getEssentialPrices(category: 'Food & Staples');
+      expect(staplesOverview.items, isNotEmpty);
+      for (final item in staplesOverview.items) {
+        expect(item.category.toLowerCase(), 'food & staples');
       }
 
       final item = await repo.getCommodity('wheat_flour');

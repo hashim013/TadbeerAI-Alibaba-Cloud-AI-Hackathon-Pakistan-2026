@@ -410,19 +410,19 @@ class TestEssentialPricesEndpoint:
 
     def test_essential_prices_category_filter(self, make_client):
         client = make_client(primary=ScriptedAgentProvider())
-        response = client.get("/v1/economy/essential-prices?category=Vegetables")
+        response = client.get("/v1/economy/essential-prices?category=Food%20%26%20Staples")
         assert response.status_code == 200
         body = response.json()
         assert len(body["items"]) > 0
-        assert all(item["category"] == "Vegetables" for item in body["items"])
+        assert all(item["category"] == "Food & Staples" for item in body["items"])
 
     def test_essential_price_detail_found(self, make_client):
         client = make_client(primary=ScriptedAgentProvider())
-        response = client.get("/v1/economy/essential-prices/tomatoes")
+        response = client.get("/v1/economy/essential-prices/wheat_flour_10kg")
         assert response.status_code == 200
         body = response.json()
-        assert body["id"] == "tomatoes"
-        assert body["name"] == "Tomatoes"
+        assert body["id"] == "wheat_flour_10kg"
+        assert "Wheat Flour" in body["name"]
         assert body["price"] > 0
         assert body["source_name"] == "Pakistan Bureau of Statistics (PBS)"
 

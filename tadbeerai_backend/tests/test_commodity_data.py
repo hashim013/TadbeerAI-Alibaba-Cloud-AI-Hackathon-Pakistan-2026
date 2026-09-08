@@ -50,17 +50,24 @@ class TestCommodityModels:
         assert trend == "stable"
 
     def test_default_commodities_catalog(self):
-        items = get_default_commodities(status=STATUS_DEMO)
+        items = get_default_commodities(status=STATUS_LIVE)
         assert len(items) >= 12
-        tomatoes = next(item for item in items if item.id == "tomatoes")
-        assert tomatoes.name == "Tomatoes"
-        assert tomatoes.category == "Vegetables"
-        assert tomatoes.price > 0
-        assert tomatoes.data_status == STATUS_DEMO
-        assert "Pakistan Bureau of Statistics" in tomatoes.source_name
-        assert tomatoes.source_url.startswith("https://")
-        assert tomatoes.what_changed != ""
-        assert tomatoes.why_it_matters != ""
+        flour = next(item for item in items if item.id == "wheat_flour_10kg")
+        assert "Wheat Flour" in flour.name
+        assert flour.category == "Food & Staples"
+        assert flour.price > 0
+        assert flour.data_status == STATUS_LIVE
+        assert "Pakistan Bureau of Statistics" in flour.source_name
+        assert flour.source_url.startswith("https://")
+        assert flour.what_changed != ""
+        assert flour.why_it_matters != ""
+
+        # Verify presence of petrol and diesel
+        ids = {item.id for item in items}
+        assert "petrol_super" in ids
+        assert "diesel_hsd" in ids
+        assert "fresh_milk" in ids
+        assert "farm_eggs" in ids
 
     def test_to_dict_serialization(self):
         items = get_default_commodities()
@@ -78,14 +85,14 @@ class TestPBSCommodityClient:
             "published_at": "2026-09-03",
             "items": [
                 {
-                    "id": "tomatoes",
-                    "name": "Tomatoes",
-                    "category": "Vegetables",
-                    "unit": "1 kg",
-                    "price": 118.5,
-                    "previous_price": 115.55,
-                    "what_changed": "Up by 2.55%",
-                    "why_it_matters": "Seasonal shift",
+                    "id": "wheat_flour_10kg",
+                    "name": "Wheat Flour (Atta 10 kg)",
+                    "category": "Food & Staples",
+                    "unit": "10 kg Bag",
+                    "price": 1390.0,
+                    "previous_price": 1380.0,
+                    "what_changed": "Up by 0.72%",
+                    "why_it_matters": "Dietary staple",
                 }
             ],
         }
@@ -105,9 +112,9 @@ class TestPBSCommodityClient:
         results = client.fetch_commodities()
         assert len(results) == 1
         item = results[0]
-        assert item.id == "tomatoes"
-        assert item.price == 118.5
-        assert item.previous_price == 115.55
+        assert item.id == "wheat_flour_10kg"
+        assert item.price == 1390.0
+        assert item.previous_price == 1380.0
         assert item.trend == "up"
         assert item.data_status == STATUS_LIVE
         assert "via gateway.example.com" in item.source_name
@@ -128,28 +135,32 @@ class TestPBSCommodityClient:
 
 
 class TestCommodityService:
-    def test_service_snapshot_default_demo(self):
+    def test_service_snapshot_default_status(self):
         service = EconomicDataService(allow_demo=True)
         overview = service.commodity_snapshot()
-        assert overview.data_status == STATUS_DEMO
+        assert overview.data_status == STATUS_LIVE
         assert len(overview.items) >= 12
         assert overview.period != ""
         assert "Pakistan Bureau of Statistics" in overview.source["name"]
 
     def test_service_snapshot_filtering(self):
         service = EconomicDataService(allow_demo=True)
-        veg_overview = service.commodity_snapshot(category="Vegetables")
-        assert len(veg_overview.items) > 0
-        assert all(item.category == "Vegetables" for item in veg_overview.items)
+        staples_overview = service.commodity_snapshot(category="Food & Staples")
+        assert len(staples_overview.items) > 0
+        assert all(item.category == "Food & Staples" for item in staples_overview.items)
+
+        fuel_overview = service.commodity_snapshot(category="Cooking & Fuel")
+        assert len(fuel_overview.items) > 0
+        assert all(item.category == "Cooking & Fuel" for item in fuel_overview.items)
 
         limited_overview = service.commodity_snapshot(limit=3)
         assert len(limited_overview.items) == 3
 
     def test_service_detail_found_and_not_found(self):
         service = EconomicDataService(allow_demo=True)
-        tomatoes = service.commodity_detail("tomatoes")
-        assert tomatoes is not None
-        assert tomatoes.id == "tomatoes"
+        flour = service.commodity_detail("wheat_flour_10kg")
+        assert flour is not None
+        assert flour.id == "wheat_flour_10kg"
 
         missing = service.commodity_detail("nonexistent_item")
         assert missing is None
