@@ -652,7 +652,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get economySourceStatusLive => 'Live official data';
 
   @override
-  String get economySourceStatusPartial => 'Partly live, partly demo';
+  String get economySourceStatusPartial => 'Partly live data';
 
   @override
   String get economySourceStatusDemo => 'Synthetic demo data — not live';
@@ -1135,10 +1135,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get liveAiBadge => 'Tadbeer AI';
 
   @override
-  String get dataStatusLive => 'Live economic data';
+  String get dataStatusLive => 'Live data';
 
   @override
-  String get dataStatusPartial => 'Some indicators use demo data';
+  String get dataStatusPartial => 'Partial live data';
 
   @override
   String get dataStatusDemo => 'Demo economic data';

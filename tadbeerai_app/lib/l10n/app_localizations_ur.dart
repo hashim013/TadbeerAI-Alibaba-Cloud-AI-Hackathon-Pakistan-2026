@@ -2231,7 +2231,7 @@ class AppLocalizationsUrLatn extends AppLocalizationsUr {
   String get economySourceStatusLive => 'Live sarkari data';
 
   @override
-  String get economySourceStatusPartial => 'Juzwi live, juzwi demo';
+  String get economySourceStatusPartial => 'Juzwi live data';
 
   @override
   String get economySourceStatusDemo => 'Synthetic demo data — live nahi';
@@ -2718,10 +2718,10 @@ class AppLocalizationsUrLatn extends AppLocalizationsUr {
   String get liveAiBadge => 'Tadbeer AI';
 
   @override
-  String get dataStatusLive => 'Live maashi data';
+  String get dataStatusLive => 'Live data';
 
   @override
-  String get dataStatusPartial => 'Kuch ashariye demo data par hain';
+  String get dataStatusPartial => 'Juzwi live data';
 
   @override
   String get dataStatusDemo => 'Demo maashi data';

@@ -1260,7 +1260,7 @@ abstract class AppLocalizations {
   /// No description provided for @economySourceStatusPartial.
   ///
   /// In en, this message translates to:
-  /// **'Partly live, partly demo'**
+  /// **'Partly live data'**
   String get economySourceStatusPartial;
 
   /// No description provided for @economySourceStatusDemo.
@@ -2026,13 +2026,13 @@ abstract class AppLocalizations {
   /// No description provided for @dataStatusLive.
   ///
   /// In en, this message translates to:
-  /// **'Live economic data'**
+  /// **'Live data'**
   String get dataStatusLive;
 
   /// No description provided for @dataStatusPartial.
   ///
   /// In en, this message translates to:
-  /// **'Some indicators use demo data'**
+  /// **'Partial live data'**
   String get dataStatusPartial;
 
   /// No description provided for @dataStatusDemo.
