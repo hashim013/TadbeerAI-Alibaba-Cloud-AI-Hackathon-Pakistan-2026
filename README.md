@@ -73,8 +73,8 @@ Developed with passion for the **Alibaba Cloud AI Hackathon Pakistan 2026**:
 | Team Member | Role & Core Responsibilities |
 | :--- | :--- |
 | **Muhammad Hashim** | **Team Lead & Full-Stack Architect**<br/>• Mobile architecture (Flutter & Riverpod) & UI/UX design systems<br/>• Multi-agent pipeline integration & deterministic math engines<br/>• End-to-end performance optimization & testing |
-| **Rao Abdullah** | **AI & Backend Systems Engineer**<br/>• LangGraph multi-agent orchestration & supervisor routing logic<br/>• FastAPI gateway architecture, async microservices & Dockerization<br/>• LLM adapter reliability & fallback strategies |
-| **Amir Ali** | **Data Engineering & Macro Integration**<br/>• World Bank indicators API & PBS Sensitive Price Indicator (SPI) pipelines<br/>• Macroeconomic data modeling, provenance tracking & status badges<br/>• Scenario simulation parameter calibration |
+| **Amir Ali** | **AI & Backend Systems Engineer**<br/>• LangGraph multi-agent orchestration & supervisor routing logic<br/>• FastAPI gateway architecture, async microservices & Dockerization<br/>• LLM adapter reliability & fallback strategies |
+| **Rao Abdullah** | **Data Engineering & Macro Integration**<br/>• World Bank indicators API & PBS Sensitive Price Indicator (SPI) pipelines<br/>• Macroeconomic data modeling, provenance tracking & status badges<br/>• Scenario simulation parameter calibration |
 | **Khet Meshwari** | **FinTech Domain & Financial Inclusion Lead**<br/>• 5-Pillar Financial Health Index & 50/30/20 localized budgeting rules<br/>• Persona logic (Salaried, Student, Business Owner, Retailer)<br/>• Trilingual localization (English, Urdu, Roman Urdu) & user validation |
 
 ---
